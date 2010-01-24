@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.*;
 
 import com.thoughtworks.xstream.*;
 
@@ -21,24 +24,44 @@ public class Npvrd {
 		String groupIp = "224.0.0.1";
 		int groupPort = 1234;
 		String targetFile = "stream.ts";
+		Date poczatekNagrywania = null;
+		Date koniecNagrywania = null;
+		Calendar cal = Calendar.getInstance();
+		
+		poczatekNagrywania = cal.getTime();
+		koniecNagrywania = new Date(poczatekNagrywania.getTime());
 		
 		for (int i = 0; i < args.length; i++) {
 			System.out.println(args[i]);
 			if (args[i].equals("-c")) {
-				System.out.println("Plik konfiguracyjny: " + args[++i]);
-				configFile = args[i];
+				configFile = args[++i];
 			}
-			if (args[i].equals("-g")) {
-				System.out.println("Wybrana grupa: " + args[++i]);
-				groupIp = args[i];
+			else if (args[i].equals("-g")) {
+				groupIp = args[++i];
 			}
-			if (args[i].equals("-p")) {
-				System.out.println("Wybrany port: " + args[++i]);
-				groupPort = Integer.parseInt(args[i]);
+			else if (args[i].equals("-p")) {
+				groupPort = Integer.parseInt(args[++i]);
 			}
-			if (args[i].equals("-o")) {
-				System.out.println("Wybrany plik: " + args[++i]);
-				targetFile = args[i];
+			else if (args[i].equals("-o")) {
+				targetFile = args[++i];
+			}
+			else if (args[i].equals("-b")) {
+				try {
+					poczatekNagrywania = DateFormat.getInstance().parse(args[++i]);
+				} catch (ParseException e) {
+					System.err.println("Błędny format daty rozpoczęcia nagrywania.");
+				}
+			}
+			else if (args[i].equals("-e")) {
+				try {
+					koniecNagrywania = DateFormat.getInstance().parse(args[++i]);
+				} catch (ParseException e) {
+					System.err.println("Błędny format daty zakończenia nagrywania.");
+				}
+			}
+			else if (args[i].equals("-t")) {
+				int seconds = Integer.parseInt(args[++i]);
+				koniecNagrywania.setTime(koniecNagrywania.getTime() + (seconds * 1000));
 			}
 		}
 		
@@ -53,7 +76,6 @@ public class Npvrd {
 			System.out.println("Nie znalazłem pliku konfiguracyjnego!");
 		}
 		
-		int counter = 0;
 		try {
 			InetAddress group = InetAddress.getByName(groupIp);
 			MulticastSocket sock = new MulticastSocket(groupPort);
@@ -61,20 +83,29 @@ public class Npvrd {
 			
 			FileOutputStream fos = new FileOutputStream(targetFile);
 			
-			System.out.println("Odbieram strumien:");
 			byte[] buf = new byte[sock.getReceiveBufferSize()];
 			DatagramPacket recv = new DatagramPacket(buf, buf.length);
 			
-			while (counter < 100000000)
+			System.out.println("Czekam na: " + poczatekNagrywania.toGMTString());
+			
+			while (System.currentTimeMillis() < poczatekNagrywania.getTime())
+			{
+				
+			}
+			
+			System.out.println("Rozpoczynam nagrywanie.");
+			
+			while (System.currentTimeMillis() < koniecNagrywania.getTime())
 			{
 				sock.receive(recv);
 				
 				recv.getData();
 				fos.write(recv.getData());
-				
-				counter += buf.length;
-				System.out.println(counter);
 			}
+			
+			System.out.println("Jest już: " + koniecNagrywania.toGMTString());
+			
+			System.out.println("Koniec nagrywania.");
 			
 			fos.close();
 			sock.leaveGroup(group);
