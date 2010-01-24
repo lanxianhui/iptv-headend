@@ -5,8 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
-import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.thoughtworks.xstream.*;
@@ -32,7 +32,6 @@ public class Npvrd {
 		koniecNagrywania = new Date(poczatekNagrywania.getTime());
 		
 		for (int i = 0; i < args.length; i++) {
-			System.out.println(args[i]);
 			if (args[i].equals("-c")) {
 				configFile = args[++i];
 			}
@@ -47,15 +46,17 @@ public class Npvrd {
 			}
 			else if (args[i].equals("-b")) {
 				try {
-					poczatekNagrywania = DateFormat.getInstance().parse(args[++i]);
+					poczatekNagrywania = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).parse(args[++i]);
 				} catch (ParseException e) {
+					System.err.println(e.getMessage());
 					System.err.println("Błędny format daty rozpoczęcia nagrywania.");
 				}
 			}
 			else if (args[i].equals("-e")) {
 				try {
-					koniecNagrywania = DateFormat.getInstance().parse(args[++i]);
+					koniecNagrywania = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).parse(args[++i]);
 				} catch (ParseException e) {
+					System.err.println(e.getMessage());
 					System.err.println("Błędny format daty zakończenia nagrywania.");
 				}
 			}
