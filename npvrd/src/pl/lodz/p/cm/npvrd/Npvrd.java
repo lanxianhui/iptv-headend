@@ -11,7 +11,8 @@ import com.thoughtworks.xstream.*;
 public class Npvrd {
 	
 	static DatabaseConfiguration config;
-	static ArrayList<Recording> recordingsList; 
+	static ArrayList<ChannelRecorder> channelRecorders; 
+	static ArrayList<Thread> recorderThreads;
 
 	/**
 	 * @param args Argumenty przekazane do programu przez linię komend
@@ -20,10 +21,11 @@ public class Npvrd {
 		String configFile = "config.xml";
 		String groupIp = "224.0.0.1";
 		int groupPort = 1234;
-		String targetFile = "stream.ts";
 		Date poczatekNagrywania = null;
 		Date koniecNagrywania = null;
 		Calendar cal = Calendar.getInstance();
+		
+		channelRecorders = new ArrayList<ChannelRecorder>();
 		
 		poczatekNagrywania = cal.getTime();
 		koniecNagrywania = new Date(poczatekNagrywania.getTime());
@@ -37,9 +39,6 @@ public class Npvrd {
 			}
 			else if (args[i].equals("-p")) {
 				groupPort = Integer.parseInt(args[++i]);
-			}
-			else if (args[i].equals("-o")) {
-				targetFile = args[++i];
 			}
 			else if (args[i].equals("-b")) {
 				try {
@@ -73,9 +72,14 @@ public class Npvrd {
 			System.err.println("Nie znalazłem pliku konfiguracyjnego!");
 		}
 		
-		Recording NoweNagranie = new Recording(groupIp, groupPort, targetFile, poczatekNagrywania, koniecNagrywania);
+		ChannelRecorder NowyKanal = new ChannelRecorder(groupIp, groupPort);
 		
-		Thread RecordingThread = new Thread(NoweNagranie);
+		channelRecorders.add(NowyKanal);
+		
+		Thread RecordingThread = new Thread(NowyKanal);
+		
+		recorderThreads.add(RecordingThread);
+		
 		RecordingThread.start();
 		
 		while (RecordingThread.isAlive())

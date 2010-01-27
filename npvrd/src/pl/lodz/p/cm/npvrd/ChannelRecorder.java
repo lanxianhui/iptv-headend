@@ -1,24 +1,20 @@
 package pl.lodz.p.cm.npvrd;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.util.Date;
+import java.util.LinkedList;
 
-public class Recording implements Runnable {
+public class ChannelRecorder implements Runnable {
 	
 	private String groupIp;
 	private int groupPort;
-	private String fileName;
-	private Date poczatekNagrywania;
-	private Date koniecNagrywania;
+	public LinkedList<RecordingTask> programNagrywania;
 	
-	public Recording(String groupIp, int groupPort, String fileName, Date poczatekNagrywania, Date koniecNagrywania) {
+	public ChannelRecorder(String groupIp, int groupPort) {
 		this.groupIp = groupIp;
 		this.groupPort = groupPort;
-		this.fileName = fileName;
-		this.poczatekNagrywania = poczatekNagrywania;
-		this.koniecNagrywania = koniecNagrywania;
+		this.programNagrywania = new LinkedList<RecordingTask>();
 	}
 
 	public String getGroupIp() {
@@ -36,29 +32,9 @@ public class Recording implements Runnable {
 	public void setGroupPort(int groupPort) {
 		this.groupPort = groupPort;
 	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public Date getPoczatekNagrywania() {
-		return poczatekNagrywania;
-	}
-
-	public void setPoczatekNagrywania(Date poczatekNagrywania) {
-		this.poczatekNagrywania = poczatekNagrywania;
-	}
-
-	public Date getKoniecNagrywania() {
-		return koniecNagrywania;
-	}
-
-	public void setKoniecNagrywania(Date koniecNagrywania) {
-		this.koniecNagrywania = koniecNagrywania;
+	
+	private String generateFileName(String programTitle, Date poczatekNagrywania, Date koniecNagrywania) {
+		return "";
 	}
 
 	@Override
