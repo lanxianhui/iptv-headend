@@ -16,10 +16,8 @@ public class Npvrd {
 	/**
 	 * @param args Argumenty przekazane do programu przez linię komend
 	 */
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		String configFile = "config.xml";
-		String recordFile = "recordings.xml";
 		String groupIp = "224.0.0.1";
 		int groupPort = 1234;
 		String targetFile = "stream.ts";
