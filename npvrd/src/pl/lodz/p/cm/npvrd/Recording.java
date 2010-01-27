@@ -74,21 +74,22 @@ public class Recording implements Runnable {
 				byte[] buf = new byte[sock.getReceiveBufferSize()];
 				DatagramPacket recv = new DatagramPacket(buf, buf.length);
 				
+				long poczatekNagrywaniaLiczb = poczatekNagrywania.getTime();
+				long koniecNagrywaniaLiczb = koniecNagrywania.getTime();
+				
 				System.out.println(fileName + ": Czekam na: " + poczatekNagrywania.toGMTString());
 				
-				while (System.currentTimeMillis() < poczatekNagrywania.getTime())
+				while (System.currentTimeMillis() < poczatekNagrywaniaLiczb)
 				{
-					
+					sock.receive(recv);
 				}
 				
 				System.out.println(fileName + ": Rozpoczynam nagrywanie");
 				
-				while (System.currentTimeMillis() < koniecNagrywania.getTime())
+				while (System.currentTimeMillis() < koniecNagrywaniaLiczb)
 				{
 					sock.receive(recv);
-					
-					recv.getData();
-					fos.write(recv.getData());
+					fos.write(recv.getData(), 0, recv.getLength());
 				}
 				
 				System.out.println(fileName + ": Jest już: " + koniecNagrywania.toGMTString());			
