@@ -5,21 +5,35 @@ import java.util.Date;
 public class RecordingTask {
 	
 	private String programName;
-	private Date poczatekNagrywania;
-	private Date koniecNagrywania;
+	private Date recordingBegin;
+	private Date recordingEnd;
 	
-	public RecordingTask(String programName, Date poczatekNagrywania, Date koniecNagrywania) {
+	/**
+	 * Represents a single program to be recorded
+	 * @param programName Program to be recorded
+	 * @param recordingBegin Program's start time 
+	 * @param koniecNagrywania Program's end time
+	 */
+	public RecordingTask(String programName, Date recordingBegin, Date recordingEnd) {
 		this.programName = programName;
-		this.poczatekNagrywania = poczatekNagrywania;
-		this.koniecNagrywania = koniecNagrywania;
+		this.recordingBegin = recordingBegin;
+		this.recordingEnd = recordingEnd;
 	}
 	
+	/**
+	 * Creates a new recording task based on an old one
+	 * @param oldTask Old task to be copied
+	 */
 	public RecordingTask(RecordingTask oldTask) {
 		this.programName = oldTask.getProgramName();
-		this.poczatekNagrywania = oldTask.getPoczatekNagrywania();
-		this.koniecNagrywania = oldTask.getKoniecNagrywania();
+		this.recordingBegin = oldTask.getRecordingBegin();
+		this.recordingEnd = oldTask.getRecordingEnd();
 	}
 
+	/**
+	 * Get task program name
+	 * @return
+	 */
 	public String getProgramName() {
 		return programName;
 	}
@@ -28,20 +42,20 @@ public class RecordingTask {
 		this.programName = programName;
 	}
 
-	public Date getPoczatekNagrywania() {
-		return poczatekNagrywania;
+	public Date getRecordingBegin() {
+		return recordingBegin;
 	}
 
-	public void setPoczatekNagrywania(Date poczatekNagrywania) {
-		this.poczatekNagrywania = poczatekNagrywania;
+	public void setRecordingBegin(Date poczatekNagrywania) {
+		this.recordingBegin = poczatekNagrywania;
 	}
 
-	public Date getKoniecNagrywania() {
-		return koniecNagrywania;
+	public Date getRecordingEnd() {
+		return recordingEnd;
 	}
 
-	public void setKoniecNagrywania(Date koniecNagrywania) {
-		this.koniecNagrywania = koniecNagrywania;
+	public void setRecordingEnd(Date koniecNagrywania) {
+		this.recordingEnd = koniecNagrywania;
 	}
 
 }
