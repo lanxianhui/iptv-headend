@@ -15,20 +15,20 @@ public class Npvrd {
 	static ArrayList<Thread> recorderThreads;
 
 	/**
-	 * @param args Argumenty przekazane do programu przez linię komend
+	 * @param args Arguments passed to the program in the command line
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
 		String groupIp = "224.0.0.1";
 		int groupPort = 1234;
-		Date poczatekNagrywania = null;
-		Date koniecNagrywania = null;
+		Date recordingBegin = null;
+		Date recordingEnd = null;
 		Calendar cal = Calendar.getInstance();
 		
 		channelRecorders = new ArrayList<ChannelRecorder>();
 		
-		poczatekNagrywania = cal.getTime();
-		koniecNagrywania = new Date(poczatekNagrywania.getTime());
+		recordingBegin = cal.getTime();
+		recordingEnd = new Date(recordingBegin.getTime());
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -42,23 +42,23 @@ public class Npvrd {
 			}
 			else if (args[i].equals("-b")) {
 				try {
-					poczatekNagrywania = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).parse(args[++i]);
+					recordingBegin = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).parse(args[++i]);
 				} catch (ParseException e) {
 					System.err.println(e.getMessage());
-					System.err.println("Błędny format daty rozpoczęcia nagrywania.");
+					System.err.println("Invalid date format.");
 				}
 			}
 			else if (args[i].equals("-e")) {
 				try {
-					koniecNagrywania = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).parse(args[++i]);
+					recordingEnd = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).parse(args[++i]);
 				} catch (ParseException e) {
 					System.err.println(e.getMessage());
-					System.err.println("Błędny format daty zakończenia nagrywania.");
+					System.err.println("Invalid date format.");
 				}
 			}
 			else if (args[i].equals("-t")) {
 				int seconds = Integer.parseInt(args[++i]);
-				koniecNagrywania.setTime(poczatekNagrywania.getTime() + (seconds * 1000));
+				recordingEnd.setTime(recordingBegin.getTime() + (seconds * 1000));
 			}
 		}
 		
@@ -69,7 +69,7 @@ public class Npvrd {
 			
 			config = (DatabaseConfiguration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
-			System.err.println("Nie znalazłem pliku konfiguracyjnego!");
+			System.err.println("Configuration file not found!");
 		}
 		
 		ChannelRecorder NowyKanal = new ChannelRecorder(groupIp, groupPort);
