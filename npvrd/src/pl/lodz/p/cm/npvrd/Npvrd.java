@@ -1,6 +1,8 @@
 package pl.lodz.p.cm.npvrd;
 
 import java.io.FileNotFoundException;
+import org.apache.commons.daemon.*;
+
 import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,14 +10,14 @@ import java.util.*;
 
 import com.thoughtworks.xstream.*;
 
-public class Npvrd {
+public class Npvrd implements Daemon {
 	
 	static DatabaseConfiguration config;
 	static ArrayList<ChannelRecorder> channelRecorders; 
 	static ArrayList<Thread> recorderThreads;
 
 	/**
-	 * @param args Arguments passed to the program in the command line
+	 * @param args Arguments passed to the program in the command line.
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
@@ -87,7 +89,31 @@ public class Npvrd {
 			
 		}
 		
-		System.out.println("Zakończone");
+		System.out.println("Finished");
+	}
+
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void init(DaemonContext arg0) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void start() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void stop() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

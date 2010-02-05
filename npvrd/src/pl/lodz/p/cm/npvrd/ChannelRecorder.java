@@ -5,14 +5,19 @@ import java.math.BigInteger;
 import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedList;
+import java.util.*;
 
 public class ChannelRecorder implements Runnable {
 	
 	private String groupIp;
 	private int groupPort;
-	public LinkedList<RecordingTask> recordingSchedule;
+	private LinkedList<RecordingTask> recordingSchedule;
 	
+	/**
+	 * Creates a new channel recorder listening on a given multicast IP address and port.
+	 * @param groupIp Multicast group IP to listen to.
+	 * @param groupPort UDP Port to listen on.
+	 */
 	public ChannelRecorder(String groupIp, int groupPort) {
 		this.groupIp = groupIp;
 		this.groupPort = groupPort;
@@ -35,8 +40,40 @@ public class ChannelRecorder implements Runnable {
 		this.groupPort = groupPort;
 	}
 	
+	/**
+	 * Add a task for a program to record.
+	 * @param task A task to be added to the list
+	 */
+	public boolean add(RecordingTask task) {
+		boolean result = recordingSchedule.add(task);
+		if (result) Collections.sort(recordingSchedule);
+		return result;
+	}
+	
+	public boolean remove(RecordingTask task) {
+		return recordingSchedule.remove(task);
+	}
+	
+	public boolean removeAll(Collection<RecordingTask> tasks) {
+		return recordingSchedule.removeAll(tasks);
+	}
+	
+	public void clear() {
+		recordingSchedule.clear();
+	}
+	
+	public Collection<RecordingTask> getTasks() {
+		return this.recordingSchedule;
+	}
+	
+	/**
+	 * Generates a unique file name for a program. Uses a MD5 digest on begining and
+	 * end times of the task and the task name.
+	 * @param task Task to generate the name for.
+	 * @return A unique file name.
+	 */
 	private String generateFileName(RecordingTask task) {
-		String plaintext = task.getRecordingBegin().toGMTString() + task.getRecordingEnd().toGMTString() + task.getProgramName();
+		String plaintext = task.getRecordingBegin().toString() + task.getRecordingEnd().toString() + task.getProgramName();
 		MessageDigest m;
 		try {
 			m = MessageDigest.getInstance("MD5");
@@ -78,7 +115,7 @@ public class ChannelRecorder implements Runnable {
 					long poczatekNagrywaniaLiczb = task.getRecordingBegin().getTime();
 					long koniecNagrywaniaLiczb = task.getRecordingEnd().getTime();
 					
-					System.out.println(fileName + ": Waiting for: " + task.getRecordingBegin().toGMTString());
+					System.out.println(fileName + ": Waiting for: " + task.getRecordingBegin().toString());
 					
 					while (System.currentTimeMillis() < poczatekNagrywaniaLiczb)
 					{
@@ -93,7 +130,7 @@ public class ChannelRecorder implements Runnable {
 						fos.write(recv.getData(), 0, recv.getLength());
 					}
 					
-					System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString());			
+					System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toString());			
 					System.out.println(groupIp + ": Recording ends");
 					
 					fos.close();
