@@ -1,5 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <config>
-	<userName>test</userName>
-	<password>test</password>
-	<databaseLocator>test</databaseLocator>
+	<database>
+		<userName>test</userName>
+		<password>test</password>
+		<databaseLocator>test</databaseLocator>
+	</database>
 </config>
