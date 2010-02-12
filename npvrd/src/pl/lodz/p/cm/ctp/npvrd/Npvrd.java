@@ -12,9 +12,18 @@ import com.thoughtworks.xstream.*;
 
 public class Npvrd implements Daemon {
 	
-	static DatabaseConfiguration config;
+	static Configuration config;
 	static ArrayList<ChannelRecorder> channelRecorders; 
 	static ArrayList<Thread> recorderThreads;
+	
+	public static boolean isAnyRecorderAlive() {
+		Iterator<Thread> recordersIterator = recorderThreads.iterator();
+		while(recordersIterator.hasNext()) {
+			if (recordersIterator.next().isAlive())
+				return true;
+		}
+		return false;
+	}
 
 	/**
 	 * @param args Arguments passed to the program in the command line.
@@ -67,29 +76,32 @@ public class Npvrd implements Daemon {
 		try {
 			XStream xs = new XStream();
 			FileInputStream fis = new FileInputStream(configFile);
-			xs.alias("config", DatabaseConfiguration.class);
+			xs.alias("config", Configuration.class);
+			xs.alias("database", DatabaseConfiguration.class);
 			
-			config = (DatabaseConfiguration)xs.fromXML(fis);
+			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
 			System.err.println("Configuration file not found!");
 		}
 		
 		ChannelRecorder NowyKanal = new ChannelRecorder(groupIp, groupPort);
-		
 		channelRecorders.add(NowyKanal);
 		
 		Thread RecordingThread = new Thread(NowyKanal);
-		
 		recorderThreads.add(RecordingThread);
 		
 		RecordingThread.start();
 		
-		while (RecordingThread.isAlive())
+		while (isAnyRecorderAlive())
 		{
-			
+			try {
+				Thread.sleep(10000); // Sleeping for 10 secs.
+			} catch (InterruptedException e) {
+				System.err.println("Monitor thread: woken up for no apparent reason?");
+			}
 		}
 		
-		System.out.println("Finished");
+		System.out.println("Finished. All recorder threads dead.");
 	}
 
 	@Override
