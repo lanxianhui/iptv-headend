@@ -1,4 +1,4 @@
-package pl.lodz.p.cm.npvrd;
+package pl.lodz.p.cm.ctp.npvrd;
 
 import java.io.*;
 import java.math.BigInteger;
