@@ -96,6 +96,7 @@ public class ChannelRecorder implements Runnable {
 	@Override
 	public void run() {
 		try {
+			System.out.println(groupIp + ": Setting up socket.");
 			InetAddress group = InetAddress.getByName(groupIp);
 			MulticastSocket sock = new MulticastSocket(groupPort);
 			sock.joinGroup(group);
@@ -115,12 +116,12 @@ public class ChannelRecorder implements Runnable {
 					long poczatekNagrywaniaLiczb = task.getRecordingBegin().getTime();
 					long koniecNagrywaniaLiczb = task.getRecordingEnd().getTime();
 					
-					System.out.println(fileName + ": Waiting for: " + task.getRecordingBegin().toString());
+					System.out.println(groupIp + ": Waiting for: " + task.getRecordingBegin().toString());
 					
 					try {
 						Thread.sleep(poczatekNagrywaniaLiczb - System.currentTimeMillis() - 10);
 					} catch (InterruptedException e) {
-						System.err.println(fileName + ": Woken up while waiting, what's up?");
+						System.err.println(groupIp + ": Woken up while waiting, what's up?");
 						e.printStackTrace();
 					}
 					
@@ -145,6 +146,8 @@ public class ChannelRecorder implements Runnable {
 					System.err.println(groupIp + ": Destination file is unavailable");
 				}
 			}
+			
+			System.out.println(groupIp + ": Nothing to do.");
 			
 			sock.leaveGroup(group);
 			sock.close();
