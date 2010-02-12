@@ -117,6 +117,13 @@ public class ChannelRecorder implements Runnable {
 					
 					System.out.println(fileName + ": Waiting for: " + task.getRecordingBegin().toString());
 					
+					try {
+						Thread.sleep(poczatekNagrywaniaLiczb - System.currentTimeMillis() - 10);
+					} catch (InterruptedException e) {
+						System.err.println(fileName + ": Woken up while waiting, what's up?");
+						e.printStackTrace();
+					}
+					
 					while (System.currentTimeMillis() < poczatekNagrywaniaLiczb)
 					{
 						sock.receive(recv);
