@@ -37,6 +37,7 @@ public class Npvrd implements Daemon {
 		Calendar cal = Calendar.getInstance();
 		
 		channelRecorders = new ArrayList<ChannelRecorder>();
+		recorderThreads = new ArrayList<Thread>();
 		
 		recordingBegin = cal.getTime();
 		recordingEnd = new Date(recordingBegin.getTime());
