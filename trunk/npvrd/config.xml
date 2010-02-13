@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
 	<database>
-		<userName>test</userName>
-		<password>test</password>
-		<databaseLocator>test</databaseLocator>
+		<userName>iptv-test</userName>
+		<password>iptv-test</password>
+		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv</databaseLocator>
+		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
 </config>
