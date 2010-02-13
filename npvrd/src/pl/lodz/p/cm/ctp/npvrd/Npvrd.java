@@ -1,37 +1,44 @@
 package pl.lodz.p.cm.ctp.npvrd;
 
 import java.io.*;
-
 import org.apache.commons.daemon.*;
+import pl.lodz.p.cm.ctp.dao.*;
+import pl.lodz.p.cm.ctp.dao.model.*;
 import java.util.*;
 import com.thoughtworks.xstream.*;
 
 public class Npvrd implements Daemon {
 	
+	static class ChannelRecorderThread {
+		public Thread thread;
+		public ChannelRecorder channelRecorder;
+		
+		public ChannelRecorderThread(Thread thread, ChannelRecorder channelRecorder) {
+			this.thread = thread;
+			this.channelRecorder = channelRecorder;
+		}
+	}
+	
 	static Configuration config;
-	static ArrayList<Thread> recorderThreads;
-	static ArrayList<ChannelRecorder> channelRecorders;
+	static ArrayList<ChannelRecorderThread> channelRecorders;
 	
 	public static boolean isAnyRecorderAlive() {
-		Iterator<Thread> recordersIterator = recorderThreads.iterator();
-		while(recordersIterator.hasNext()) {
-			if (recordersIterator.next().isAlive())
+		for(ChannelRecorderThread threadRecorder : channelRecorders) {
+			if (threadRecorder.thread.isAlive())
 				return true;
 		}
 		return false;
 	}
 	
-	public static void wakeUpAllThreads() {
-		Iterator<Thread> recordersIterator = recorderThreads.iterator();
-		while(recordersIterator.hasNext()) {
-			recordersIterator.next().interrupt();
+	public static void wakeUpAllRecorders() {
+		for (ChannelRecorderThread threadRecorder : channelRecorders) {
+			threadRecorder.thread.interrupt();
 		}
 	}
 	
 	public static void setRunModesRecorders(ChannelRecorder.RunMode newMode) {
-		Iterator<ChannelRecorder> channelsIterator = channelRecorders.iterator();
-		while(channelsIterator.hasNext()) {
-			channelsIterator.next().setRunMode(newMode);
+		for (ChannelRecorderThread threadRecorder : channelRecorders) {
+			threadRecorder.channelRecorder.setRunMode(newMode);
 		}
 	}
 
@@ -41,8 +48,7 @@ public class Npvrd implements Daemon {
 	public static void main(String[] args) {
 		String configFile = "config.xml";
 		
-		recorderThreads = new ArrayList<Thread>();
-		channelRecorders = new ArrayList<ChannelRecorder>();
+		channelRecorders = new ArrayList<ChannelRecorderThread>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -63,12 +69,28 @@ public class Npvrd implements Daemon {
 		
 		// TODO Read all recordable channels from the database and create ChannelRecorders for them.
 		
-		ChannelRecorder NewChannel = new ChannelRecorder("239.192.0.1", 1234);
-		channelRecorders.add(NewChannel);
-		Thread RecordingThread = new Thread(NewChannel);
-		recorderThreads.add(RecordingThread);
-		
-		RecordingThread.start();
+		DAOFactory dbase = DAOFactory.getInstance(config.database);
+		System.out.println("DAOFactory successfully obtained: " + dbase);
+
+		TvChannelDAO tvChannelDAO = dbase.getTvChannelDAO();
+        System.out.println("TvChannelDAO successfully obtained: " + tvChannelDAO);
+        
+        try {
+			List<TvChannel> tvChannelList = tvChannelDAO.list();
+			System.out.println("Got " + tvChannelList.size() + " TV channels. Creating recorders for channels.");
+			
+			for (TvChannel tvChannel : tvChannelList) {
+				ChannelRecorder NewChannel = new ChannelRecorder(tvChannel.getIpAdress(), tvChannel.getPort());
+				Thread RecordingThread = new Thread(NewChannel);
+				channelRecorders.add(new ChannelRecorderThread(RecordingThread, NewChannel));
+				RecordingThread.start();
+			}
+		} catch (DAOException e1) {
+			System.err.println("Database error: " + e1.getMessage());
+			System.err.println("This is a critical error. Terminating.");
+			System.exit(1);
+			e1.printStackTrace();
+		}
 		
 		String curLine = "";
 		InputStreamReader converter = new InputStreamReader(System.in);
@@ -78,12 +100,6 @@ public class Npvrd implements Daemon {
 		
 		while (isAnyRecorderAlive())
 		{
-			/* try {
-				Thread.sleep(10000); // Sleeping for 10 secs.
-			} catch (InterruptedException e) {
-				System.err.println("Monitor thread: woken up for no apparent reason?");
-			} */
-			
 			while (!(curLine.equals("quit"))) {
 				try {
 					System.out.print("#: ");
@@ -91,11 +107,10 @@ public class Npvrd implements Daemon {
 					if (curLine.equals("quit")) {
 						System.out.println("Terminating all threads...");
 						setRunModesRecorders(ChannelRecorder.RunMode.STOP);
-						wakeUpAllThreads();
+						wakeUpAllRecorders();
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
 				}            
 			}
 
