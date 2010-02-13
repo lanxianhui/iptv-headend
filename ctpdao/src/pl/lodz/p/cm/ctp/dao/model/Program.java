@@ -11,11 +11,11 @@ public class Program {
 	private Timestamp begin;
 	private Timestamp end;
 	
-	private Program() {
+	public Program() {
 		
 	}
 	
-	private Program(Long id, Long tvChannelId, String title, Timestamp begin, Timestamp end) {
+	public Program(Long id, Long tvChannelId, String title, Timestamp begin, Timestamp end) {
 		this.id = id;
 		this.tvChannelId = tvChannelId;
 		this.title = title;
@@ -23,7 +23,7 @@ public class Program {
 		this.end = end;
 	}
 	
-	private Program(Long id, Long tvChannelId, String title, String description, Timestamp begin, Timestamp end) {
+	public Program(Long id, Long tvChannelId, String title, String description, Timestamp begin, Timestamp end) {
 		this(id, tvChannelId, title, begin, end);
 		this.description = description;
 	}
