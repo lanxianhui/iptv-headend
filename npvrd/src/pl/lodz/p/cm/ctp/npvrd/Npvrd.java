@@ -41,6 +41,10 @@ public class Npvrd implements Daemon {
 			threadRecorder.channelRecorder.setRunMode(newMode);
 		}
 	}
+	
+	public static Configuration getConfiguration() {
+		return config;
+	}
 
 	/**
 	 * @param args Arguments passed to the program in the command line.
@@ -80,7 +84,7 @@ public class Npvrd implements Daemon {
 			System.out.println("Got " + tvChannelList.size() + " TV channels. Creating recorders for channels.");
 			
 			for (TvChannel tvChannel : tvChannelList) {
-				ChannelRecorder NewChannel = new ChannelRecorder(tvChannel.getIpAdress(), tvChannel.getPort());
+				ChannelRecorder NewChannel = new ChannelRecorder(tvChannel.getId(), tvChannel.getIpAdress(), tvChannel.getPort());
 				Thread RecordingThread = new Thread(NewChannel);
 				channelRecorders.add(new ChannelRecorderThread(RecordingThread, NewChannel));
 				RecordingThread.start();

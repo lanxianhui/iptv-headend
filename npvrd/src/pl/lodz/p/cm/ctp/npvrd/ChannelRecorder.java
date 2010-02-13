@@ -9,9 +9,11 @@ import pl.lodz.p.cm.ctp.dao.*;
 public class ChannelRecorder implements Runnable {
 	public enum RunMode { RUN, STOP };
 	
+	private long channelId;
 	private String groupIp;
 	private int groupPort;
 	private LinkedList<RecordingTask> recordingSchedule;
+	private Thread scheduleUpdater;
 	private Lock recordingScheduleLock = new ReentrantLock();
 	private RunMode runMode;
 	
@@ -20,11 +22,20 @@ public class ChannelRecorder implements Runnable {
 	 * @param groupIp Multicast group IP to listen to.
 	 * @param groupPort UDP Port to listen on.
 	 */
-	public ChannelRecorder(String groupIp, int groupPort) {
+	public ChannelRecorder(long channelId, String groupIp, int groupPort) {
+		this.channelId = channelId;
 		this.groupIp = groupIp;
 		this.groupPort = groupPort;
 		this.recordingSchedule = new LinkedList<RecordingTask>();
 		this.runMode = RunMode.RUN;
+		
+		ScheduleUpdater updater = new ScheduleUpdater(this);
+		this.scheduleUpdater = new Thread(updater);
+		this.scheduleUpdater.start();
+	}
+	
+	public long getChannelId() {
+		return channelId;
 	}
 
 	public String getGroupIp() {
