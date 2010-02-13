@@ -21,6 +21,13 @@ public class Npvrd implements Daemon {
 		return false;
 	}
 	
+	public static void wakeUpAllThreads() {
+		Iterator<Thread> recordersIterator = recorderThreads.iterator();
+		while(recordersIterator.hasNext()) {
+			recordersIterator.next().interrupt();
+		}
+	}
+	
 	public static void setRunModesRecorders(ChannelRecorder.RunMode newMode) {
 		Iterator<ChannelRecorder> channelsIterator = channelRecorders.iterator();
 		while(channelsIterator.hasNext()) {
@@ -84,6 +91,7 @@ public class Npvrd implements Daemon {
 					if (curLine.equals("quit")) {
 						System.out.println("Terminating all threads...");
 						setRunModesRecorders(ChannelRecorder.RunMode.STOP);
+						wakeUpAllThreads();
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
