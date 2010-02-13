@@ -8,14 +8,14 @@ public class Program {
 	private Long tvChannelId;
 	private String title;
 	private String description;
-	private Time begin;
-	private Time end;
+	private Timestamp begin;
+	private Timestamp end;
 	
 	private Program() {
 		
 	}
 	
-	private Program(Long id, Long tvChannelId, String title, Time begin, Time end) {
+	private Program(Long id, Long tvChannelId, String title, Timestamp begin, Timestamp end) {
 		this.id = id;
 		this.tvChannelId = tvChannelId;
 		this.title = title;
@@ -23,7 +23,7 @@ public class Program {
 		this.end = end;
 	}
 	
-	private Program(Long id, Long tvChannelId, String title, String description, Time begin, Time end) {
+	private Program(Long id, Long tvChannelId, String title, String description, Timestamp begin, Timestamp end) {
 		this(id, tvChannelId, title, begin, end);
 		this.description = description;
 	}
@@ -60,19 +60,19 @@ public class Program {
 		this.description = description;
 	}
 
-	public Time getBegin() {
+	public Timestamp getBegin() {
 		return begin;
 	}
 
-	public void setBegin(Time begin) {
+	public void setBegin(Timestamp begin) {
 		this.begin = begin;
 	}
 
-	public Time getEnd() {
+	public Timestamp getEnd() {
 		return end;
 	}
 
-	public void setEnd(Time end) {
+	public void setEnd(Timestamp end) {
 		this.end = end;
 	}
 	
