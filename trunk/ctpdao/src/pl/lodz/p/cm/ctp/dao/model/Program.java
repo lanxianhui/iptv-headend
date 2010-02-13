@@ -84,6 +84,7 @@ public class Program {
         return (id != null) ? (this.getClass().hashCode() + id.hashCode()) : super.hashCode();
     }
 	
+	@SuppressWarnings("deprecation")
 	public String toString() {
 		return String.format("Program[id=%d,tvChannelId=%d,title=%s,begin=%s,end=%s]", 
 	            id, tvChannelId, title, begin.toGMTString(), end.toGMTString());
