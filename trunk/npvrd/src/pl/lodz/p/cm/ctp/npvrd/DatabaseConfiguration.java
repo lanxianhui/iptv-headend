@@ -8,10 +8,11 @@ public class DatabaseConfiguration implements Serializable {
 	public String userName = null;
 	public String password = null;
 	public String databaseLocator = null;
+	public String databaseDriver = null;
 	
 	@Override
 	public String toString() {
-		return userName + ":" + password + " " + databaseLocator;
+		return userName + ":" + password + "  " + databaseLocator + " @ " + databaseDriver;
 	}
 
 }
