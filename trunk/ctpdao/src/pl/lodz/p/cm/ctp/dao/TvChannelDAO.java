@@ -127,7 +127,8 @@ public final class TvChannelDAO {
             tvChannel.getName(),
             tvChannel.getIpAdress(),
             tvChannel.getPort(),
-            tvChannel.getIcon()
+            tvChannel.getIcon(),
+            tvChannel.getId()
         };
 
         Connection connection = null;
