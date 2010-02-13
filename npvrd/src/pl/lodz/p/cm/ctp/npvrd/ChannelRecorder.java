@@ -1,12 +1,10 @@
 package pl.lodz.p.cm.ctp.npvrd;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.net.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.locks.*;
+import pl.lodz.p.cm.ctp.dao.*;
 
 public class ChannelRecorder implements Runnable {
 	public enum RunMode { RUN, STOP };
@@ -133,23 +131,7 @@ public class ChannelRecorder implements Runnable {
 	 */
 	private String generateFileName(RecordingTask task) {
 		String plaintext = task.getRecordingBegin().toString() + task.getRecordingEnd().toString() + task.getProgramName();
-		MessageDigest m;
-		try {
-			m = MessageDigest.getInstance("MD5");
-			m.reset();
-			m.update(plaintext.getBytes());
-			byte[] digest = m.digest();
-			BigInteger bigInt = new BigInteger(1,digest);
-			String hashtext = bigInt.toString(16);
-
-			while(hashtext.length() < 32 ){
-			  hashtext = "0"+hashtext;
-			}
-			return hashtext + ".m2t";
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			return "stream.m2t";
-		}
+		return DAOUtil.hashMD5(plaintext) + ".m2t";
 	}
 
 	@Override
