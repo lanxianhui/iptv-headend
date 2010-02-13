@@ -211,10 +211,10 @@ public class ChannelRecorder implements Runnable {
 						fos.close();
 					} else {
 						try {
-							System.out.println(groupIp + ": Temporarly going to sleep, nothing to do now.");
-							Thread.sleep(10000);
+							System.out.println(groupIp + ": Temporarly going to sleep, task list empty.");
+							Thread.sleep(100000);
 						} catch (InterruptedException e) {
-							System.out.println(groupIp + ": Someone woke me up - what for?");
+							System.out.println(groupIp + ": Woken up.");
 						}
 					}
 				} catch (IOException e) {
