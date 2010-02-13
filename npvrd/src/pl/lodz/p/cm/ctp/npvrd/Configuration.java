@@ -1,6 +1,7 @@
 package pl.lodz.p.cm.ctp.npvrd;
 
 import java.io.Serializable;
+import pl.lodz.p.cm.ctp.dao.DatabaseConfiguration;
 
 public class Configuration implements Serializable {
 
