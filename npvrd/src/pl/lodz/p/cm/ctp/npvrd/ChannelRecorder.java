@@ -6,7 +6,6 @@ import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 public class ChannelRecorder implements Runnable {
@@ -197,7 +196,7 @@ public class ChannelRecorder implements Runnable {
 							sock.receive(recv);
 						}
 						
-						System.out.println(groupIp + ": Recording starts");
+						System.out.println(groupIp + ": Recording starts for " + task.getProgramName());
 						
 						while (System.currentTimeMillis() < koniecNagrywaniaLiczb)
 						{
