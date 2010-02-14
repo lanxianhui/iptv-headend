@@ -9,6 +9,7 @@ public class ScheduleUpdater implements Runnable {
 	
 	private ChannelRecorder parentChannel;
 	private Thread parentThread;
+	private ProgramDvrSchedule lastProgram = null;
 
 	public ScheduleUpdater(ChannelRecorder parentChannel, Thread parentThread) {
 		this.parentChannel = parentChannel;
@@ -27,17 +28,23 @@ public class ScheduleUpdater implements Runnable {
 				if (programDvrScheduleList.size() > 0) {
 					System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
 					
+					ProgramDvrSchedule newFirstProgram = null;
 					parentChannel.lockSchedule();
 					try {
 						parentChannel.clear();
 						for (ProgramDvrSchedule programDvrSchedule : programDvrScheduleList) {
+							if (newFirstProgram == null) newFirstProgram = programDvrSchedule;
 							parentChannel.add(new RecordingTask(programDvrSchedule));	
 						}
 					} finally {
 						parentChannel.unlockSchedule();
 					}
 					parentChannel.setRecheckSchedule(true);
-					parentThread.interrupt();
+					if (!newFirstProgram.equals(lastProgram))
+					{
+						lastProgram = newFirstProgram;
+						parentThread.interrupt();
+					}
 				}
 			} catch (DAOException e) {
 				System.err.println("Database error: " + e.getMessage());

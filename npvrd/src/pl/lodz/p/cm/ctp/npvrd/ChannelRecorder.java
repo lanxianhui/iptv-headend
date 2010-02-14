@@ -148,13 +148,21 @@ public class ChannelRecorder implements Runnable {
 			this.scheduleUpdater.start();
 			
 			while (this.getRunMode().equals(RunMode.RUN)) {
+				RecordingTask task = null;
 				while ((this.getRecheckSchedule()) && (!this.isEmpty())) {
 					this.setRecheckSchedule(false);
 					try {
-						RecordingTask task = null;
 						recordingScheduleLock.lock();
 						try {
-							task = recordingSchedule.removeFirst();
+							if (task != null) {
+								if (recordingSchedule.peekFirst().compareTo(task) < 0) {
+									task.setState(Mode.AVAILABLE);
+									task.saveToDatabase();
+									task = recordingSchedule.removeFirst();
+								}
+							} else {
+								task = recordingSchedule.removeFirst();
+							}
 						} finally {
 							recordingScheduleLock.unlock();
 						}
