@@ -23,7 +23,7 @@ public final class ProgramDvrScheduleDAO {
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "DvrSchedule.id, DvrSchedule.mode, DvrSchedule.fileName FROM Program, DvrSchedule " +
         "WHERE Program.id = DvrSchedule.programId AND Program.tvChannelId = ? " +
-        "AND Program.begin > NOW() AND DvrSchedule.mode = 'WAITING'" +
+        "AND Program.end > NOW() AND DvrSchedule.mode = 'WAITING'" +
         "ORDER BY Program.begin ASC";
 	
 	private DAOFactory daoFactory;
