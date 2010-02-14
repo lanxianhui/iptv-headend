@@ -23,9 +23,9 @@ public final class DvrScheduleDAO {
 	private static final String SQL_INSERT =
         "INSERT INTO DvrSchedule (programId, mode, fileName) VALUES (?, ?, ?)";
     private static final String SQL_UPDATE =
-        "UPDATE Program SET programId = ?, mode = ?, fileName = ? WHERE id = ?";
+        "UPDATE DvrSchedule SET programId = ?, mode = ?, fileName = ? WHERE id = ?";
     private static final String SQL_DELETE =
-        "DELETE FROM Program WHERE id = ?";
+        "DELETE FROM DvrSchedule WHERE id = ?";
 	
 	private DAOFactory daoFactory;
 
@@ -96,7 +96,7 @@ public final class DvrScheduleDAO {
 
         Object[] values = {
             dvrSchedule.getProgramId(),
-            dvrSchedule.getMode(),
+            dvrSchedule.getMode().toString(),
             dvrSchedule.getFileName()
         };
 
@@ -131,7 +131,7 @@ public final class DvrScheduleDAO {
 
         Object[] values = {
             dvrSchedule.getProgramId(),
-            dvrSchedule.getMode(),
+            dvrSchedule.getMode().toString(),
             dvrSchedule.getFileName(),
             dvrSchedule.getId()
         };
@@ -187,7 +187,7 @@ public final class DvrScheduleDAO {
         return new DvrSchedule(
             resultSet.getLong("id"),
             resultSet.getLong("programId"),
-            (DvrSchedule.Mode)resultSet.getObject("mode"),
+            DvrSchedule.Mode.valueOf(resultSet.getString("DvrSchedule.mode")),
             resultSet.getObject("fileName") != null ? resultSet.getString("fileName") : null
         );
     }

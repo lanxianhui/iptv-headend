@@ -23,7 +23,7 @@ public final class ProgramDvrScheduleDAO {
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "DvrSchedule.id, DvrSchedule.mode, DvrSchedule.fileName FROM Program, DvrSchedule " +
         "WHERE Program.id = DvrSchedule.programId AND Program.tvChannelId = ? " +
-        "AND Program.begin > NOW()" +
+        "AND Program.begin > NOW() AND DvrSchedule.mode = 'WAITING'" +
         "ORDER BY Program.begin ASC";
 	
 	private DAOFactory daoFactory;
@@ -75,7 +75,7 @@ public final class ProgramDvrScheduleDAO {
     		new DvrSchedule(
     			resultSet.getLong("DvrSchedule.id"),
     			resultSet.getLong("Program.id"),
-    			(DvrSchedule.Mode)resultSet.getObject("DvrSchedule.mode"),
+    			DvrSchedule.Mode.valueOf(resultSet.getString("DvrSchedule.mode")),
                 resultSet.getObject("DvrSchedule.fileName") != null ? resultSet.getString("DvrSchedule.fileName") : null
     		)
         );
