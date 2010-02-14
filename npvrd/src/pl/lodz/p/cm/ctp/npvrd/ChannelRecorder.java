@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.locks.*;
 import pl.lodz.p.cm.ctp.dao.*;
-import pl.lodz.p.cm.ctp.dao.model.DvrSchedule.Mode;
+import pl.lodz.p.cm.ctp.dao.model.Recording.Mode;
 
 public class ChannelRecorder implements Runnable {
 	public enum RunMode { RUN, STOP };

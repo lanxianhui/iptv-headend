@@ -9,7 +9,7 @@ public class ScheduleUpdater implements Runnable {
 	
 	private ChannelRecorder parentChannel;
 	private Thread parentThread;
-	private ProgramDvrSchedule lastProgram = null;
+	private ProgramRecording lastProgram = null;
 
 	public ScheduleUpdater(ChannelRecorder parentChannel, Thread parentThread) {
 		this.parentChannel = parentChannel;
@@ -20,19 +20,19 @@ public class ScheduleUpdater implements Runnable {
 	public void run() {
 		while (parentChannel.getRunMode().equals(ChannelRecorder.RunMode.RUN)) {
 			DAOFactory dbase = DAOFactory.getInstance(Npvrd.config.database);
-			ProgramDvrScheduleDAO programDvrScheduleDAO = dbase.getProgramDvrScheduleDAO();
+			ProgramRecordingDAO programDvrScheduleDAO = dbase.getProgramRecordingDAO();
 	        
 	        try {
-				List<ProgramDvrSchedule> programDvrScheduleList = programDvrScheduleDAO.listOlderThanNow(parentChannel.getChannelId());
+				List<ProgramRecording> programDvrScheduleList = programDvrScheduleDAO.listOlderThanNow(parentChannel.getChannelId());
 				
 				if (programDvrScheduleList.size() > 0) {
 					System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
 					
-					ProgramDvrSchedule newFirstProgram = null;
+					ProgramRecording newFirstProgram = null;
 					parentChannel.lockSchedule();
 					try {
 						parentChannel.clear();
-						for (ProgramDvrSchedule programDvrSchedule : programDvrScheduleList) {
+						for (ProgramRecording programDvrSchedule : programDvrScheduleList) {
 							if (newFirstProgram == null) newFirstProgram = programDvrSchedule;
 							parentChannel.add(new RecordingTask(programDvrSchedule));	
 						}
