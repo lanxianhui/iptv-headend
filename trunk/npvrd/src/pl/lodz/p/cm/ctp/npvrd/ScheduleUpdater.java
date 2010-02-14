@@ -36,6 +36,7 @@ public class ScheduleUpdater implements Runnable {
 					} finally {
 						parentChannel.unlockSchedule();
 					}
+					parentChannel.setRecheckSchedule(true);
 					parentThread.interrupt();
 				}
 			} catch (DAOException e) {

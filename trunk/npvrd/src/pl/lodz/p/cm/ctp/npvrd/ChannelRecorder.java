@@ -16,6 +16,7 @@ public class ChannelRecorder implements Runnable {
 	private LinkedList<RecordingTask> recordingSchedule;
 	private Thread scheduleUpdater;
 	private Lock recordingScheduleLock = new ReentrantLock();
+	private volatile boolean recheckSchedule; 
 	private RunMode runMode;
 	
 	/**
@@ -49,6 +50,14 @@ public class ChannelRecorder implements Runnable {
 
 	public void setGroupPort(int groupPort) {
 		this.groupPort = groupPort;
+	}
+	
+	public boolean getRecheckSchedule() {
+		return this.recheckSchedule;
+	}
+	
+	public void setRecheckSchedule(boolean recheck) {
+		this.recheckSchedule = recheck;
 	}
 	
 	public RunMode getRunMode() {
@@ -138,7 +147,92 @@ public class ChannelRecorder implements Runnable {
 			this.scheduleUpdater = new Thread(updater);
 			this.scheduleUpdater.start();
 			
-			while (this.getRunMode().equals(RunMode.RUN))
+			while (this.getRunMode().equals(RunMode.RUN)) {
+				while ((this.getRecheckSchedule()) && (!this.isEmpty())) {
+					this.setRecheckSchedule(false);
+					try {
+						RecordingTask task = null;
+						recordingScheduleLock.lock();
+						try {
+							task = recordingSchedule.removeFirst();
+						} finally {
+							recordingScheduleLock.unlock();
+						}
+						
+						long beginRecordingNum = task.getRecordingBegin().getTime();
+						long endRecordingNum = task.getRecordingEnd().getTime();
+						
+						if (endRecordingNum > System.currentTimeMillis()) {
+							task.setState(Mode.PROCESSING);
+							task.saveToDatabase();
+							String fileName = generateFileName(task);
+							
+							try {
+								FileOutputStream fos = new FileOutputStream(fileName);
+								
+								byte[] buf = new byte[sock.getReceiveBufferSize()];
+								DatagramPacket recv = new DatagramPacket(buf, buf.length);
+								
+								if (System.currentTimeMillis() < beginRecordingNum) {
+									System.out.println(groupIp + ": Waiting for: " + task.getRecordingBegin().toGMTString());
+									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
+								}
+								
+								while (System.currentTimeMillis() < beginRecordingNum)
+								{
+									try {
+										sock.receive(recv);
+										if (!getRunMode().equals(RunMode.RUN)) {
+											fos.close();
+											throw new InterruptedException();
+										}
+									} catch (IOException e) {
+										// Do not report that source group is unavailable, if just waiting for program to start
+									}
+								}
+								
+								System.out.println(groupIp + ": Recording starts for " + task.getProgramName());
+								
+								while (System.currentTimeMillis() < endRecordingNum)
+								{
+									try {
+										sock.receive(recv);
+										fos.write(recv.getData(), 0, recv.getLength());
+										if (!getRunMode().equals(RunMode.RUN)) {
+											fos.close();
+											throw new InterruptedException();
+										}
+									} catch (IOException e) {
+										System.err.println(groupIp + ": Source channel is off-air: " + e.getMessage());
+									}
+								}
+								
+								System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString() + ". Recording ends.");			
+								
+								fos.close();
+								task.setState(Mode.AVAILABLE);
+								task.setResultFileName(fileName);
+								task.saveToDatabase();
+							} catch (IOException ioe) {
+								System.err.println(groupIp + ": Destination file is unavailable: " + ioe.getMessage());
+							}
+						}
+					} catch (InterruptedException ie) {
+						System.out.println(groupIp + ": Thread woken up.");
+					}
+				}
+				
+				if (this.getRunMode().equals(RunMode.RUN) && this.isEmpty() && !this.getRecheckSchedule())
+				{
+					try {
+						Thread.sleep(100000);
+					} catch (InterruptedException e) {
+						System.out.println(groupIp + ": Thread woken up.");
+					}
+				}
+			}
+			
+			/* while (this.getRunMode().equals(RunMode.RUN))
 			{
 				try {
 					if (!this.isEmpty()) {
@@ -217,7 +311,7 @@ public class ChannelRecorder implements Runnable {
 				} catch (IOException e) {
 					System.err.println(groupIp + ": Destination file is unavailable: " + e.getMessage());
 				}
-			}
+			} */
 			
 			System.out.println(groupIp + ": Thread terminating.");
 			this.scheduleUpdater.interrupt();

@@ -107,6 +107,13 @@ public class RecordingTask implements Comparable<RecordingTask> {
 			}
 		}
 	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof RecordingTask) {
+			return (((RecordingTask) o).programName.equals(this.programName) && ((RecordingTask) o).recordingBegin.equals(this.recordingBegin) && ((RecordingTask) o).recordingEnd.equals(this.recordingEnd));
+		}
+		return false;
+	}
 
 	@Override
 	public int compareTo(RecordingTask o) {
