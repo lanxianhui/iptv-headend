@@ -72,10 +72,7 @@ public class Npvrd implements Daemon {
 		}
 		
 		DAOFactory dbase = DAOFactory.getInstance(config.database);
-		System.out.println("DAOFactory successfully obtained: " + dbase);
-
 		TvChannelDAO tvChannelDAO = dbase.getTvChannelDAO();
-        System.out.println("TvChannelDAO successfully obtained: " + tvChannelDAO);
         
         try {
 			List<TvChannel> tvChannelList = tvChannelDAO.list();

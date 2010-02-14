@@ -2,11 +2,17 @@ package pl.lodz.p.cm.ctp.npvrd;
 
 import java.util.Date;
 
+import pl.lodz.p.cm.ctp.dao.*;
+import pl.lodz.p.cm.ctp.dao.model.*;
+import pl.lodz.p.cm.ctp.dao.model.DvrSchedule.Mode;
+
 public class RecordingTask implements Comparable<RecordingTask> {
 	
 	private String programName;
 	private Date recordingBegin;
 	private Date recordingEnd;
+	private Mode state = Mode.WAITING;
+	private ProgramDvrSchedule programDvrSchedule = null;
 	
 	/**
 	 * Represents a single program to be recorded.
@@ -18,6 +24,14 @@ public class RecordingTask implements Comparable<RecordingTask> {
 		this.programName = programName;
 		this.recordingBegin = recordingBegin;
 		this.recordingEnd = recordingEnd;
+	}
+	
+	public RecordingTask(ProgramDvrSchedule programDvrSchedule) {
+		this.programDvrSchedule = programDvrSchedule;
+		this.programName = programDvrSchedule.program.getTitle();
+		this.recordingBegin = programDvrSchedule.program.getBegin();
+		this.recordingEnd = programDvrSchedule.program.getEnd();
+		this.state = this.programDvrSchedule.dvrSchedule.getMode();
 	}
 	
 	/**
@@ -56,6 +70,28 @@ public class RecordingTask implements Comparable<RecordingTask> {
 
 	public void setRecordingEnd(Date koniecNagrywania) {
 		this.recordingEnd = koniecNagrywania;
+	}
+	
+	public void setState(Mode state) {
+		this.state = state;
+		if (programDvrSchedule != null) {
+			this.programDvrSchedule.dvrSchedule.setMode(this.state);
+			
+			DAOFactory dbase = DAOFactory.getInstance(Npvrd.config.database);
+			DvrScheduleDAO dvrScheduleDAO = dbase.getDvrScheduleDAO();
+			
+			try {
+				dvrScheduleDAO.save(this.programDvrSchedule.dvrSchedule);
+			} catch (DAOException e) {
+				System.err.println("Unable to save the mode of the underlying DvrSchedule for " + this.programName);
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public Mode getState() {
+		return this.state;
 	}
 
 	@Override
