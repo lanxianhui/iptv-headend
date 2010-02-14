@@ -23,9 +23,10 @@ public class ScheduleUpdater implements Runnable {
 	        
 	        try {
 				List<ProgramDvrSchedule> programDvrScheduleList = programDvrScheduleDAO.listOlderThanNow(parentChannel.getChannelId());
-				System.out.println(parentChannel.getGroupIp() + "/SD: Got " + programDvrScheduleList.size() + " schedule items.");
 				
 				if (programDvrScheduleList.size() > 0) {
+					System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
+					
 					parentChannel.lockSchedule();
 					try {
 						parentChannel.clear();
@@ -44,15 +45,14 @@ public class ScheduleUpdater implements Runnable {
 				e.printStackTrace();
 			}
 
-			System.out.println(parentChannel.getGroupIp() + "/SD: Schedule updater going to sleep for 10s.");
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
-				System.out.println(parentChannel.getGroupIp() + "/SD: Woken up, possibly for termination.");
+				
 			}
 		}
 		
-		System.out.println(parentChannel.getGroupIp() + "/SD: Thread terminating.");
+		System.out.println(parentChannel.getGroupIp() + "/SU: Thread terminating.");
 	}
 
 }

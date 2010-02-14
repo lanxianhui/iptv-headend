@@ -12,6 +12,7 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	private Date recordingBegin;
 	private Date recordingEnd;
 	private Mode state = Mode.WAITING;
+	private String resultFileName = null;
 	private ProgramDvrSchedule programDvrSchedule = null;
 	
 	/**
@@ -31,6 +32,7 @@ public class RecordingTask implements Comparable<RecordingTask> {
 		this.programName = programDvrSchedule.program.getTitle();
 		this.recordingBegin = programDvrSchedule.program.getBegin();
 		this.recordingEnd = programDvrSchedule.program.getEnd();
+		this.resultFileName = this.programDvrSchedule.dvrSchedule.getFileName();
 		this.state = this.programDvrSchedule.dvrSchedule.getMode();
 	}
 	
@@ -76,22 +78,34 @@ public class RecordingTask implements Comparable<RecordingTask> {
 		this.state = state;
 		if (programDvrSchedule != null) {
 			this.programDvrSchedule.dvrSchedule.setMode(this.state);
-			
-			DAOFactory dbase = DAOFactory.getInstance(Npvrd.config.database);
-			DvrScheduleDAO dvrScheduleDAO = dbase.getDvrScheduleDAO();
-			
-			try {
-				dvrScheduleDAO.save(this.programDvrSchedule.dvrSchedule);
-			} catch (DAOException e) {
-				System.err.println("Unable to save the mode of the underlying DvrSchedule for " + this.programName);
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-			}
 		}
 	}
 	
 	public Mode getState() {
 		return this.state;
+	}
+	
+	public void setResultFileName(String fileName) {
+		this.resultFileName = fileName;
+		if (programDvrSchedule != null) {
+			this.programDvrSchedule.dvrSchedule.setFileName(fileName);
+		}
+	}
+	
+	public String getResultFileName() {
+		return this.resultFileName;
+	}
+	
+	public void saveToDatabase() {
+		if (programDvrSchedule != null) {
+			DAOFactory dbase = DAOFactory.getInstance(Npvrd.config.database);
+			DvrScheduleDAO dvrScheduleDAO = dbase.getDvrScheduleDAO();
+			try {
+				dvrScheduleDAO.save(this.programDvrSchedule.dvrSchedule);
+			} catch (DAOException e) {
+				System.err.println("Unable to save underlying DvrSchedule (" + this.programDvrSchedule.dvrSchedule.getId() + ") to database: " + e.getMessage());
+			}
+		}
 	}
 
 	@Override
