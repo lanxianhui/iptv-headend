@@ -71,8 +71,6 @@ public class Npvrd implements Daemon {
 			System.err.println("Configuration file not found!");
 		}
 		
-		// TODO Read all recordable channels from the database and create ChannelRecorders for them.
-		
 		DAOFactory dbase = DAOFactory.getInstance(config.database);
 		System.out.println("DAOFactory successfully obtained: " + dbase);
 
