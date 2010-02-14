@@ -10,49 +10,49 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import pl.lodz.p.cm.ctp.dao.model.DvrSchedule;
+import pl.lodz.p.cm.ctp.dao.model.Recording;
 
-public final class DvrScheduleDAO {
+public final class RecordingDAO {
 	
 	private static final String SQL_FIND_BY_ID =
-        "SELECT id, programId, mode, fileName FROM DvrSchedule WHERE id = ?";
+        "SELECT id, programId, mode, fileName FROM Recording WHERE id = ?";
 	private static final String SQL_FIND_BY_PROGRAMID = 
-		"SELECT id, programId, mode, fileName FROM DvrSchedule WHERE programId = ?";
+		"SELECT id, programId, mode, fileName FROM Recording WHERE programId = ?";
 	private static final String SQL_LIST_ORDER_BY_ID =
-        "SELECT id, programId, mode, fileName FROM DvrSchedule ORDER BY id";
+        "SELECT id, programId, mode, fileName FROM Recording ORDER BY id";
 	private static final String SQL_INSERT =
-        "INSERT INTO DvrSchedule (programId, mode, fileName) VALUES (?, ?, ?)";
+        "INSERT INTO Recording (programId, mode, fileName) VALUES (?, ?, ?)";
     private static final String SQL_UPDATE =
-        "UPDATE DvrSchedule SET programId = ?, mode = ?, fileName = ? WHERE id = ?";
+        "UPDATE Recording SET programId = ?, mode = ?, fileName = ? WHERE id = ?";
     private static final String SQL_DELETE =
-        "DELETE FROM DvrSchedule WHERE id = ?";
+        "DELETE FROM Recording WHERE id = ?";
 	
 	private DAOFactory daoFactory;
 
-	DvrScheduleDAO(DAOFactory daoFactory) {
+	RecordingDAO(DAOFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 	
-	public DvrSchedule find(Long id) throws DAOException {
+	public Recording find(Long id) throws DAOException {
         return find(SQL_FIND_BY_ID, id);
     }
 	
-	public DvrSchedule findByProgramId(Long programId) throws DAOException {
+	public Recording findByProgramId(Long programId) throws DAOException {
 		return find(SQL_FIND_BY_PROGRAMID, programId);
 	}
 	
-	private DvrSchedule find(String sql, Object... values) throws DAOException {
+	private Recording find(String sql, Object... values) throws DAOException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        DvrSchedule dvrSchedule = null;
+        Recording dvrSchedule = null;
 
         try {
             connection = daoFactory.getConnection();
             preparedStatement = prepareStatement(connection, sql, false, values);
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                dvrSchedule = mapDvrSchedule(resultSet);
+                dvrSchedule = mapRecording(resultSet);
             }
         } catch (SQLException e) {
             throw new DAOException(e);
@@ -63,22 +63,22 @@ public final class DvrScheduleDAO {
         return dvrSchedule;
     }
 	
-	public List<DvrSchedule> list() throws DAOException {
+	public List<Recording> list() throws DAOException {
 		return list(SQL_LIST_ORDER_BY_ID);
 	}
 	
-	public List<DvrSchedule> list(String sql, Object... values) throws DAOException {
+	public List<Recording> list(String sql, Object... values) throws DAOException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        List<DvrSchedule> dvrSchedules = new ArrayList<DvrSchedule>();
+        List<Recording> dvrSchedules = new ArrayList<Recording>();
 
         try {
             connection = daoFactory.getConnection();
             preparedStatement = prepareStatement(connection, sql, false, values);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                dvrSchedules.add(mapDvrSchedule(resultSet));
+                dvrSchedules.add(mapRecording(resultSet));
             }
         } catch (SQLException e) {
             throw new DAOException(e);
@@ -89,9 +89,9 @@ public final class DvrScheduleDAO {
         return dvrSchedules;
     }
 	
-	public void create(DvrSchedule dvrSchedule) throws IllegalArgumentException, DAOException {
+	public void create(Recording dvrSchedule) throws IllegalArgumentException, DAOException {
         if (dvrSchedule.getId() != null) {
-            throw new IllegalArgumentException("This schedule is already created, the schedule id is not null.");
+            throw new IllegalArgumentException("This recording is already created, the recording id is not null.");
         }
 
         Object[] values = {
@@ -109,13 +109,13 @@ public final class DvrScheduleDAO {
             preparedStatement = prepareStatement(connection, SQL_INSERT, true, values);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
-                throw new DAOException("Creating schedule channel failed, no rows affected.");
+                throw new DAOException("Creating recording failed, no rows affected.");
             }
             generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 dvrSchedule.setId(generatedKeys.getLong(1));
             } else {
-                throw new DAOException("Creating schedule channel, no generated key obtained.");
+                throw new DAOException("Creating recording, no generated key obtained.");
             }
         } catch (SQLException e) {
             throw new DAOException(e);
@@ -124,16 +124,16 @@ public final class DvrScheduleDAO {
         }
     }
 
-	public void update(DvrSchedule dvrSchedule) throws DAOException {
-        if (dvrSchedule.getId() == null) {
-            throw new IllegalArgumentException("Schedule is not created yet, the schedule ID is null.");
+	public void update(Recording recording) throws DAOException {
+        if (recording.getId() == null) {
+            throw new IllegalArgumentException("Recording is not created yet, the recording ID is null.");
         }
 
         Object[] values = {
-            dvrSchedule.getProgramId(),
-            dvrSchedule.getMode().toString(),
-            dvrSchedule.getFileName(),
-            dvrSchedule.getId()
+            recording.getProgramId(),
+            recording.getMode().toString(),
+            recording.getFileName(),
+            recording.getId()
         };
 
         Connection connection = null;
@@ -153,16 +153,16 @@ public final class DvrScheduleDAO {
         }
     }
 	
-	public void save(DvrSchedule dvrSchedule) throws DAOException {
-        if (dvrSchedule.getId() == null) {
-            create(dvrSchedule);
+	public void save(Recording recording) throws DAOException {
+        if (recording.getId() == null) {
+            create(recording);
         } else {
-            update(dvrSchedule);
+            update(recording);
         }
     }
 	
-	public void delete(DvrSchedule dvrSchedule) throws DAOException {
-        Object[] values = { dvrSchedule.getId() };
+	public void delete(Recording recording) throws DAOException {
+        Object[] values = { recording.getId() };
 
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -174,7 +174,7 @@ public final class DvrScheduleDAO {
             if (affectedRows == 0) {
                 throw new DAOException("Deleting schedule failed, no rows affected.");
             } else {
-                dvrSchedule.setId(null);
+                recording.setId(null);
             }
         } catch (SQLException e) {
             throw new DAOException(e);
@@ -183,11 +183,11 @@ public final class DvrScheduleDAO {
         }
     }
 	
-	private static DvrSchedule mapDvrSchedule(ResultSet resultSet) throws SQLException {
-        return new DvrSchedule(
+	private static Recording mapRecording(ResultSet resultSet) throws SQLException {
+        return new Recording(
             resultSet.getLong("id"),
             resultSet.getLong("programId"),
-            DvrSchedule.Mode.valueOf(resultSet.getString("DvrSchedule.mode")),
+            Recording.Mode.valueOf(resultSet.getString("Recording.mode")),
             resultSet.getObject("fileName") != null ? resultSet.getString("fileName") : null
         );
     }

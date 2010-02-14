@@ -45,16 +45,16 @@ public abstract class DAOFactory {
 		return new ProgramDAO(this);
 	}
 	
-	public DvrScheduleDAO getDvrScheduleDAO() {
-		return new DvrScheduleDAO(this);
+	public RecordingDAO getRecordingDAO() {
+		return new RecordingDAO(this);
 	}
 	
 	public TvChannelDAO getTvChannelDAO() {
 		return new TvChannelDAO(this);
 	}
 	
-	public ProgramDvrScheduleDAO getProgramDvrScheduleDAO() {
-		return new ProgramDvrScheduleDAO(this);
+	public ProgramRecordingDAO getProgramRecordingDAO() {
+		return new ProgramRecordingDAO(this);
 	}
 	
 }

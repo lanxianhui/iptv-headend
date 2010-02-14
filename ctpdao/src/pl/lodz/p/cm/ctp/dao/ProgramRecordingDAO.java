@@ -12,39 +12,39 @@ import java.util.List;
 
 import pl.lodz.p.cm.ctp.dao.model.*;
 
-public final class ProgramDvrScheduleDAO {
+public final class ProgramRecordingDAO {
 	
 	private static final String SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN =
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
-        "DvrSchedule.id, DvrSchedule.mode, DvrSchedule.fileName FROM Program, DvrSchedule " +
-        "WHERE Program.id = DvrSchedule.programId AND Program.tvChannelId = ? ORDER BY Program.begin ASC";
+        "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
+        "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? ORDER BY Program.begin ASC";
 	
 	private static final String SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN =
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
-        "DvrSchedule.id, DvrSchedule.mode, DvrSchedule.fileName FROM Program, DvrSchedule " +
-        "WHERE Program.id = DvrSchedule.programId AND Program.tvChannelId = ? " +
-        "AND Program.end > NOW() AND DvrSchedule.mode = 'WAITING'" +
+        "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
+        "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
+        "AND Program.end > NOW() AND Recording.mode = 'WAITING'" +
         "ORDER BY Program.begin ASC";
 	
 	private DAOFactory daoFactory;
 
-	ProgramDvrScheduleDAO(DAOFactory daoFactory) {
+	ProgramRecordingDAO(DAOFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 	
-	public List<ProgramDvrSchedule> listOlderThanNow(long tvChannelId) throws DAOException {
+	public List<ProgramRecording> listOlderThanNow(long tvChannelId) throws DAOException {
 		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN, tvChannelId);
 	}
 	
-	public List<ProgramDvrSchedule> list(long tvChannelId) throws DAOException {
+	public List<ProgramRecording> list(long tvChannelId) throws DAOException {
 		return list(SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN, tvChannelId);
 	}
 	
-	public List<ProgramDvrSchedule> list(String sql, Object... values) throws DAOException {
+	public List<ProgramRecording> list(String sql, Object... values) throws DAOException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        List<ProgramDvrSchedule> dvrSchedules = new ArrayList<ProgramDvrSchedule>();
+        List<ProgramRecording> dvrSchedules = new ArrayList<ProgramRecording>();
 
         try {
             connection = daoFactory.getConnection();
@@ -62,8 +62,8 @@ public final class ProgramDvrScheduleDAO {
         return dvrSchedules;
     }
 	
-	private static ProgramDvrSchedule mapProgramDvrSchedule(ResultSet resultSet) throws SQLException {
-        return new ProgramDvrSchedule(
+	private static ProgramRecording mapProgramDvrSchedule(ResultSet resultSet) throws SQLException {
+        return new ProgramRecording(
     		new Program(
     			resultSet.getLong("Program.id"),
     			resultSet.getLong("Program.tvChannelId"),
@@ -72,11 +72,11 @@ public final class ProgramDvrScheduleDAO {
     			resultSet.getTimestamp("Program.begin"),
     			resultSet.getTimestamp("Program.end")
     		),
-    		new DvrSchedule(
-    			resultSet.getLong("DvrSchedule.id"),
+    		new Recording(
+    			resultSet.getLong("Recording.id"),
     			resultSet.getLong("Program.id"),
-    			DvrSchedule.Mode.valueOf(resultSet.getString("DvrSchedule.mode")),
-                resultSet.getObject("DvrSchedule.fileName") != null ? resultSet.getString("DvrSchedule.fileName") : null
+    			Recording.Mode.valueOf(resultSet.getString("Recording.mode")),
+                resultSet.getObject("Recording.fileName") != null ? resultSet.getString("Recording.fileName") : null
     		)
         );
     }
