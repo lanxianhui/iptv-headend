@@ -263,7 +263,6 @@ public class ChannelRecorder implements Runnable {
 									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
 								} catch (InterruptedException e) {
 									System.err.println(groupIp + ": Woken up while waiting, what's up?");
-									e.printStackTrace();
 								}
 								
 								while (System.currentTimeMillis() < beginRecordingNum)
