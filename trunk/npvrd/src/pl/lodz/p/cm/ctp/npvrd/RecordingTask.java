@@ -13,7 +13,7 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	private Date recordingEnd;
 	private Mode state = Mode.WAITING;
 	private String resultFileName = null;
-	private ProgramRecording programDvrSchedule = null;
+	private ProgramRecording programRecording = null;
 	
 	/**
 	 * Represents a single program to be recorded.
@@ -27,13 +27,13 @@ public class RecordingTask implements Comparable<RecordingTask> {
 		this.recordingEnd = recordingEnd;
 	}
 	
-	public RecordingTask(ProgramRecording programDvrSchedule) {
-		this.programDvrSchedule = programDvrSchedule;
-		this.programName = programDvrSchedule.program.getTitle();
-		this.recordingBegin = programDvrSchedule.program.getBegin();
-		this.recordingEnd = programDvrSchedule.program.getEnd();
-		this.resultFileName = this.programDvrSchedule.recording.getFileName();
-		this.state = this.programDvrSchedule.recording.getMode();
+	public RecordingTask(ProgramRecording programRecording) {
+		this.programRecording = programRecording;
+		this.programName = programRecording.program.getTitle();
+		this.recordingBegin = programRecording.program.getBegin();
+		this.recordingEnd = programRecording.program.getEnd();
+		this.resultFileName = this.programRecording.recording.getFileName();
+		this.state = this.programRecording.recording.getMode();
 	}
 	
 	/**
@@ -76,8 +76,8 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	
 	public void setState(Mode state) {
 		this.state = state;
-		if (programDvrSchedule != null) {
-			this.programDvrSchedule.recording.setMode(this.state);
+		if (programRecording != null) {
+			this.programRecording.recording.setMode(this.state);
 		}
 	}
 	
@@ -87,8 +87,8 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	
 	public void setResultFileName(String fileName) {
 		this.resultFileName = fileName;
-		if (programDvrSchedule != null) {
-			this.programDvrSchedule.recording.setFileName(fileName);
+		if (programRecording != null) {
+			this.programRecording.recording.setFileName(fileName);
 		}
 	}
 	
@@ -97,13 +97,13 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	}
 	
 	public void saveToDatabase() {
-		if (programDvrSchedule != null) {
+		if (programRecording != null) {
 			DAOFactory dbase = DAOFactory.getInstance(Npvrd.config.database);
 			RecordingDAO dvrScheduleDAO = dbase.getRecordingDAO();
 			try {
-				dvrScheduleDAO.save(this.programDvrSchedule.recording);
+				dvrScheduleDAO.save(this.programRecording.recording);
 			} catch (DAOException e) {
-				System.err.println("Unable to save underlying DvrSchedule (" + this.programDvrSchedule.recording.getId() + ") to database: " + e.getMessage());
+				System.err.println("Unable to save underlying DvrSchedule (" + this.programRecording.recording.getId() + ") to database: " + e.getMessage());
 			}
 		}
 	}
