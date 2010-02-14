@@ -9,6 +9,10 @@ public class ProgramDvrSchedule {
 		this.dvrSchedule = dvrSchedule;
 	}
 	
+	public boolean equals(Object o) {
+		return (o instanceof ProgramDvrSchedule) ? (((ProgramDvrSchedule)o).program.equals(this.program) && ((ProgramDvrSchedule)o).dvrSchedule.equals(this.dvrSchedule)) : false; 
+	}
+	
 	public String toString() {
 		return String.format("ProgramDvrSchedule[program=\n%s\ndvrSchedule=\n%s]", 
 	            program, dvrSchedule);
