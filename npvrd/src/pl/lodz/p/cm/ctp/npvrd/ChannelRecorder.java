@@ -209,7 +209,6 @@ public class ChannelRecorder implements Runnable {
 						}
 					} else {
 						try {
-							System.out.println(groupIp + ": Temporarly going to sleep, task list empty.");
 							Thread.sleep(100000);
 						} catch (InterruptedException e) {
 							
