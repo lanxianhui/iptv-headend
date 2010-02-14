@@ -53,4 +53,8 @@ public abstract class DAOFactory {
 		return new TvChannelDAO(this);
 	}
 	
+	public ProgramDvrScheduleDAO getProgramDvrScheduleDAO() {
+		return new ProgramDvrScheduleDAO(this);
+	}
+	
 }
