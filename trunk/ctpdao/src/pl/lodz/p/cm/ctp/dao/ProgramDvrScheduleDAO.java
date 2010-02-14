@@ -32,12 +32,12 @@ public final class ProgramDvrScheduleDAO {
 		this.daoFactory = daoFactory;
 	}
 	
-	public List<ProgramDvrSchedule> listOlderThanNow() throws DAOException {
-		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN);
+	public List<ProgramDvrSchedule> listOlderThanNow(long tvChannelId) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN, tvChannelId);
 	}
 	
-	public List<ProgramDvrSchedule> list() throws DAOException {
-		return list(SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN);
+	public List<ProgramDvrSchedule> list(long tvChannelId) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN, tvChannelId);
 	}
 	
 	public List<ProgramDvrSchedule> list(String sql, Object... values) throws DAOException {
