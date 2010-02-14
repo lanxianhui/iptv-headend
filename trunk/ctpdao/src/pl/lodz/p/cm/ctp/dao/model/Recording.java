@@ -1,6 +1,6 @@
 package pl.lodz.p.cm.ctp.dao.model;
 
-public class DvrSchedule {
+public class Recording {
 	
 	public enum Mode { WAITING, PROCESSING, AVAILABLE, UNAVAILABLE };
 
@@ -9,16 +9,16 @@ public class DvrSchedule {
 	private Mode mode;
 	private String fileName;
 	
-	public DvrSchedule() {
+	public Recording() {
 		
 	}
 	
-	public DvrSchedule(Long id, Long programId) {
+	public Recording(Long id, Long programId) {
 		this.id = id;
 		this.programId = programId;
 	}
 	
-	public DvrSchedule(Long id, Long programId, Mode mode, String fileName) {
+	public Recording(Long id, Long programId, Mode mode, String fileName) {
 		this(id, programId);
 		this.mode = mode;
 		this.fileName = fileName;
@@ -57,7 +57,7 @@ public class DvrSchedule {
 	}
 	
 	public boolean equals(Object other) {
-		return (other instanceof DvrSchedule) && (id != null) ? id.equals(((DvrSchedule) other).id) : (other == this);
+		return (other instanceof Recording) && (id != null) ? id.equals(((Recording) other).id) : (other == this);
 	}
 	
 	public int hashCode() {
