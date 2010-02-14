@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.locks.*;
 import pl.lodz.p.cm.ctp.dao.*;
+import pl.lodz.p.cm.ctp.dao.model.DvrSchedule.Mode;
 
 public class ChannelRecorder implements Runnable {
 	public enum RunMode { RUN, STOP };
@@ -28,10 +29,6 @@ public class ChannelRecorder implements Runnable {
 		this.groupPort = groupPort;
 		this.recordingSchedule = new LinkedList<RecordingTask>();
 		this.runMode = RunMode.RUN;
-		
-		ScheduleUpdater updater = new ScheduleUpdater(this);
-		this.scheduleUpdater = new Thread(updater);
-		this.scheduleUpdater.start();
 	}
 	
 	public long getChannelId() {
@@ -73,48 +70,22 @@ public class ChannelRecorder implements Runnable {
 	public boolean add(RecordingTask task) {
 		boolean result = false;
 		
-		recordingScheduleLock.lock();
-		try {
-			result = recordingSchedule.add(task);
-			if (result) Collections.sort(recordingSchedule);
-		} finally {
-			recordingScheduleLock.unlock();
-		}
+		result = recordingSchedule.add(task);
+		if (result) Collections.sort(recordingSchedule);
 		return result;
 	}
 	
 	public boolean remove(RecordingTask task) {
-		boolean result = false;
-		
-		recordingScheduleLock.lock();
-		try {
-			result = recordingSchedule.remove(task);
-		} finally {
-			recordingScheduleLock.unlock();
-		}
-		return result;
+		return recordingSchedule.remove(task);
 		
 	}
 	
 	public boolean removeAll(Collection<RecordingTask> tasks) {
-		boolean result = false;
-		
-		recordingScheduleLock.lock();
-		try {
-			result = recordingSchedule.removeAll(tasks);
-		} finally {
-			recordingScheduleLock.unlock();
-		}
-		return result;
+		return recordingSchedule.removeAll(tasks);
 	}
 	
 	public void clear() {
-		recordingScheduleLock.lock();
-		try {
-			recordingSchedule.clear();
-		} finally {
-			recordingScheduleLock.unlock();
-		}
+		recordingSchedule.clear();
 	}
 	
 	public boolean isEmpty() {
@@ -128,6 +99,14 @@ public class ChannelRecorder implements Runnable {
 		}
 		
 		return result;
+	}
+	
+	public void lockSchedule() {
+		this.recordingScheduleLock.lock();
+	}
+	
+	public void unlockSchedule() {
+		this.recordingScheduleLock.unlock();
 	}
 	
 	public Collection<RecordingTask> getTasks() {
@@ -151,56 +130,79 @@ public class ChannelRecorder implements Runnable {
 			System.out.println(groupIp + ": Setting up socket.");
 			InetAddress group = InetAddress.getByName(groupIp);
 			MulticastSocket sock = new MulticastSocket(groupPort);
+			sock.setSoTimeout(10000);
 			sock.joinGroup(group);
 			
+			ScheduleUpdater updater = new ScheduleUpdater(this, Thread.currentThread());
+			this.scheduleUpdater = new Thread(updater);
+			this.scheduleUpdater.start();
 			
-			while (this.getRunMode() == RunMode.RUN)
+			while (this.getRunMode().equals(RunMode.RUN))
 			{
 				try {
 					if (!this.isEmpty()) {
 						RecordingTask task = null;
 						recordingScheduleLock.lock();
 						try {
-							task = recordingSchedule.removeLast();
+							task = recordingSchedule.removeFirst();
 						} finally {
 							recordingScheduleLock.unlock();
 						}
-						String fileName = generateFileName(task);
+						long beginRecordingNum = task.getRecordingBegin().getTime();
+						long endRecordingNum = task.getRecordingEnd().getTime();
 						
-						FileOutputStream fos = new FileOutputStream(fileName);
-						
-						byte[] buf = new byte[sock.getReceiveBufferSize()];
-						DatagramPacket recv = new DatagramPacket(buf, buf.length);
-						
-						long poczatekNagrywaniaLiczb = task.getRecordingBegin().getTime();
-						long koniecNagrywaniaLiczb = task.getRecordingEnd().getTime();
-						
-						System.out.println(groupIp + ": Waiting for: " + task.getRecordingBegin().toString());
-						
-						try {
-							Thread.sleep(poczatekNagrywaniaLiczb - System.currentTimeMillis() - 10);
-						} catch (InterruptedException e) {
-							System.err.println(groupIp + ": Woken up while waiting, what's up?");
-							e.printStackTrace();
+						if (endRecordingNum > System.currentTimeMillis()) { 
+							task.setState(Mode.PROCESSING);
+							String fileName = generateFileName(task);
+							
+							FileOutputStream fos = new FileOutputStream(fileName);
+							
+							byte[] buf = new byte[sock.getReceiveBufferSize()];
+							DatagramPacket recv = new DatagramPacket(buf, buf.length);
+							
+							if (System.currentTimeMillis() < beginRecordingNum) {
+								System.out.println(groupIp + ": Waiting for: " + task.getRecordingBegin().toGMTString());
+								
+								try {
+									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
+								} catch (InterruptedException e) {
+									System.err.println(groupIp + ": Woken up while waiting, what's up?");
+									e.printStackTrace();
+								}
+								
+								while (System.currentTimeMillis() < beginRecordingNum)
+								{
+									try {
+										sock.receive(recv);
+									} catch (IOException e) {
+										System.err.println(groupIp + ": Source channel is off-air: " + e.getMessage());
+									}
+								}
+							}
+							
+							System.out.println(groupIp + ": Recording starts for " + task.getProgramName());
+							
+							while (System.currentTimeMillis() < endRecordingNum)
+							{
+								try {
+									sock.receive(recv);
+									fos.write(recv.getData(), 0, recv.getLength());
+								} catch (IOException e) {
+									System.err.println(groupIp + ": Source channel is off-air: " + e.getMessage());
+								}
+							}
+							
+							System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString());			
+							System.out.println(groupIp + ": Recording ends");
+							
+							fos.close();
+							task.setState(Mode.AVAILABLE);
+						} else {
+							System.out.println(groupIp + ": Too late for " + task.getProgramName());
+							if (task.getState().equals(Mode.WAITING)) {
+								task.setState(Mode.UNAVAILABLE);
+							}
 						}
-						
-						while (System.currentTimeMillis() < poczatekNagrywaniaLiczb)
-						{
-							sock.receive(recv);
-						}
-						
-						System.out.println(groupIp + ": Recording starts for " + task.getProgramName());
-						
-						while (System.currentTimeMillis() < koniecNagrywaniaLiczb)
-						{
-							sock.receive(recv);
-							fos.write(recv.getData(), 0, recv.getLength());
-						}
-						
-						System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toString());			
-						System.out.println(groupIp + ": Recording ends");
-						
-						fos.close();
 					} else {
 						try {
 							System.out.println(groupIp + ": Temporarly going to sleep, task list empty.");
@@ -210,11 +212,12 @@ public class ChannelRecorder implements Runnable {
 						}
 					}
 				} catch (IOException e) {
-					System.err.println(groupIp + ": Destination file is unavailable");
+					System.err.println(groupIp + ": Destination file is unavailable: " + e.getMessage());
 				}
 			}
 			
 			System.out.println(groupIp + ": Thread terminating.");
+			this.scheduleUpdater.interrupt();
 			
 			sock.leaveGroup(group);
 			sock.close();
