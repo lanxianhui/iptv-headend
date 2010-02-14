@@ -10,30 +10,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import pl.lodz.p.cm.ctp.dao.model.DvrSchedule;
-import pl.lodz.p.cm.ctp.dao.model.Program;
+import pl.lodz.p.cm.ctp.dao.model.*;
 
 public final class ProgramDvrScheduleDAO {
-	
-	public static class ProgramDvrSchedule {
-		public Program program;
-		public DvrSchedule dvrSchedule;
-		
-		public ProgramDvrSchedule(Program program, DvrSchedule dvrSchedule) {
-			this.program = program;
-			this.dvrSchedule = dvrSchedule;
-		}
-	}
 	
 	private static final String SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN =
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "DvrSchedule.id, DvrSchedule.mode, DvrSchedule.fileName FROM Program, DvrSchedule " +
         "WHERE Program.id = DvrSchedule.programId AND Program.tvChannelId = ? ORDER BY Program.begin ASC";
 	
+	private static final String SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN =
+        "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
+        "DvrSchedule.id, DvrSchedule.mode, DvrSchedule.fileName FROM Program, DvrSchedule " +
+        "WHERE Program.id = DvrSchedule.programId AND Program.tvChannelId = ? " +
+        "AND Program.begin > NOW()" +
+        "ORDER BY Program.begin ASC";
+	
 	private DAOFactory daoFactory;
 
 	ProgramDvrScheduleDAO(DAOFactory daoFactory) {
 		this.daoFactory = daoFactory;
+	}
+	
+	public List<ProgramDvrSchedule> listOlderThanNow() throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN);
 	}
 	
 	public List<ProgramDvrSchedule> list() throws DAOException {
