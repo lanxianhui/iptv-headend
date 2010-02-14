@@ -124,6 +124,7 @@ public class ChannelRecorder implements Runnable {
 		return DAOUtil.hashMD5(plaintext) + ".m2t";
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
 		try {
@@ -153,6 +154,7 @@ public class ChannelRecorder implements Runnable {
 						
 						if (endRecordingNum > System.currentTimeMillis()) { 
 							task.setState(Mode.PROCESSING);
+							task.saveToDatabase();
 							String fileName = generateFileName(task);
 							
 							FileOutputStream fos = new FileOutputStream(fileName);
@@ -175,7 +177,7 @@ public class ChannelRecorder implements Runnable {
 									try {
 										sock.receive(recv);
 									} catch (IOException e) {
-										System.err.println(groupIp + ": Source channel is off-air: " + e.getMessage());
+										
 									}
 								}
 							}
@@ -192,15 +194,17 @@ public class ChannelRecorder implements Runnable {
 								}
 							}
 							
-							System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString());			
-							System.out.println(groupIp + ": Recording ends");
+							System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString() + ". Recording ends.");			
 							
 							fos.close();
 							task.setState(Mode.AVAILABLE);
+							task.setResultFileName(fileName);
+							task.saveToDatabase();
 						} else {
 							System.out.println(groupIp + ": Too late for " + task.getProgramName());
 							if (task.getState().equals(Mode.WAITING)) {
 								task.setState(Mode.UNAVAILABLE);
+								task.saveToDatabase();
 							}
 						}
 					} else {
@@ -208,7 +212,7 @@ public class ChannelRecorder implements Runnable {
 							System.out.println(groupIp + ": Temporarly going to sleep, task list empty.");
 							Thread.sleep(100000);
 						} catch (InterruptedException e) {
-							System.out.println(groupIp + ": Woken up.");
+							
 						}
 					}
 				} catch (IOException e) {
