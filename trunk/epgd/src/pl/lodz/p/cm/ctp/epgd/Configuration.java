@@ -9,5 +9,6 @@ public class Configuration implements Serializable {
 	
 	public DatabaseConfiguration database;
 	public XmlTvGrabberConfig xmlTvGrabber;
+	public String refresh;
 	
 }

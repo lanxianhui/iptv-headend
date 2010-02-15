@@ -8,7 +8,7 @@ public class XMLMap implements Serializable {
 	
 	private String name;
 	private String externalId;
-	private int internalId;
+	private long internalId;
 
 	public XMLMap(String externalId, int internalId) {
 		this.externalId = externalId;
@@ -32,10 +32,10 @@ public class XMLMap implements Serializable {
 	public void setExternalId(String externalId) {
 		this.externalId = externalId;
 	}
-	public int getInternalId() {
+	public long getInternalId() {
 		return internalId;
 	}
-	public void setInternalId(int internalId) {
+	public void setInternalId(long internalId) {
 		this.internalId = internalId;
 	}
 	

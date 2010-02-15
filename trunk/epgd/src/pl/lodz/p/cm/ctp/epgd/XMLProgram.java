@@ -1,9 +1,7 @@
 package pl.lodz.p.cm.ctp.epgd;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 public class XMLProgram implements Serializable {
 	
@@ -67,7 +65,7 @@ public class XMLProgram implements Serializable {
 	}
 	
 	private Date dateFromXmlString(String xmlDate) {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance();
 		
 		String year = xmlDate.substring(0, 4);
 		String month = xmlDate.substring(4, 6);
@@ -78,7 +76,7 @@ public class XMLProgram implements Serializable {
 		String timeZone = "GMT" + xmlDate.substring(15, 20);
 		
 		calendar.setTimeZone(TimeZone.getTimeZone(timeZone));
-		calendar.set(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(date), Integer.parseInt(hourOfDay), Integer.parseInt(minute), Integer.parseInt(second));
+		calendar.set(Integer.parseInt(year), Integer.parseInt(month) - 1, Integer.parseInt(date), Integer.parseInt(hourOfDay), Integer.parseInt(minute), Integer.parseInt(second));
 		return calendar.getTime();
 	}
 	

@@ -12,4 +12,5 @@
 		<resultFile>thisWeek.xml</resultFile>
 		<mapFile>mapping.xml</mapFile>
 	</xmlTvGrabber>
+	<refresh>59 23 * * sun</refresh> <!-- this is crontab-like syntax, for more lookup cron4j -->
 </config>
