@@ -3,6 +3,7 @@ package pl.lodz.p.cm.ctp.npvrd;
 import java.io.*;
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.*;
+
 import java.util.*;
 import com.thoughtworks.xstream.*;
 
@@ -88,31 +89,29 @@ public class Npvrd {
 			System.exit(1);
 		}
 		
-		String curLine = "";
-		InputStreamReader converter = new InputStreamReader(System.in);
-		BufferedReader console = new BufferedReader(converter);
+		// Setup the shutdown hook
 		
-		System.out.println("npvrd in interactive command-line mode:");
-		
-		while (isAnyRecorderAlive())
-		{
-			while (!(curLine.equals("quit"))) {
-				try {
-					System.out.print("#: ");
-					curLine = console.readLine();
-					if (curLine.equals("quit")) {
-						System.out.println("Terminating all threads...");
-						setRunModesRecorders(ChannelRecorder.RunMode.STOP);
-						wakeUpAllRecorders();
-					}
-				} catch (IOException e) {
-
-				}            
+		Thread runtimeHookThread = new Thread() {
+			public void run() {
+				shutdownHook();
 			}
-
-		}
+		};
 		
-		System.out.println("Finished. All recorder threads dead.");
+		Runtime.getRuntime().addShutdownHook(runtimeHookThread);
+		
+		try {
+			while (isAnyRecorderAlive()) {
+				Thread.sleep(1000L * 60L * 10L);
+				// We keep this thread running, so that the JVM will know that we are still running
+			}
+		} catch (Throwable t) {
+			System.out.println("Exception " + t.getMessage());
+		}
+	}
+	
+	public static void shutdownHook() {
+		setRunModesRecorders(ChannelRecorder.RunMode.STOP);
+		wakeUpAllRecorders();
 	}
 
 }
