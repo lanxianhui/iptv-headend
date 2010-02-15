@@ -137,7 +137,7 @@ public class ChannelRecorder implements Runnable {
 	@Override
 	public void run() {
 		try {
-			System.out.println(groupIp + ": Setting up socket.");
+			Npvrd.log(groupIp + ": Setting up socket.");
 			InetAddress group = InetAddress.getByName(groupIp);
 			MulticastSocket sock = new MulticastSocket(groupPort);
 			sock.setSoTimeout(10000);
