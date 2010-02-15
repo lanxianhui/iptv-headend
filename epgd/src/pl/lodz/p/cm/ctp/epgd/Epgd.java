@@ -1,9 +1,14 @@
 package pl.lodz.p.cm.ctp.epgd;
 
 import java.io.*;
+import java.sql.Timestamp;
 import java.util.Hashtable;
 
 import org.apache.commons.daemon.*;
+
+import pl.lodz.p.cm.ctp.dao.*;
+import pl.lodz.p.cm.ctp.dao.model.Program;
+
 import com.thoughtworks.xstream.*;
 
 public class Epgd implements Daemon {
@@ -39,7 +44,7 @@ public class Epgd implements Daemon {
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
-		Hashtable<String, Integer> channelMap = new Hashtable<String, Integer>();
+		Hashtable<String, Long> channelMap = new Hashtable<String, Long>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -73,7 +78,6 @@ public class Epgd implements Daemon {
 						Object ro = ois.readObject();
 						if (ro instanceof XMLMap) {
 							XMLMap rm = (XMLMap)ro;
-							System.out.println("New mapping (" + rm.getName() + "): " + rm.getExternalId() + " => " + Integer.toString(rm.getInternalId()));
 							channelMap.put(rm.getExternalId(), rm.getInternalId());
 						}
 					} catch (ClassNotFoundException e) {
@@ -94,13 +98,6 @@ public class Epgd implements Daemon {
 			
 		}
 		
-		/* System.out.println(config.xmlTvGrabber);
-		
-		String arguments[] = config.xmlTvGrabber.arguments.split(" ");
-		for (String argument : arguments) {
-			System.out.println(argument);
-		} */
-		
 		try {
 			XStream xs = new XStream();
 			
@@ -114,6 +111,10 @@ public class Epgd implements Daemon {
 			xs.aliasAttribute(XMLProgram.class, "subTitle", "sub-title");
 			xs.aliasAttribute(XMLProgram.class, "description", "desc");
 			
+			DAOFactory dbase = DAOFactory.getInstance(Epgd.config.database);
+			ProgramDAO programDAO = dbase.getProgramDAO();
+			Long lastId = 0L;
+			
 			ObjectInputStream ois = xs.createObjectInputStream(new FileInputStream("programtv.xml"));
 			try {
 				while(true) {
@@ -121,29 +122,35 @@ public class Epgd implements Daemon {
 						Object ro = ois.readObject();
 						if (ro instanceof XMLChannel) {
 							XMLChannel rc = (XMLChannel)ro;
-							System.out.println("New channel found: " + rc.getDisplayName());
 						} else if (ro instanceof XMLProgram) {
 							XMLProgram rp = (XMLProgram)ro;
-							System.out.println("New program found: " + rp.getTitle());
-							System.out.println("Start: " + rp.getStartDate().toGMTString() + ", End: " + rp.getStopDate().toGMTString());
-							System.out.println();
+							
+							String extChannelId = rp.getChannelId();
+							Long mappedId = channelMap.get(extChannelId);
+							
+							if (mappedId != null) {
+								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime()), new Timestamp(rp.getStopDate().getTime()));
+								try {
+									programDAO.save(prog);
+									lastId = prog.getId();
+								} catch (DAOException e) {
+									System.err.println("Database error: " + e.getMessage());
+								}
+							}
 						}
 					} catch (ClassNotFoundException e) {
 						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
 					}
 				}
 			} catch (EOFException eof) {
-				System.out.println("File ended.");
+				
 			}
 			ois.close();
 		} catch (FileNotFoundException e) {
 			System.err.println("XMLTV result file could not be opened." + e.getMessage());
 		} catch (IOException e) {
 			System.err.println("There is a problem with the XMLTV file: " + e.getMessage());
-		} finally {
-			
 		}
-		
 	}
 
 }
