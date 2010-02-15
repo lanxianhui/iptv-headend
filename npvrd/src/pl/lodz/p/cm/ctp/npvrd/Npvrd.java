@@ -1,13 +1,12 @@
 package pl.lodz.p.cm.ctp.npvrd;
 
 import java.io.*;
-import org.apache.commons.daemon.*;
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.*;
 import java.util.*;
 import com.thoughtworks.xstream.*;
 
-public class Npvrd implements Daemon {
+public class Npvrd {
 	
 	static class ChannelRecorderThread {
 		public Thread thread;
@@ -21,6 +20,10 @@ public class Npvrd implements Daemon {
 	
 	static Configuration config;
 	static ArrayList<ChannelRecorderThread> channelRecorders;
+	
+	public Npvrd() {
+		channelRecorders = new ArrayList<ChannelRecorderThread>();
+	}
 	
 	public static boolean isAnyRecorderAlive() {
 		for(ChannelRecorderThread threadRecorder : channelRecorders) {
@@ -41,18 +44,12 @@ public class Npvrd implements Daemon {
 			threadRecorder.channelRecorder.setRunMode(newMode);
 		}
 	}
-	
-	public static Configuration getConfiguration() {
-		return config;
-	}
 
 	/**
 	 * @param args Arguments passed to the program in the command line.
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
-		
-		channelRecorders = new ArrayList<ChannelRecorderThread>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -116,30 +113,6 @@ public class Npvrd implements Daemon {
 		}
 		
 		System.out.println("Finished. All recorder threads dead.");
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void init(DaemonContext arg0) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void start() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void stop() throws Exception {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
