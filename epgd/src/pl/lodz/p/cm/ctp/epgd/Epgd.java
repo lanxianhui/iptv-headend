@@ -1,12 +1,9 @@
 package pl.lodz.p.cm.ctp.epgd;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 
-import org.apache.commons.daemon.Daemon;
-import org.apache.commons.daemon.DaemonContext;
-
-import com.thoughtworks.xstream.XStream;
+import org.apache.commons.daemon.*;
+import com.thoughtworks.xstream.*;
 
 public class Epgd implements Daemon {
 	
@@ -59,11 +56,54 @@ public class Epgd implements Daemon {
 			System.err.println("Configuration file not found!");
 		}
 		
-		System.out.println(config.xmlTvGrabber);
+		/* System.out.println(config.xmlTvGrabber);
 		
 		String arguments[] = config.xmlTvGrabber.arguments.split(" ");
 		for (String argument : arguments) {
 			System.out.println(argument);
+		} */
+		
+		try {
+			XStream xs = new XStream();
+			
+			xs.alias("channel", XMLChannel.class);
+			xs.aliasAttribute(XMLChannel.class, "displayName", "display-name");
+			
+			xs.alias("programme", XMLProgram.class);
+			xs.aliasAttribute(XMLProgram.class, "start", "start");
+			xs.aliasAttribute(XMLProgram.class, "stop", "stop");
+			xs.aliasAttribute(XMLProgram.class, "channelId", "channel");
+			xs.aliasAttribute(XMLProgram.class, "subTitle", "sub-title");
+			xs.aliasAttribute(XMLProgram.class, "description", "desc");
+			
+			ObjectInputStream ois = xs.createObjectInputStream(new FileInputStream("programtv.xml"));
+			try {
+				while(true) {
+					try {
+						Object ro = ois.readObject();
+						if (ro instanceof XMLChannel) {
+							XMLChannel rc = (XMLChannel)ro;
+							System.out.println("New channel found: " + rc.getDisplayName());
+						} else if (ro instanceof XMLProgram) {
+							XMLProgram rp = (XMLProgram)ro;
+							System.out.println("New program found: " + rp.getTitle());
+							System.out.println("Start: " + rp.getStartDate().toGMTString() + ", End: " + rp.getStopDate().toGMTString());
+							System.out.println();
+						}
+					} catch (ClassNotFoundException e) {
+						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
+					}
+				}
+			} catch (EOFException eof) {
+				System.out.println("File ended.");
+			}
+			ois.close();
+		} catch (FileNotFoundException e) {
+			System.err.println("XMLTV result file could not be opened." + e.getMessage());
+		} catch (IOException e) {
+			System.err.println("There is a problem with the XMLTV file: " + e.getMessage());
+		} finally {
+			
 		}
 		
 	}
