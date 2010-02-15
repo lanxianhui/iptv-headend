@@ -51,6 +51,7 @@ public class Npvrd {
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
+		channelRecorders = new ArrayList<ChannelRecorderThread>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -110,6 +111,7 @@ public class Npvrd {
 	}
 	
 	public static void shutdownHook() {
+		System.out.println("Shutting down at user request.");
 		setRunModesRecorders(ChannelRecorder.RunMode.STOP);
 		wakeUpAllRecorders();
 	}
