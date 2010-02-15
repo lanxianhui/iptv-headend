@@ -1,6 +1,7 @@
 package pl.lodz.p.cm.ctp.epgd;
 
 import java.io.*;
+import java.util.Hashtable;
 
 import org.apache.commons.daemon.*;
 import com.thoughtworks.xstream.*;
@@ -38,6 +39,7 @@ public class Epgd implements Daemon {
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
+		Hashtable<String, Integer> channelMap = new Hashtable<String, Integer>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -54,6 +56,42 @@ public class Epgd implements Daemon {
 			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
 			System.err.println("Configuration file not found!");
+			System.exit(1);
+		}
+		
+		try {
+			XStream xs = new XStream();
+			xs.alias("map", XMLMap.class);
+			xs.aliasAttribute(XMLMap.class, "externalId", "extId");
+			xs.aliasAttribute(XMLMap.class, "internalId", "dbId");
+			xs.aliasAttribute(XMLMap.class, "name", "name");
+			
+			ObjectInputStream ois = xs.createObjectInputStream(new FileInputStream(config.xmlTvGrabber.mapFile));
+			try {
+				while(true) {
+					try {
+						Object ro = ois.readObject();
+						if (ro instanceof XMLMap) {
+							XMLMap rm = (XMLMap)ro;
+							System.out.println("New mapping (" + rm.getName() + "): " + rm.getExternalId() + " => " + Integer.toString(rm.getInternalId()));
+							channelMap.put(rm.getExternalId(), rm.getInternalId());
+						}
+					} catch (ClassNotFoundException e) {
+						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
+					}	
+				}
+				
+			} catch (EOFException eof) {
+				
+			}
+			
+			ois.close();
+		} catch (FileNotFoundException e) {
+			System.err.println("XMLTV mapping file could not be opened." + e.getMessage());
+		} catch (IOException e) {
+			System.err.println("There is a problem with the XMLTV mapping file: " + e.getMessage());
+		} finally {
+			
 		}
 		
 		/* System.out.println(config.xmlTvGrabber);
