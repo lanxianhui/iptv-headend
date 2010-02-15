@@ -4,7 +4,9 @@ import java.io.*;
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
+
 import com.thoughtworks.xstream.*;
 
 public class Npvrd {
@@ -67,7 +69,7 @@ public class Npvrd {
 			
 			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
-			System.err.println("Configuration file not found!");
+			error("Configuration file not found! This is a critical problem, shuting down.");
 			System.exit(1);
 		}
 		
@@ -76,7 +78,7 @@ public class Npvrd {
         
         try {
 			List<TvChannel> tvChannelList = tvChannelDAO.list();
-			System.out.println("Got " + tvChannelList.size() + " TV channels. Creating recorders for channels.");
+			log("Got " + tvChannelList.size() + " TV channels. Creating recorders for channels.");
 			
 			for (TvChannel tvChannel : tvChannelList) {
 				ChannelRecorder NewChannel = new ChannelRecorder(tvChannel.getId(), tvChannel.getIpAdress(), tvChannel.getPort());
@@ -85,8 +87,8 @@ public class Npvrd {
 				RecordingThread.start();
 			}
 		} catch (DAOException e1) {
-			System.err.println("Database error: " + e1.getMessage());
-			System.err.println("This is a critical error. Terminating.");
+			error("Database error: " + e1.getMessage());
+			error("This is a critical error. Terminating.");
 			System.exit(1);
 		}
 		
@@ -106,14 +108,28 @@ public class Npvrd {
 				// We keep this thread running, so that the JVM will know that we are still running
 			}
 		} catch (Throwable t) {
-			System.out.println("Exception " + t.getMessage());
+			error("Exception " + t.getMessage());
 		}
 	}
 	
 	public static void shutdownHook() {
-		System.out.println("Shutting down at user request.");
+		log("Shutting down at user request.");
 		setRunModesRecorders(ChannelRecorder.RunMode.STOP);
 		wakeUpAllRecorders();
 	}
+	
+	static void error(String msg) {
+		System.err.println(getTimeStamp() + " " + msg);
+	}
+	
+	static void log(String msg) {
+		System.out.println(getTimeStamp() + " " + msg);
+	}
+
+	private static String getTimeStamp() {
+	   SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	   return f.format(new Date());
+	}
+
 
 }
