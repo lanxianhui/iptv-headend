@@ -69,6 +69,7 @@ public class Npvrd implements Daemon {
 			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
 			System.err.println("Configuration file not found!");
+			System.exit(1);
 		}
 		
 		DAOFactory dbase = DAOFactory.getInstance(config.database);
@@ -88,7 +89,6 @@ public class Npvrd implements Daemon {
 			System.err.println("Database error: " + e1.getMessage());
 			System.err.println("This is a critical error. Terminating.");
 			System.exit(1);
-			e1.printStackTrace();
 		}
 		
 		String curLine = "";
