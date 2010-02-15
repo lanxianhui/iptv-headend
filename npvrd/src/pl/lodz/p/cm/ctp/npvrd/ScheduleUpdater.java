@@ -26,7 +26,7 @@ public class ScheduleUpdater implements Runnable {
 				List<ProgramRecording> programDvrScheduleList = programDvrScheduleDAO.listOlderThanNow(parentChannel.getChannelId());
 				
 				if (programDvrScheduleList.size() > 0) {
-					System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
+					//System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
 					
 					ProgramRecording newFirstProgram = null;
 					parentChannel.lockSchedule();
@@ -47,10 +47,8 @@ public class ScheduleUpdater implements Runnable {
 					}
 				}
 			} catch (DAOException e) {
-				System.err.println("Database error: " + e.getMessage());
-				System.err.println("This is a critical error. Terminating.");
-				System.exit(1);
-				e.printStackTrace();
+				Npvrd.error(parentChannel.getGroupIp() + "/SU: Database error: " + e.getMessage());
+				Npvrd.error(parentChannel.getGroupIp() + "/SU: This is a critical error, but we hope for the best and keep running.");
 			}
 
 			try {
@@ -60,7 +58,7 @@ public class ScheduleUpdater implements Runnable {
 			}
 		}
 		
-		System.out.println(parentChannel.getGroupIp() + "/SU: Thread terminating.");
+		Npvrd.log(parentChannel.getGroupIp() + "/SU: shutting down.");
 	}
 
 }

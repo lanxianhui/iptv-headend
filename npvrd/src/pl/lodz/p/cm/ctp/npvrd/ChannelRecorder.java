@@ -175,6 +175,8 @@ public class ChannelRecorder implements Runnable {
 							task.saveToDatabase();
 							String fileName = generateFileName(task);
 							
+							Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
+							
 							try {
 								FileOutputStream fos = new FileOutputStream(fileName);
 								
@@ -182,7 +184,7 @@ public class ChannelRecorder implements Runnable {
 								DatagramPacket recv = new DatagramPacket(buf, buf.length);
 								
 								if (System.currentTimeMillis() < beginRecordingNum) {
-									System.out.println(groupIp + ": Waiting for: " + task.getRecordingBegin().toGMTString());
+									Npvrd.log(groupIp + ": Waiting for: " + task.getRecordingBegin().toGMTString());
 									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
 								}
 								
@@ -199,7 +201,7 @@ public class ChannelRecorder implements Runnable {
 									}
 								}
 								
-								System.out.println(groupIp + ": Recording starts for " + task.getProgramName());
+								Npvrd.log(groupIp + ": Recording starts for " + task.getProgramName());
 								
 								while (System.currentTimeMillis() < endRecordingNum)
 								{
@@ -211,22 +213,22 @@ public class ChannelRecorder implements Runnable {
 											throw new InterruptedException();
 										}
 									} catch (IOException e) {
-										System.err.println(groupIp + ": Source channel is off-air: " + e.getMessage());
+										Npvrd.error(groupIp + ": Source channel is off-air: " + e.getMessage());
 									}
 								}
 								
-								System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString() + ". Recording ends.");			
+								Npvrd.log(groupIp + ": Recording ends.");			
 								
 								fos.close();
 								task.setState(Mode.AVAILABLE);
 								task.setResultFileName(fileName);
 								task.saveToDatabase();
 							} catch (IOException ioe) {
-								System.err.println(groupIp + ": Destination file is unavailable: " + ioe.getMessage());
+								Npvrd.error(groupIp + ": Destination file is unavailable: " + ioe.getMessage());
 							}
 						}
 					} catch (InterruptedException ie) {
-						System.out.println(groupIp + ": Thread woken up.");
+						
 					}
 				}
 				
@@ -235,100 +237,21 @@ public class ChannelRecorder implements Runnable {
 					try {
 						Thread.sleep(100000);
 					} catch (InterruptedException e) {
-						System.out.println(groupIp + ": Thread woken up.");
+						
 					}
 				}
 			}
 			
-			/* while (this.getRunMode().equals(RunMode.RUN))
-			{
-				try {
-					if (!this.isEmpty()) {
-						RecordingTask task = null;
-						recordingScheduleLock.lock();
-						try {
-							task = recordingSchedule.removeFirst();
-						} finally {
-							recordingScheduleLock.unlock();
-						}
-						long beginRecordingNum = task.getRecordingBegin().getTime();
-						long endRecordingNum = task.getRecordingEnd().getTime();
-						
-						if (endRecordingNum > System.currentTimeMillis()) { 
-							task.setState(Mode.PROCESSING);
-							task.saveToDatabase();
-							String fileName = generateFileName(task);
-							
-							FileOutputStream fos = new FileOutputStream(fileName);
-							
-							byte[] buf = new byte[sock.getReceiveBufferSize()];
-							DatagramPacket recv = new DatagramPacket(buf, buf.length);
-							
-							if (System.currentTimeMillis() < beginRecordingNum) {
-								System.out.println(groupIp + ": Waiting for: " + task.getRecordingBegin().toGMTString());
-								
-								try {
-									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
-								} catch (InterruptedException e) {
-									System.err.println(groupIp + ": Woken up while waiting, what's up?");
-								}
-								
-								while (System.currentTimeMillis() < beginRecordingNum)
-								{
-									try {
-										sock.receive(recv);
-									} catch (IOException e) {
-										
-									}
-								}
-							}
-							
-							System.out.println(groupIp + ": Recording starts for " + task.getProgramName());
-							
-							while (System.currentTimeMillis() < endRecordingNum)
-							{
-								try {
-									sock.receive(recv);
-									fos.write(recv.getData(), 0, recv.getLength());
-								} catch (IOException e) {
-									System.err.println(groupIp + ": Source channel is off-air: " + e.getMessage());
-								}
-							}
-							
-							System.out.println(groupIp + ": Current time: " + task.getRecordingBegin().toGMTString() + ". Recording ends.");			
-							
-							fos.close();
-							task.setState(Mode.AVAILABLE);
-							task.setResultFileName(fileName);
-							task.saveToDatabase();
-						} else {
-							System.out.println(groupIp + ": Too late for " + task.getProgramName());
-							if (task.getState().equals(Mode.WAITING)) {
-								task.setState(Mode.UNAVAILABLE);
-								task.saveToDatabase();
-							}
-						}
-					} else {
-						try {
-							Thread.sleep(100000);
-						} catch (InterruptedException e) {
-							
-						}
-					}
-				} catch (IOException e) {
-					System.err.println(groupIp + ": Destination file is unavailable: " + e.getMessage());
-				}
-			} */
-			
-			System.out.println(groupIp + ": Thread terminating.");
 			this.scheduleUpdater.interrupt();
+			
+			Npvrd.log(groupIp + ": Shutting down");
 			
 			sock.leaveGroup(group);
 			sock.close();
 		} catch (UnknownHostException e) {
-			System.err.println(groupIp + ": Group IP address invalid");
+			Npvrd.error(groupIp + ": Group IP address invalid");
 		} catch (IOException e) {
-			System.err.println(groupIp + ": Listening port busy");
+			Npvrd.error(groupIp + ": Listening port busy");
 		}
 	}
 
