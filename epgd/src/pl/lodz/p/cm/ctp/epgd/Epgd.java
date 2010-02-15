@@ -61,6 +61,11 @@ public class Epgd implements Daemon {
 		
 		System.out.println(config.xmlTvGrabber);
 		
+		String arguments[] = config.xmlTvGrabber.arguments.split(" ");
+		for (String argument : arguments) {
+			System.out.println(argument);
+		}
+		
 	}
 
 }
