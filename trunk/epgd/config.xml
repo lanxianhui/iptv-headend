@@ -3,7 +3,7 @@
 	<database>
 		<userName>iptv-test</userName>
 		<password>iptv-test</password>
-		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv</databaseLocator>
+		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv?useUnicode=true&amp;characterEncoding=utf-8</databaseLocator>
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
 	<xmlTvGrabber>
