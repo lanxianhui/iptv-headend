@@ -6,4 +6,9 @@
 		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv</databaseLocator>
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
+	<xmlTvGrabber>
+		<commandLine></commandLine>
+		<arguments></arguments>
+		<resultFile></resultFile>
+	</xmlTvGrabber>
 </config>
