@@ -16,16 +16,18 @@ public class ProgramUpdater implements Runnable {
 	@Override
 	public void run() {
 		try {
+			Epgd.log("Starting XMLTV grabber");
 			String[] cmd = Epgd.config.xmlTvGrabber.commandLine.split(" ");
 			
 			try {
 				Process p = Runtime.getRuntime().exec(cmd);
 				p.waitFor();
 			} catch (InterruptedException e1) {
-				System.err.println("Woken up?");
+				Epgd.error("Woken up?");
 				e1.printStackTrace();
 			} catch (IOException io) {
-				System.err.println("Unable to start xmltv grabber." + io.getMessage());
+				Epgd.error("Unable to start xmltv grabber." + io.getMessage());
+				return;
 			}
 			
 			XStream xs = new XStream();
@@ -44,6 +46,7 @@ public class ProgramUpdater implements Runnable {
 			ProgramDAO programDAO = dbase.getProgramDAO();
 			
 			ObjectInputStream ois = xs.createObjectInputStream(new FileInputStream(Epgd.config.xmlTvGrabber.resultFile));
+			int progCounter = 0;
 			try {
 				while(true) {
 					try {
@@ -60,13 +63,14 @@ public class ProgramUpdater implements Runnable {
 								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime()), new Timestamp(rp.getStopDate().getTime()));
 								try {
 									programDAO.save(prog);
+									progCounter++;
 								} catch (DAOException e) {
-									System.err.println("Database error: " + e.getMessage());
+									Epgd.error("Database error: " + e.getMessage());
 								}
 							}
 						}
 					} catch (ClassNotFoundException e) {
-						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
+						Epgd.error("Unknown object in XMLTV file: " + e.getMessage());
 					}
 				}
 			} catch (EOFException eof) {
@@ -74,12 +78,14 @@ public class ProgramUpdater implements Runnable {
 			}
 			ois.close();
 			
+			Epgd.log("Successfully uploaded " + progCounter + " programs to EPG database.");
+			
 			File usedXmltv = new File(Epgd.config.xmlTvGrabber.resultFile);
 			usedXmltv.delete();
 		} catch (FileNotFoundException e) {
-			System.err.println("XMLTV result file could not be opened." + e.getMessage());
+			Epgd.error("XMLTV result file could not be opened." + e.getMessage());
 		} catch (IOException e) {
-			System.err.println("There is a problem with the XMLTV file: " + e.getMessage());
+			Epgd.error("There is a problem with the XMLTV file: " + e.getMessage());
 		}		
 	}
 	

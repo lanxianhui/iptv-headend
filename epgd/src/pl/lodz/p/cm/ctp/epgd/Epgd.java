@@ -1,6 +1,8 @@
 package pl.lodz.p.cm.ctp.epgd;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Hashtable;
 
 import com.thoughtworks.xstream.*;
@@ -32,7 +34,7 @@ public class Epgd {
 			
 			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
-			System.err.println("Configuration file not found!");
+			error("Configuration file not found! This is a critical problem, shuting down.");
 			System.exit(1);
 		}
 		
@@ -63,9 +65,9 @@ public class Epgd {
 			
 			ois.close();
 		} catch (FileNotFoundException e) {
-			System.err.println("XMLTV mapping file could not be opened." + e.getMessage());
+			error("XMLTV mapping file could not be opened." + e.getMessage());
 		} catch (IOException e) {
-			System.err.println("There is a problem with the XMLTV mapping file: " + e.getMessage());
+			error("There is a problem with the XMLTV mapping file: " + e.getMessage());
 		}
 		
 		// Setup the shutdown hook
@@ -87,13 +89,26 @@ public class Epgd {
 				// We keep this thread running, so that the JVM will know that we are still running
 			}
 		} catch (Throwable t) {
-			System.out.println("Exception " + t.getMessage());
+			error("Exception " + t.getMessage());
 		}
 	}
 	
 	private static void shutdownHook() {
-		System.out.println("Shutting down at user request.");
+		log("Shutting down at user request.");
 		scheduler.stop();
+	}
+	
+	static void error(String msg) {
+		System.err.println(getTimeStamp() + " " + msg);
+	}
+	
+	static void log(String msg) {
+		System.out.println(getTimeStamp() + " " + msg);
+	}
+
+	private static String getTimeStamp() {
+	   SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	   return f.format(new Date());
 	}
 
 }
