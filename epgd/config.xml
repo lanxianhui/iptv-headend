@@ -7,7 +7,7 @@
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
 	<xmlTvGrabber>
-		<commandLine>epguide</commandLine>
+		<commandLine>/home/jasio/epguide-1.2/src/epguide_run</commandLine>
 		<arguments>-c 1,2 -f xmltv -o thisWeek.xml</arguments>
 		<resultFile>thisWeek.xml</resultFile>
 		<mapFile>mapping.xml</mapFile>
