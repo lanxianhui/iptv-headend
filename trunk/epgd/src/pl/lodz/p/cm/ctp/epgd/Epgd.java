@@ -80,6 +80,8 @@ public class Epgd {
 		
 		Runtime.getRuntime().addShutdownHook(runtimeHookThread);
 		
+		log("Starting up the scheduler");
+		
 		scheduler.schedule(Epgd.config.refresh, new ProgramUpdater());
 		scheduler.start();
 		
