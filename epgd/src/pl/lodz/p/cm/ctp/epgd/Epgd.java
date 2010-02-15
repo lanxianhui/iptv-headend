@@ -5,7 +5,7 @@ import java.util.Hashtable;
 
 import com.thoughtworks.xstream.*;
 
-import it.sauronsoftware.cron4j.Scheduler;;
+import it.sauronsoftware.cron4j.Scheduler;
 
 public class Epgd {
 	
@@ -66,9 +66,31 @@ public class Epgd {
 			System.err.println("There is a problem with the XMLTV mapping file: " + e.getMessage());
 		}
 		
-		scheduler.schedule(Epgd.config.refresh, new ProgramUpdater());
+		// Setup the shutdown hook
 		
+		Thread runtimeHookThread = new Thread() {
+			public void run() {
+				shutdownHook();
+			}
+		};
+		
+		Runtime.getRuntime().addShutdownHook(runtimeHookThread);
+		
+		scheduler.schedule(Epgd.config.refresh, new ProgramUpdater());
 		scheduler.start();
+		
+		try {
+			while (true) {
+				Thread.sleep(1000L * 60L * 10L);
+				// We keep this thread running, so that the JVM will know that we are still running
+			}
+		} catch (Throwable t) {
+			System.out.println("Exception " + t.getMessage());
+		}
+	}
+	
+	private static void shutdownHook() {
+		scheduler.stop();
 	}
 
 }
