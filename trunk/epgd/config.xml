@@ -7,8 +7,8 @@
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
 	<xmlTvGrabber>
-		<commandLine></commandLine>
-		<arguments></arguments>
-		<resultFile></resultFile>
+		<commandLine>epguide</commandLine>
+		<arguments>-c 1,2 -f xmltv -o thisWeek.xml</arguments>
+		<resultFile>thisWeek.xml</resultFile>
 	</xmlTvGrabber>
 </config>
