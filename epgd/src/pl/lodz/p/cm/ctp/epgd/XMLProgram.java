@@ -73,7 +73,11 @@ public class XMLProgram implements Serializable {
 		String hourOfDay = xmlDate.substring(8, 10);
 		String minute = xmlDate.substring(10, 12);
 		String second = xmlDate.substring(12, 14);
-		String timeZone = "GMT" + xmlDate.substring(15, 20);
+		String timeZone = xmlDate.substring(15);
+		
+		if ((timeZone.charAt(0) == '-') | (timeZone.charAt(0) == '+')) {
+			timeZone = "GMT" + timeZone;
+		}
 		
 		calendar.setTimeZone(TimeZone.getTimeZone(timeZone));
 		calendar.set(Integer.parseInt(year), Integer.parseInt(month) - 1, Integer.parseInt(date), Integer.parseInt(hourOfDay), Integer.parseInt(minute), Integer.parseInt(second));
