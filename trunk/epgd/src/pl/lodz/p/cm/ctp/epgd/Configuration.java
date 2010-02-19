@@ -1,6 +1,8 @@
 package pl.lodz.p.cm.ctp.epgd;
 
 import java.io.Serializable;
+import java.util.List;
+
 import pl.lodz.p.cm.ctp.dao.DatabaseConfiguration;
 
 public class Configuration implements Serializable {
@@ -8,7 +10,6 @@ public class Configuration implements Serializable {
 	private static final long serialVersionUID = -323016552321966082L;
 	
 	public DatabaseConfiguration database;
-	public XmlTvGrabberConfig xmlTvGrabber;
-	public String refresh;
+	public List<XmlTvGrabberConfig> xmlTvGrabbers;
 	
 }
