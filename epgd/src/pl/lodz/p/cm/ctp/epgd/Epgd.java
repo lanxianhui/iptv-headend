@@ -3,7 +3,6 @@ package pl.lodz.p.cm.ctp.epgd;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Hashtable;
 
 import com.thoughtworks.xstream.*;
 
@@ -12,12 +11,10 @@ import it.sauronsoftware.cron4j.Scheduler;
 public class Epgd {
 	
 	static Configuration config;
-	static volatile Hashtable<String, Long> channelMap;
 	static volatile Scheduler scheduler;
 	
 	public static void main(String[] args) {
 		String configFile = "config.xml";
-		channelMap = new Hashtable<String, Long>();
 		scheduler = new Scheduler();
 		
 		for (int i = 0; i < args.length; i++) {
@@ -38,38 +35,6 @@ public class Epgd {
 			System.exit(1);
 		}
 		
-		try {
-			XStream xs = new XStream();
-			xs.alias("map", XMLMap.class);
-			xs.aliasAttribute(XMLMap.class, "externalId", "extId");
-			xs.aliasAttribute(XMLMap.class, "internalId", "dbId");
-			xs.aliasAttribute(XMLMap.class, "name", "name");
-			
-			ObjectInputStream ois = xs.createObjectInputStream(new FileInputStream(config.xmlTvGrabber.mapFile));
-			try {
-				while(true) {
-					try {
-						Object ro = ois.readObject();
-						if (ro instanceof XMLMap) {
-							XMLMap rm = (XMLMap)ro;
-							channelMap.put(rm.getExternalId(), rm.getInternalId());
-						}
-					} catch (ClassNotFoundException e) {
-						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
-					}	
-				}
-				
-			} catch (EOFException eof) {
-				
-			}
-			
-			ois.close();
-		} catch (FileNotFoundException e) {
-			error("XMLTV mapping file could not be opened." + e.getMessage());
-		} catch (IOException e) {
-			error("There is a problem with the XMLTV mapping file: " + e.getMessage());
-		}
-		
 		// Setup the shutdown hook
 		
 		Thread runtimeHookThread = new Thread() {
@@ -82,7 +47,12 @@ public class Epgd {
 		
 		log("Starting up the scheduler");
 		
-		scheduler.schedule(Epgd.config.refresh, new ProgramUpdater());
+		for (XmlTvGrabberConfig grabber : config.xmlTvGrabbers) {
+			log("Creating XMLTV grabbers");
+			String schedule = grabber.schedule;
+			scheduler.schedule(schedule, new ProgramUpdater(grabber));
+		}
+		
 		scheduler.start();
 		
 		try {
