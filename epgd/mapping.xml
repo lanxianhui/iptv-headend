@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <channelMap>
 	<map name="TVP 1"> <!-- name attribute is currently for informational purposes only -->
-		<extId>1</extId>
-		<dbId>1</dbId>
+		<extId>1</extId> <!-- the channel id in the XMLTV -->
+		<dbId>1</dbId> <!-- the numerical id in the database -->
 	</map>
 	<map name="TVP 2">
 		<extId>2</extId>
