@@ -3,6 +3,7 @@ package pl.lodz.p.cm.ctp.epgd;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
 
 import com.thoughtworks.xstream.*;
 
@@ -28,6 +29,8 @@ public class Epgd {
 			FileInputStream fis = new FileInputStream(configFile);
 			xs.alias("config", Configuration.class);
 			xs.aliasField("database", Configuration.class, "database");
+			xs.alias("xmlTvGrabber", XmlTvGrabberConfig.class);
+			xs.alias("xmlTvGrabbers", ArrayList.class);
 			
 			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
@@ -45,13 +48,17 @@ public class Epgd {
 		
 		Runtime.getRuntime().addShutdownHook(runtimeHookThread);
 		
-		log("Starting up the scheduler");
+		log("Seting up the scheduler");
 		
+		log("Creating XMLTV grabbers");
 		for (XmlTvGrabberConfig grabber : config.xmlTvGrabbers) {
-			log("Creating XMLTV grabbers");
 			String schedule = grabber.schedule;
 			scheduler.schedule(schedule, new ProgramUpdater(grabber));
 		}
+		
+		log("Creating a cleaner");
+		String schedule = config.cleaner.schedule;
+		scheduler.schedule(schedule, new Cleaner(config.cleaner));
 		
 		scheduler.start();
 		
