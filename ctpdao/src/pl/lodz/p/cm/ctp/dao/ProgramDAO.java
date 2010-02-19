@@ -26,6 +26,8 @@ public final class ProgramDAO {
         "UPDATE Program SET tvChannelId = ?, title = ?, description = ?, begin = ?, end = ? WHERE id = ?";
     private static final String SQL_DELETE =
         "DELETE FROM Program WHERE id = ?";
+    private static final String SQL_DELETE_OLDER =
+        "DELETE FROM Program WHERE DIMESTAMPDIFF(DAY, NOW(), Program.end) > ?";
 	
 	private DAOFactory daoFactory;
 
@@ -207,6 +209,30 @@ public final class ProgramDAO {
             close(connection, preparedStatement);
         }
     }
+	
+	public boolean deleteOlderThan(Long days) throws DAOException {
+		Object[] values = { days };
+		boolean result = false;
+		
+		Connection connection = null;
+        PreparedStatement preparedStatement = null;
+		
+		try {
+            connection = daoFactory.getConnection();
+            preparedStatement = prepareStatement(connection, SQL_DELETE_OLDER, false, values);
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                //throw new DAOException("Deleting program failed, no rows affected.");
+            } else {
+            	result = true;
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        } finally {
+            close(connection, preparedStatement);
+        }
+        return result;
+	}
 	
 	private static Program mapProgram(ResultSet resultSet) throws SQLException {
         return new Program(
