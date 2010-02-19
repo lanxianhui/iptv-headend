@@ -9,5 +9,6 @@ public class Configuration implements Serializable {
 	
 	public DatabaseConfiguration database;
 	public String recordings;
+	public Long schedUpdaterInterval;
 
 }

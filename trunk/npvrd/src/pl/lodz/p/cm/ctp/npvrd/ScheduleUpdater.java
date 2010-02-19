@@ -52,7 +52,7 @@ public class ScheduleUpdater implements Runnable {
 			}
 
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(Npvrd.config.schedUpdaterInterval * 1000L);
 			} catch (InterruptedException e) {
 				
 			}
