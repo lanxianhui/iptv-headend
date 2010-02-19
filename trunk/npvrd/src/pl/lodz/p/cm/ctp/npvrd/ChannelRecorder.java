@@ -173,12 +173,13 @@ public class ChannelRecorder implements Runnable {
 						if (endRecordingNum > System.currentTimeMillis()) {
 							task.setState(Mode.PROCESSING);
 							task.saveToDatabase();
-							String fileName = Npvrd.config.recordings + generateFileName(task);
+							String path = Npvrd.config.recordings;
+							String fileName = generateFileName(task);
 							
 							Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
 							
 							try {
-								FileOutputStream fos = new FileOutputStream(fileName);
+								FileOutputStream fos = new FileOutputStream(path + fileName);
 								
 								byte[] buf = new byte[sock.getReceiveBufferSize()];
 								DatagramPacket recv = new DatagramPacket(buf, buf.length);
