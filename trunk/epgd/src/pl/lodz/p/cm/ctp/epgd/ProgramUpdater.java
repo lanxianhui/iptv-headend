@@ -17,6 +17,8 @@ public class ProgramUpdater implements Runnable {
 	public ProgramUpdater(XmlTvGrabberConfig config) {
 		this.myConfig = config;
 		
+		this.channelMap = new Hashtable<String, Long>();
+		
 		try {
 			XStream xs = new XStream();
 			xs.alias("map", XMLMap.class);
@@ -37,7 +39,6 @@ public class ProgramUpdater implements Runnable {
 						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
 					}	
 				}
-				
 			} catch (EOFException eof) {
 				
 			}

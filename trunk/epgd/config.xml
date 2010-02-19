@@ -11,7 +11,11 @@
 			<commandLine>/home/jstar/epguide-1.2/src/epguide_run -w -c 1,2 -f xmltv -o thisWeek.xml</commandLine>
 			<resultFile>thisWeek.xml</resultFile>
 			<mapFile>mapping.xml</mapFile>
-			<schedule>* * * * *</schedule> <!-- this is crontab-like syntax, for more lookup cron4j -->
+			<schedule>3 10 * * Mon</schedule> <!-- this is crontab-like syntax, for more lookup cron4j -->
 		</xmlTvGrabber>
 	</xmlTvGrabbers>
+	<cleaner>
+		<schedule>3 30 * * Mon</schedule>
+		<olderThanDays>14</olderThanDays>
+	</cleaner>
 </config>
