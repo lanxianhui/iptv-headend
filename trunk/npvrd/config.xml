@@ -6,4 +6,5 @@
 		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv?useUnicode=true&amp;characterEncoding=utf-8</databaseLocator>
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
+	<recordings>./recordings/</recordings>
 </config>
