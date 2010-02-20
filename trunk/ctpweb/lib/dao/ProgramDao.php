@@ -84,6 +84,21 @@ class ProgramDao {
           else
                return false;
     }
+    
+    
+    function loadDay(&$conn, &$channel, $date) {
+    	
+    	if (!$channel->getId()) {
+               return false;
+       	}
+    	
+    	$sql = "SELECT * FROM Program ORDER BY begin ASC WHERE ( channelId = ".$channel->getId()." AND DATE(begin) = DATE(FROM_UNIXTIME(".$begin."))";
+    	
+    	$searchResults = $this->listQuery(&$conn, &$sql);
+    	
+    	return $searchResults;
+    	
+    }
 
 
     /**
