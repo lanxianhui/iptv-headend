@@ -56,6 +56,17 @@ class RecordingDao {
           $this->load(&$conn, &$valueObject);
           return $valueObject;
     }
+    
+    /**
+     * getObject-method. This will get a recording for a given Program Id
+     */
+    function getObject(&$conn, $id, $programId) {
+    	
+          $valueObject = $this->createValueObject();
+          $valueObject->setProgramId($programId);
+          $this->load(&$conn, &$valueObject);
+          return $valueObject;
+    }
 
 
     /**
@@ -71,13 +82,19 @@ class RecordingDao {
      *                     Primary-key field must be set for this to work properly.
      */
     function load(&$conn, &$valueObject) {
-
+    	
+		  $sql = "";
+    	
           if (!$valueObject->getId()) {
-               //print "Can not select without Primary-Key!";
-               return false;
-          }
-
-          $sql = "SELECT * FROM Recording WHERE (id = ".$valueObject->getId().") "; 
+               if (!$valueObject->getProgramId())
+               {
+               		return false;
+               } else {
+               		$sql = "SELECT * FROM Recording WHERE (programId = ".$valueObject->getProgramId().") ";
+               }
+          } else {
+				$sql = "SELECT * FROM Recording WHERE (id = ".$valueObject->getId().") ";
+          } 
 
           if ($this->singleQuery(&$conn, $sql, &$valueObject))
                return true;

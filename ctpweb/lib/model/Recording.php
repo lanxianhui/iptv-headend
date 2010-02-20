@@ -25,7 +25,10 @@
   * "Tuomo.Lukka@iki.fi" for more information. Thank you!
   */
 
-
+define("RECORDING_WAITING", "WAITING");
+define("RECORDING_AVAILABLE","AVAILABLE");
+define("RECORDING_PROCESSING", "PROCESSING");
+define("RECORDING_UNAVAILABLE","UNAVAILABLE");
 
 
 class Recording {
