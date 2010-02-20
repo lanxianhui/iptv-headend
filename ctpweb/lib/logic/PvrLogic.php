@@ -18,7 +18,7 @@ class PvrLogic {
 		$recording = $recordingDAO->getObject($conn, null, $program->getId());
 		if (!$recording->getId()) {
 			$recording = new Recording();
-			$recording->setAll(null, $program->getId(), RECORDING_WAITING, null);
+			$recording->setAll(null, $program->getId(), Recording::WAITING, null);
 			if (!$recordingDAO->create($conn, $recording))
 				return false;
 		}

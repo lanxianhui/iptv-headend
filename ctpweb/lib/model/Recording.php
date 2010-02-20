@@ -25,11 +25,6 @@
   * "Tuomo.Lukka@iki.fi" for more information. Thank you!
   */
 
-define("RECORDING_WAITING", "WAITING");
-define("RECORDING_AVAILABLE","AVAILABLE");
-define("RECORDING_PROCESSING", "PROCESSING");
-define("RECORDING_UNAVAILABLE","UNAVAILABLE");
-
 
 class Recording {
 
@@ -41,8 +36,11 @@ class Recording {
     var $programId;
     var $mode;
     var $fileName;
-
-
+    
+	const WAITING = "WAITING";
+	const AVAILABLE = "AVAILABLE";
+	const PROCESSING = "PROCESSING";
+	const UNAVAILABLE = "UNAVAILABLE";
 
     /** 
      * Constructors. DaoGen generates two constructors by default.
