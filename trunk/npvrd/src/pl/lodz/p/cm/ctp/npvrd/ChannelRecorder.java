@@ -61,15 +61,11 @@ public class ChannelRecorder implements Runnable {
 	}
 	
 	public RunMode getRunMode() {
-		synchronized (this) {
-			return this.runMode;
-		}
+		return this.runMode;
 	}
 	
 	public void setRunMode(RunMode newMode) {
-		synchronized (this) {
-			this.runMode = newMode;
-		}
+		this.runMode = newMode;
 	}
 	
 	/**
@@ -140,6 +136,7 @@ public class ChannelRecorder implements Runnable {
 			Npvrd.log(groupIp + ": Setting up socket.");
 			InetAddress group = InetAddress.getByName(groupIp);
 			MulticastSocket sock = new MulticastSocket(groupPort);
+			sock.setLoopbackMode(true);
 			sock.setSoTimeout(10000);
 			sock.joinGroup(group);
 			
@@ -179,8 +176,6 @@ public class ChannelRecorder implements Runnable {
 							Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
 							
 							try {
-								FileOutputStream fos = new FileOutputStream(path + fileName);
-								
 								byte[] buf = new byte[sock.getReceiveBufferSize()];
 								DatagramPacket recv = new DatagramPacket(buf, buf.length);
 								
@@ -189,11 +184,13 @@ public class ChannelRecorder implements Runnable {
 									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
 								}
 								
+								FileOutputStream fos = new FileOutputStream(path + fileName);
+								
 								while (System.currentTimeMillis() < beginRecordingNum)
 								{
 									try {
 										sock.receive(recv);
-										if (!getRunMode().equals(RunMode.RUN)) {
+										if (!runMode.equals(RunMode.RUN)) {
 											fos.close();
 											throw new InterruptedException();
 										}
@@ -204,23 +201,29 @@ public class ChannelRecorder implements Runnable {
 								
 								Npvrd.log(groupIp + ": Recording starts for " + task.getProgramName());
 								
-								while (System.currentTimeMillis() < endRecordingNum)
-								{
-									try {
+								try {
+									while (System.currentTimeMillis() < endRecordingNum)
+									{
 										sock.receive(recv);
-										fos.write(recv.getData(), 0, recv.getLength());
-										if (!getRunMode().equals(RunMode.RUN)) {
+										fos.write(recv.getData(), recv.getOffset(), recv.getLength());
+										if (!runMode.equals(RunMode.RUN)) {
 											fos.close();
 											throw new InterruptedException();
 										}
-									} catch (IOException e) {
-										Npvrd.error(groupIp + ": Source channel is off-air: " + e.getMessage());
 									}
+								} catch (IOException e) {
+									Npvrd.error(groupIp + ": Source channel is off-air: " + e.getMessage());
 								}
 								
 								Npvrd.log(groupIp + ": Recording ends.");			
 								
 								fos.close();
+								
+								// Make the file available
+								VlmManager vlm = new VlmManager(Npvrd.config.vlm);
+								vlm.createNewVod(fileName, path + fileName);
+								
+								// Announce that the file is available
 								task.setState(Mode.AVAILABLE);
 								task.setResultFileName(fileName);
 								task.saveToDatabase();
