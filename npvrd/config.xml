@@ -6,6 +6,12 @@
 		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv?useUnicode=true&amp;characterEncoding=utf-8</databaseLocator>
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
-	<recordings>./recordings/</recordings> <!-- Where to write all recorded programs (should be writable by the npvrd -->
+	<recordings>/var/ctp/pvr/</recordings> <!-- Where to write all recorded programs (should be writable by the npvrd -->
 	<schedUpdaterInterval>10</schedUpdaterInterval> <!-- How much to wait to refresh the recording schedule (in seconds, global for all SUs) -->
+	<vlm>
+		<host>localhost</host>
+		<port>4212</port>
+		<password>ianiro</password>
+		<pvrPrefix>pvr/</pvrPrefix>
+	</vlm>
 </config>

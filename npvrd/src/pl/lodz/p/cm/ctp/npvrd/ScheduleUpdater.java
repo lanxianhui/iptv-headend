@@ -26,7 +26,7 @@ public class ScheduleUpdater implements Runnable {
 				List<ProgramRecording> programDvrScheduleList = programDvrScheduleDAO.listOlderThanNow(parentChannel.getChannelId());
 				
 				if (programDvrScheduleList.size() > 0) {
-					System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
+					//System.out.println(parentChannel.getGroupIp() + "/SU: Got " + programDvrScheduleList.size() + " schedule items.");
 					
 					ProgramRecording newFirstProgram = null;
 					parentChannel.lockSchedule();
