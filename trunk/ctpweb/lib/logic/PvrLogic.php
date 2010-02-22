@@ -48,14 +48,14 @@ class PvrLogic {
 		return $userRecordingDAO->delete($conn, &$deleteUserRecording);
 	}
 	
-	function listRecordings(&$conn) {
-		$recordingDao = new RecordingDao();
-		return $recordingDao->loadAll(&$conn);
-	}
-	
-	function listRecordings(&$conn, &$user) {
-		$userRecordingDao = new UserRecordingDao();
-		return $userRecordingDao->loadAllProgramRecordings(&$conn, &$user);
+	function listRecordings(&$conn, &$user = null) {
+		if ($user === null) {
+			$recordingDao = new RecordingDao();
+			return $recordingDao->loadAll(&$conn);
+		} else {
+			$userRecordingDao = new UserRecordingDao();
+			return $userRecordingDao->loadAllProgramRecordings(&$conn, &$user);	
+		}
 	}
 	
 }

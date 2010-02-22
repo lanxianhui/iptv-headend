@@ -11,9 +11,12 @@ class EpgLogic {
 	 * @param $conn The Datasource connection to be used
 	 * @return An array of all the channels in the system
 	 */
-	function getChannels(&$conn) {
+	function getChannels(&$conn, $start = null, $number = null) {
 		$channelDAO = new TvChannelDAO();
-		return $channelDAO->loadAll(&$conn);
+		if (($start === null) && ($number === null))
+			return $channelDAO->loadAll(&$conn);
+		else
+			return false;
 	}
 	
 	/**
@@ -24,17 +27,6 @@ class EpgLogic {
 	function getNumberOfChannels(&$conn) {
 		$channelDAO = new TvChannelDAO();
 		return $channelDAO->countAll(&$conn);
-	}
-	
-	/**
-	 * Gets only the specified number of channels starting from the given channel number (a utility function for paging)
-	 * @param $conn The Datasource connection to be used
-	 * @param $start The number of the channel to start from
-	 * @param $number Number of the channels to be returned
-	 * @return An array of TvChannel
-	 */
-	function getChannels(&$conn, $start, $number) {
-		
 	}
 	
 	/**
@@ -49,7 +41,7 @@ class EpgLogic {
 		return $programDAO->loadDay(&$conn, &$channel, $date);
 	}
 	
-	function getProgramsWithRecordings(&$conn, &$channel, &$date) {
+	function getProgramsWithRecordings(&$conn, &$channel, $date) {
 		$programRecordingDAO = new ProgramDAO();
 		return $programRecordingDAO->loadDayWithRecordings(&$conn, &$channel, $date);
 	}
