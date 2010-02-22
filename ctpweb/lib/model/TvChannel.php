@@ -40,6 +40,7 @@ class TvChannel {
     var $port;
     var $icon;
 
+    var $programs;
 
 
     /** 
@@ -99,6 +100,13 @@ class TvChannel {
     }
     function setIcon($iconIn) {
           $this->icon = $iconIn;
+    }
+    
+    function getPrograms() {
+    	  return $this->programs;
+    }
+    function setPrograms(&$programs) {
+    	  $this->programs = $programs;
     }
 
 

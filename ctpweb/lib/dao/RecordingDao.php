@@ -49,25 +49,16 @@ class RecordingDao {
      * for the real load-method which accepts the valueObject as a parameter. Returned
      * valueObject will be created using the createValueObject() method.
      */
-    function getObject(&$conn, $id) {
+    function getObject(&$conn, $id, $programId = null) {
 
           $valueObject = $this->createValueObject();
+          
           $valueObject->setId($id);
-          $this->load(&$conn, &$valueObject);
-          return $valueObject;
-    }
-    
-    /**
-     * getObject-method. This will get a recording for a given Program Id
-     */
-    function getObject(&$conn, $id, $programId) {
-    	
-          $valueObject = $this->createValueObject();
           $valueObject->setProgramId($programId);
+          
           $this->load(&$conn, &$valueObject);
           return $valueObject;
     }
-
 
     /**
      * load-method. This will load valueObject contents from database using

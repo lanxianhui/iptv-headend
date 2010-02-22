@@ -125,28 +125,14 @@ class Program {
      * directly modify instance variales, without going trough the 
      * individual set-methods.
      */
-
-    function setAll($idIn,
-          $tvChannelIdIn,
-          $titleIn,
-          $descriptionIn,
-          $beginIn,
-          $endIn) {
-          $this->id = $idIn;
-          $this->tvChannelId = $tvChannelIdIn;
-          $this->title = $titleIn;
-          $this->description = $descriptionIn;
-          $this->begin = $beginIn;
-          $this->end = $endIn;
-    }
     
-function setAll($idIn,
+	function setAll($idIn,
           $tvChannelIdIn,
           $titleIn,
           $descriptionIn,
           $beginIn,
           $endIn,
-          $recordingIn) {
+          $recordingIn = null) {
           $this->id = $idIn;
           $this->tvChannelId = $tvChannelIdIn;
           $this->title = $titleIn;

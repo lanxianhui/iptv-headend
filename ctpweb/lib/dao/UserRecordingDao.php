@@ -148,7 +148,6 @@ class UserRecordingDao {
           $sql = $sql."".$valueObject->getUserId().") ";
           $result = $this->databaseUpdate(&$conn, $sql);
 
-
           return true;
     }
 

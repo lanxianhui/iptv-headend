@@ -1,9 +1,9 @@
 <?php
-	require_once 'lib/base.inc.php';
+
+	require_once('lib/base.inc.php');
+	require_once("control/EpgController.php");
 	
-	$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
-	
-	$channels = EpgLogic::getChannels(&$conn);
-	
-	print_r($channels);
+	$smarty = new Smarty();
+	$controller = new EpgController($config, $smarty);
+
 ?>

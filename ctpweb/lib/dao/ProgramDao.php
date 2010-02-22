@@ -92,7 +92,7 @@ class ProgramDao {
                return false;
        	}
     	
-    	$sql = "SELECT * FROM Program ORDER BY begin ASC WHERE ( channelId = ".$channel->getId()." AND DATE(begin) = DATE(FROM_UNIXTIME(".$begin."))";
+    	$sql = "SELECT * FROM Program WHERE ( Program.tvChannelId = ".$channel->getId()." AND DATE(Program.begin) = DATE(FROM_UNIXTIME(".$begin."))) ORDER BY begin ASC ";
     	
     	$searchResults = $this->listQuery(&$conn, &$sql);
     	
@@ -105,7 +105,7 @@ class ProgramDao {
                return false;
        	}
     	
-    	$sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId ORDER BY begin ASC WHERE ( channelId = ".$channel->getId()." AND DATE(begin) = DATE(FROM_UNIXTIME(".$begin."))";
+    	$sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId WHERE ( Program.tvChannelId = ".$channel->getId()." AND DATE(Program.begin) = DATE(FROM_UNIXTIME(".$date.")) ) ORDER BY begin ASC";
     	
     	$searchResults = $this->listQueryRecordings(&$conn, &$sql);
     	
