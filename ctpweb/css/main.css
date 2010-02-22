@@ -1,0 +1,105 @@
+@CHARSET "UTF-8";
+
+body, h1, h2, h3, h4, h5, h6, p, ul {
+	font-size: 1.0em;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font: 0.69em "Lucida Sans Unicode", "Lucida Grande", Arial, Helvetica, sans-serif;
+	color: #000;
+	margin: 10px 5%;
+}
+
+div.guide div.channel {
+	width: 20%;
+	float: left;
+	margin-right: 10px;
+}
+
+div.guide div.header {
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+div.guide div.header h2 {
+	font-size: 1.27em;
+	font-weight: bold;
+}
+
+div.guide div.program {
+	border-left: 5px solid #eee;
+	margin-bottom: 5px;
+	padding-left: 5px;
+	overflow: auto;
+}
+
+div.guide div.program:hover {
+	border-left-color: #bbe;
+	cursor: default;
+}
+
+div.guide div.program.available {
+	border-left-color: #f8febe;
+}
+
+div.guide div.program.available:hover {
+	border-left-color: #9ba53e; 
+}
+
+div.guide div.program.waiting {
+	border-left-color: #ffd7bf;
+}
+
+div.guide div.program.waiting:hover {
+	border-left-color: #a6653e;
+}
+
+div.guide div.program div.begin {
+	float: left;
+	width: 25%;
+}
+
+div.guide div.program h3 {
+	font-size: 1.09m;
+	font-weight: bold;
+	float: right;
+	width: 74%;
+}
+
+div.guide div.program div.onhover {
+	display: none;
+}
+
+div.guide div.program:hover div.onhover {
+	display: block;
+}
+
+div.guide div.program div.description {
+	display: none;
+	float: right;
+	width: 74%;
+}
+
+div.guide div.program div.actions {
+	float: left;
+	width: 100%;
+	margin-top: 5px;
+}
+
+div.actions ul {
+	display: block;
+	text-align: right;
+}
+
+div.actions ul li {
+	display: inline-block;
+	padding: 2px 4px;
+	border: 1px solid #444;
+}
+
+div.actions ul li a {
+	text-decoration: none;
+	color: #000;
+}

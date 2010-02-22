@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Electronic Programme Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" href="css/main.css" type="text/css"/>
+</head>
+<body>
+<div class="guide">
+	{foreach $channels as $channel}
+	<div class="channel">
+		<div class="header">
+			<h2>{$channel->getName()}</h2>
+		</div>
+		<div class="schedule">
+			{foreach $channel->getPrograms() as $program}
+			{if ($program->getRecording())}
+				{if (($program->getRecording()->getMode() == "WAITING") or ($program->getRecording()->getMode() == "PROCESSING"))}
+			<div class="program waiting">
+				{else if ($program->getRecording()->getMode() == "AVAILABLE")}
+			<div class="program available">
+				{/if}
+			{else}
+			<div class="program">
+			{/if}
+				<div class="begin">{$program->getBegin()|date_format:"%l:%M %p"|lower}</div>
+				<h3>{$program->getTitle()}</h3>
+				<div class="description onhover">{$program->getDescription()}</div>
+				<div class="actions onhover">
+					<ul>
+						<li><a href="#">Record</a></li>
+						<li><a href="#">Play</a></li>
+					</ul>
+				</div>
+			</div>
+			{/foreach}
+		</div>
+	</div>
+	{/foreach}
+</div>
+</body>
+</html>
