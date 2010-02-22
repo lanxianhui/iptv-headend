@@ -186,8 +186,7 @@ public class ChannelRecorder implements Runnable {
 								
 								FileOutputStream fos = new FileOutputStream(path + fileName);
 								
-								while (System.currentTimeMillis() < beginRecordingNum)
-								{
+								while (System.currentTimeMillis() < beginRecordingNum) {
 									try {
 										sock.receive(recv);
 										if (!runMode.equals(RunMode.RUN)) {
@@ -202,8 +201,7 @@ public class ChannelRecorder implements Runnable {
 								Npvrd.log(groupIp + ": Recording starts for " + task.getProgramName());
 								
 								try {
-									while (System.currentTimeMillis() < endRecordingNum)
-									{
+									while (System.currentTimeMillis() < endRecordingNum) {
 										sock.receive(recv);
 										fos.write(recv.getData(), recv.getOffset(), recv.getLength());
 										if (!runMode.equals(RunMode.RUN)) {
@@ -236,8 +234,7 @@ public class ChannelRecorder implements Runnable {
 					}
 				}
 				
-				if (this.getRunMode().equals(RunMode.RUN) && this.isEmpty() && !this.getRecheckSchedule())
-				{
+				if (this.getRunMode().equals(RunMode.RUN) && this.isEmpty() && !this.getRecheckSchedule()) {
 					try {
 						Thread.sleep(100000);
 					} catch (InterruptedException e) {
