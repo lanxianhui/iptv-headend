@@ -18,7 +18,7 @@ class EpgController {
 		}
 		
 		$smarty->assign('channels', $channels);
-		$smarty->display('epg.tpl');
+		$smarty->display('epg.html');
 	}
 	
 }
