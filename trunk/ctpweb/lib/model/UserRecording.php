@@ -37,6 +37,9 @@ class UserRecording {
     var $recordingId;
     var $userId;
 
+    var $recording;
+    var $program;
+    var $user;
 
 
     /** 
@@ -77,7 +80,27 @@ class UserRecording {
     function setUserId($userIdIn) {
           $this->userId = $userIdIn;
     }
+    
+    function getUser() {
+    	  return $this->user;
+    }
+    function setUser($userIn) {
+    	  $this->user = $userIn;
+    }
+    
+    function getProgram() {
+    	  return $this->program;
+    }
+    function setProgram($programIn) {
+		  $this->program = $programIn;    	
+    }
 
+    function getRecording() {
+    	  return $this->recording;
+    }
+    function setRecording($recordingIn) {
+    	  $this->recording = $recordingIn;
+    }
 
 
     /** 

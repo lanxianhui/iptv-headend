@@ -91,6 +91,21 @@ class UserRecordingDao {
           else
                return false;
     }
+    
+    function loadAllProgramRecordings(&$conn, &$user) {
+    	
+    	if (!$user->getId()) {
+    		return false;
+    	}
+    	
+    	$sql = "SELECT * FROM UserRecording LEFT JOIN Recording ON UserRecording.recordingId = Recording.id ";
+    	$sql = $sql."LEFT JOIN Program ON Recording.programId = Program.id ";
+    	$sql = $sql."WHERE (UserRecording.userId = ".$user->getId().")";
+    	
+    	$searchResults = $this->listQueryRecordingProgram(&$conn, $sql);
+    	
+    	return $searchResults;
+    }
 
 
     /**
@@ -356,6 +371,41 @@ class UserRecordingDao {
 
                $temp->setRecordingId($row[0]); 
                $temp->setUserId($row[1]); 
+               array_push($searchResults, $temp);
+          }
+
+          return $searchResults;
+    }
+    
+	function listQueryRecordingProgram(&$conn, &$sql) {
+
+          $searchResults = array();
+          $result = $conn->execute($sql);
+
+          while ($row = $conn->nextRow($result)) {
+               $temp = $this->createValueObject();
+
+               $temp->setRecordingId($row[0]); 
+               $temp->setUserId($row[1]); 
+               
+               $recordingDao = new RecordingDao();
+               $tempRecording = $recordingDao->createValueObject();
+               $tempRecording->setId($row[2]);
+               $tempRecording->setProgramId($row[3]);
+               $tempRecording->setMode($row[4]);
+               $tempRecording->setFileName($row[5]);
+               
+               $programDao = new ProgramDao();
+               $tempProgram = $programDao->createValueObject();
+               $tempProgram->setTvChannelId($row[6]);
+               $tempProgram->setTitle($row[7]);
+               $tempProgram->setDescription($row[8]);
+               $tempProgram->setBegin($row[9]);
+               $tempProgram->setEnd($row[9]);
+               
+               $temp->setProgram($tempProgram);
+               $temp->setRecording($tempRecording);
+               
                array_push($searchResults, $temp);
           }
 

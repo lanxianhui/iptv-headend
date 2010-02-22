@@ -13,7 +13,7 @@ class EpgLogic {
 	 */
 	function getChannels(&$conn) {
 		$channelDAO = new TvChannelDAO();
-		return $channelDAO->loadAll($conn);
+		return $channelDAO->loadAll(&$conn);
 	}
 	
 	/**
@@ -23,7 +23,7 @@ class EpgLogic {
 	 */
 	function getNumberOfChannels(&$conn) {
 		$channelDAO = new TvChannelDAO();
-		return $channelDAO->countAll($conn);
+		return $channelDAO->countAll(&$conn);
 	}
 	
 	/**
@@ -46,12 +46,12 @@ class EpgLogic {
 	 */
 	function getPrograms(&$conn, &$channel, $date) {
 		$programDAO = new ProgramDAO();
-		return $programDAO->loadDay($conn, $channel, $date);
+		return $programDAO->loadDay(&$conn, &$channel, $date);
 	}
 	
 	function getProgramsWithRecordings(&$conn, &$channel, &$date) {
 		$programRecordingDAO = new ProgramDAO();
-		return $programRecordingDAO->loadDayWithRecordings($conn, $channel, $date);
+		return $programRecordingDAO->loadDayWithRecordings(&$conn, &$channel, $date);
 	}
 }
 

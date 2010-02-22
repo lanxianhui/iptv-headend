@@ -15,20 +15,20 @@ class PvrLogic {
 	 */
 	function recordProgram(&$conn, &$program, &$user) {
 		$recordingDAO = new RecordingDao();
-		$recording = $recordingDAO->getObject($conn, null, $program->getId());
+		$recording = $recordingDAO->getObject(&$conn, null, $program->getId());
 		if (!$recording->getId()) {
 			$recording = new Recording();
 			$recording->setAll(null, $program->getId(), Recording::WAITING, null);
-			if (!$recordingDAO->create($conn, $recording))
+			if (!$recordingDAO->create(&$conn, &$recording))
 				return false;
 		}
 		
 		$userRecordingDAO = new UserRecordingDao();
-		$userRecording = $userRecordingDAO->getObject($conn, $recording->getId(), $user->getId());
+		$userRecording = $userRecordingDAO->getObject(&$conn, $recording->getId(), $user->getId());
 		if (!$userRecording->getRecordingId()) {
 			$userRecording = new UserRecording();
 			$userRecording->setAll($recording->getId(), $user->getId());
-			if (!$userRecordingDAO->create($conn, $userRecording))
+			if (!$userRecordingDAO->create(&$conn, &$userRecording))
 				return false;
 		}
 		return true;
@@ -45,16 +45,17 @@ class PvrLogic {
 		$deleteUserRecording = new UserRecording();
 		$deleteUserRecording->setAll($recording->getId(), $user->getId());
 		$userRecordingDAO = new UserRecordingDao();
-		return $userRecordingDAO->delete($conn, $deleteUserRecording);
+		return $userRecordingDAO->delete($conn, &$deleteUserRecording);
 	}
 	
 	function listRecordings(&$conn) {
 		$recordingDao = new RecordingDao();
-		return $recordingDao->loadAll();
+		return $recordingDao->loadAll(&$conn);
 	}
 	
 	function listRecordings(&$conn, &$user) {
-		
+		$userRecordingDao = new UserRecordingDao();
+		return $userRecordingDao->loadAllProgramRecordings(&$conn, &$user);
 	}
 	
 }

@@ -228,6 +228,9 @@ class ProgramDao {
                //print "Can not delete without Primary-Key!";
                return false;
           }
+          
+          $sql = "DELETE FROM Recording WHERE (programId = ".$valueObject->getId().") ";
+          $result = $this->databaseUpdate(&$conn, $sql);
 
           $sql = "DELETE FROM Program WHERE (id = ".$valueObject->getId().") ";
           $result = $this->databaseUpdate(&$conn, $sql);
@@ -252,6 +255,9 @@ class ProgramDao {
      * @param conn         This method requires working database connection.
      */
     function deleteAll(&$conn) {
+    	
+    	  $sql = "DELETE FROM Recording";
+          $result = $this->databaseUpdate(&$conn, $sql);
 
           $sql = "DELETE FROM Program";
           $result = $this->databaseUpdate(&$conn, $sql);
