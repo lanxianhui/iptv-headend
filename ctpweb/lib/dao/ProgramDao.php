@@ -99,6 +99,18 @@ class ProgramDao {
     	return $searchResults;
     	
     }
+    
+    function loadDayWithRecordings(&$conn, &$channel, $date) {
+    	if (!$channel->getId()) {
+               return false;
+       	}
+    	
+    	$sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId ORDER BY begin ASC WHERE ( channelId = ".$channel->getId()." AND DATE(begin) = DATE(FROM_UNIXTIME(".$begin."))";
+    	
+    	$searchResults = $this->listQueryRecordings(&$conn, &$sql);
+    	
+    	return $searchResults;
+    }
 
 
     /**
@@ -410,6 +422,37 @@ class ProgramDao {
                $temp->setDescription($row[3]); 
                $temp->setBegin($row[4]); 
                $temp->setEnd($row[5]); 
+               array_push($searchResults, $temp);
+          }
+
+          return $searchResults;
+    }
+    
+    function listQueryRecordings(&$conn, &$sql) {
+
+          $searchResults = array();
+          $result = $conn->execute($sql);
+
+          while ($row = $conn->nextRow($result)) {
+               $temp = $this->createValueObject();
+
+               $temp->setId($row[0]); 
+               $temp->setTvChannelId($row[1]); 
+               $temp->setTitle($row[2]); 
+               $temp->setDescription($row[3]); 
+               $temp->setBegin($row[4]); 
+               $temp->setEnd($row[5]); 
+               
+               if ($row[6] != null) {
+	               $recordingDao = new RecordingDao();
+	               $tempRecording = $recordingDao->createValueObject();
+	               $tempRecording->setId($row[6]);
+	               $tempRecording->setProgramId($row[7]);
+	               $tempRecording->setMode($row[8]);
+	               $tempRecording->setFileName($row[9]);
+	               $temp->setRecording($tempRecording);
+               }
+               
                array_push($searchResults, $temp);
           }
 

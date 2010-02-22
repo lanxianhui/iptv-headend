@@ -41,6 +41,7 @@ class Program {
     var $begin;
     var $end;
 
+    var $recording;
 
 
     /** 
@@ -109,6 +110,12 @@ class Program {
           $this->end = $endIn;
     }
 
+    function setRecording($recordingIn) {
+    	$this->recording = $recordingIn;
+    }
+    function getRecording() {
+    	return $this->recording;
+    }
 
 
     /** 
@@ -131,6 +138,22 @@ class Program {
           $this->description = $descriptionIn;
           $this->begin = $beginIn;
           $this->end = $endIn;
+    }
+    
+function setAll($idIn,
+          $tvChannelIdIn,
+          $titleIn,
+          $descriptionIn,
+          $beginIn,
+          $endIn,
+          $recordingIn) {
+          $this->id = $idIn;
+          $this->tvChannelId = $tvChannelIdIn;
+          $this->title = $titleIn;
+          $this->description = $descriptionIn;
+          $this->begin = $beginIn;
+          $this->end = $endIn;
+          $this->recording = $recordingIn;
     }
 
 
@@ -201,6 +224,7 @@ class Program {
         $cloned->setDescription($this->description); 
         $cloned->setBegin($this->begin); 
         $cloned->setEnd($this->end); 
+        $cloned->setRecording($this->recording);
 
         return $cloned;
     }
