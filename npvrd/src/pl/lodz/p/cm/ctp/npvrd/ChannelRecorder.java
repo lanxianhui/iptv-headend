@@ -168,12 +168,15 @@ public class ChannelRecorder implements Runnable {
 						long endRecordingNum = task.getRecordingEnd().getTime();
 						
 						if (endRecordingNum > System.currentTimeMillis()) {
-							task.setState(Mode.PROCESSING);
+							Mode fileMode = Mode.PROCESSING;
+							task.setState(fileMode);
 							task.saveToDatabase();
 							String path = Npvrd.config.recordings;
 							String fileName = generateFileName(task);
 							
 							Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
+							
+							fileMode = Mode.UNAVAILABLE;
 							
 							try {
 								byte[] buf = new byte[sock.getReceiveBufferSize()];
@@ -184,7 +187,7 @@ public class ChannelRecorder implements Runnable {
 									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
 								}
 								
-								FileOutputStream fos = new FileOutputStream(path + fileName);
+								OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
 								
 								while (System.currentTimeMillis() < beginRecordingNum) {
 									try {
@@ -203,14 +206,19 @@ public class ChannelRecorder implements Runnable {
 								try {
 									while (System.currentTimeMillis() < endRecordingNum) {
 										sock.receive(recv);
-										fos.write(recv.getData(), recv.getOffset(), recv.getLength());
+										fos.write(recv.getData(), 0, recv.getLength());
 										if (!runMode.equals(RunMode.RUN)) {
 											fos.close();
+											fileMode = Mode.UNAVAILABLE;
+											task.setState(fileMode);
+											task.setResultFileName(null);
+											task.saveToDatabase();
 											throw new InterruptedException();
 										}
 									}
+									fileMode = Mode.AVAILABLE; // Recording ended successfully
 								} catch (IOException e) {
-									Npvrd.error(groupIp + ": Source channel is off-air: " + e.getMessage());
+									Npvrd.error(groupIp + ": Source channel is off-air: " + e.getMessage() + " Nothing to record.");
 								}
 								
 								Npvrd.log(groupIp + ": Recording ends.");			
@@ -220,14 +228,14 @@ public class ChannelRecorder implements Runnable {
 								// Make the file available
 								VlmManager vlm = new VlmManager(Npvrd.config.vlm);
 								vlm.createNewVod(fileName, path + fileName);
-								
-								// Announce that the file is available
-								task.setState(Mode.AVAILABLE);
-								task.setResultFileName(fileName);
-								task.saveToDatabase();
 							} catch (IOException ioe) {
 								Npvrd.error(groupIp + ": Destination file is unavailable: " + ioe.getMessage());
 							}
+
+							// Announce that the file is available
+							task.setState(fileMode);
+							task.setResultFileName(fileName);
+							task.saveToDatabase();
 						}
 					} catch (InterruptedException ie) {
 						
