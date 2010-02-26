@@ -5,6 +5,8 @@
 <title>Electronic Programme Guide</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <link rel="stylesheet" href="css/main.css" type="text/css"/>
+<script type="application/javascript" language="JavaScript" src="js/mootools-1.2.4-core-yc.js"></script>
+<script type="application/javascript" language="JavaScript" src="js/epg.js"></script> 
 </head>
 <body>
 <div class="guide">
@@ -24,9 +26,13 @@
 			{else}
 			<div class="program">
 			{/if}
-				<div class="begin">{$program->getBegin()|date_format:"%l:%M %p"|lower}</div>
-				<h3>{$program->getTitle()}</h3>
-				<div class="description onhover">{$program->getDescription()}</div>
+				<div class="left">
+					<div class="begin">{$program->getBegin()|date_format:"%l:%M %p"|lower}</div>
+				</div>
+				<div class="right">
+					<h3>{$program->getTitle()}</h3>
+					<div class="description hidden">{$program->getDescription()}</div>
+				</div>
 				<div class="actions onhover">
 					<ul>
 						<li><a href="#">Record</a></li>

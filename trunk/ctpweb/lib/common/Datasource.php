@@ -49,6 +49,9 @@ class Datasource {
 
                 // Change this line to reflect whatever Database system you are using:
                 mysql_select_db ($dbName, $this->dbLink);
+                mysql_set_charset ("utf-8", $this->dbLink);
+                
+				mysql_query("SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'", $this->dbLink);
 	}
 
 

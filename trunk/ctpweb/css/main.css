@@ -56,16 +56,19 @@ div.guide div.program.waiting:hover {
 	border-left-color: #a6653e;
 }
 
-div.guide div.program div.begin {
+div.guide div.program div.left {
 	float: left;
 	width: 25%;
+}
+
+div.guide div.program div.right {
+	float: right;
+	width: 74%;
 }
 
 div.guide div.program h3 {
 	font-size: 1.09m;
 	font-weight: bold;
-	float: right;
-	width: 74%;
 }
 
 div.guide div.program div.onhover {
@@ -76,15 +79,22 @@ div.guide div.program:hover div.onhover {
 	display: block;
 }
 
+div.guide div.program:hover span.onhover {
+	display: inline;
+}
+
+div.hidden {
+	display: none;
+}
+
 div.guide div.program div.description {
 	display: none;
-	float: right;
-	width: 74%;
 }
 
 div.guide div.program div.actions {
-	float: left;
-	width: 100%;
+	position: absolute;
+	/* float: left; */
+	/* width: 100%; */
 	margin-top: 5px;
 }
 
