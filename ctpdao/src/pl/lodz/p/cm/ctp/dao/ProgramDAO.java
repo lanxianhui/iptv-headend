@@ -27,7 +27,7 @@ public final class ProgramDAO {
     private static final String SQL_DELETE =
         "DELETE FROM Program WHERE id = ?";
     private static final String SQL_DELETE_OLDER =
-        "DELETE FROM Program WHERE DIMESTAMPDIFF(DAY, NOW(), Program.end) > ?";
+        "DELETE FROM Program WHERE TIMESTAMPDIFF(DAY, NOW(), Program.end) > ?";
 	
 	private DAOFactory daoFactory;
 
