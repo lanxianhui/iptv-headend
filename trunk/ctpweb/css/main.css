@@ -34,34 +34,12 @@ div.guide div.header h2 {
 
 div.guide div.program {
 	position: relative;
-	border-left: 5px solid #eee;
 	margin-bottom: 5px;
 	padding-left: 5px;
 }
 
 div.guide div.program div.data {
 	overflow: auto;
-}
-
-div.guide div.program:hover {
-	border-left-color: #bbe;
-	cursor: default;
-}
-
-div.guide div.program.available {
-	border-left-color: #f8febe;
-}
-
-div.guide div.program.available:hover {
-	border-left-color: #9ba53e; 
-}
-
-div.guide div.program.waiting {
-	border-left-color: #ffd7bf;
-}
-
-div.guide div.program.waiting:hover {
-	border-left-color: #a6653e;
 }
 
 div.guide div.program div.left {
@@ -100,13 +78,7 @@ div.guide div.program div.description {
 }
 
 div.guide div.program div.actions {
-	position: absolute;
-	float: left;
-	padding: 2px 5px 2px 12px;
-	top: 13px;
-	left: -5px;
-	z-index: 2;
-	background: #bbe;
+	background: #eee;
 }
 
 div.actions ul {
