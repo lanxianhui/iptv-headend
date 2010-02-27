@@ -32,14 +32,16 @@
 					</div>
 					<div class="right">
 						<h3>{$program->getTitle()}</h3>
-						<div class="description hidden">{$program->getDescription()}</div>
 					</div>
 				</div>
-				<div class="actions hidden">
-					<ul>
-						<li><a href="#"><img src="img/control_record.png" /></a></li>
-						<li><a href="#"><img src="img/control_play.png" /></a></li>
-					</ul>
+				<div class="flyout">
+					<div class="description">{$program->getDescription()}</div>
+					<div class="actions">
+						<ul>
+							<li><a href="#"><img src="img/control_record.png" /></a></li>
+							<li><a href="#"><img src="img/control_play.png" /></a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			{/foreach}
