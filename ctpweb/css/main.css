@@ -12,6 +12,10 @@ body {
 	margin: 10px 5%;
 }
 
+a img {
+	border: 0;
+}
+
 div.guide div.channel {
 	width: 20%;
 	float: left;
@@ -29,9 +33,13 @@ div.guide div.header h2 {
 }
 
 div.guide div.program {
+	position: relative;
 	border-left: 5px solid #eee;
 	margin-bottom: 5px;
 	padding-left: 5px;
+}
+
+div.guide div.program div.data {
 	overflow: auto;
 }
 
@@ -58,12 +66,12 @@ div.guide div.program.waiting:hover {
 
 div.guide div.program div.left {
 	float: left;
-	width: 25%;
+	width: 27%;
 }
 
 div.guide div.program div.right {
 	float: right;
-	width: 74%;
+	width: 73%;
 }
 
 div.guide div.program h3 {
@@ -93,9 +101,12 @@ div.guide div.program div.description {
 
 div.guide div.program div.actions {
 	position: absolute;
-	/* float: left; */
-	/* width: 100%; */
-	margin-top: 5px;
+	float: left;
+	padding: 2px 5px 2px 12px;
+	top: 13px;
+	left: -5px;
+	z-index: 2;
+	background: #bbe;
 }
 
 div.actions ul {
@@ -105,11 +116,4 @@ div.actions ul {
 
 div.actions ul li {
 	display: inline-block;
-	padding: 2px 4px;
-	border: 1px solid #444;
-}
-
-div.actions ul li a {
-	text-decoration: none;
-	color: #000;
 }

@@ -17,26 +17,28 @@
 		</div>
 		<div class="schedule">
 			{foreach $channel->getPrograms() as $program}
-			{if ($program->getRecording())}
-				{if (($program->getRecording()->getMode() == "WAITING") or ($program->getRecording()->getMode() == "PROCESSING"))}
+				{if ($program->getRecording())}
+					{if (($program->getRecording()->getMode() == "WAITING") or ($program->getRecording()->getMode() == "PROCESSING"))}
 			<div class="program waiting">
-				{else if ($program->getRecording()->getMode() == "AVAILABLE")}
+					{else if ($program->getRecording()->getMode() == "AVAILABLE")}
 			<div class="program available">
-				{/if}
-			{else}
+					{/if}
+				{else}
 			<div class="program">
-			{/if}
-				<div class="left">
-					<div class="begin">{$program->getBegin()|date_format:"%l:%M %p"|lower}</div>
-				</div>
-				<div class="right">
-					<h3>{$program->getTitle()}</h3>
-					<div class="description hidden">{$program->getDescription()}</div>
+				{/if}
+				<div class="data">
+					<div class="left">
+						<div class="begin">{$program->getBegin()|date_format:"%l:%M %p"|lower}</div>
+					</div>
+					<div class="right">
+						<h3>{$program->getTitle()}</h3>
+						<div class="description hidden">{$program->getDescription()}</div>
+					</div>
 				</div>
 				<div class="actions onhover">
 					<ul>
-						<li><a href="#">Record</a></li>
-						<li><a href="#">Play</a></li>
+						<li><a href="#"><img src="img/control_record.png" /></a></li>
+						<li><a href="#"><img src="img/control_play.png" /></a></li>
 					</ul>
 				</div>
 			</div>
