@@ -7,7 +7,7 @@ class EpgController {
 	
 	var $channels;
 	
-	function EpgController($config, &$smarty) {
+	function EpgController($config) {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
 	
 		$channels = EpgLogic::getChannels(&$conn);
@@ -17,8 +17,18 @@ class EpgController {
 			$channel->setPrograms($programs);
 		}
 		
-		$smarty->assign('channels', $channels);
-		$smarty->display('epg.html');
+		if (($_SERVER["HTTP_ACCEPT"] == "application/json") | ($_GET["format"] == "json")) {
+			print(json_encode($channels));
+			exit;
+		} else {
+			$smarty = new Smarty();
+			$smarty->template_dir = "./tpl";
+			$smarty->compile_dir = "./tpl_c";
+			$smarty->cache_dir = "./cache";
+					
+			$smarty->assign('channels', $channels);
+			$smarty->display('epg.html');
+		}
 	}
 	
 }

@@ -396,8 +396,8 @@ class ProgramDao {
                    $valueObject->setTvChannelId($row[1]); 
                    $valueObject->setTitle($row[2]); 
                    $valueObject->setDescription($row[3]); 
-                   $valueObject->setBegin($row[4]); 
-                   $valueObject->setEnd($row[5]); 
+                   $valueObject->setBegin(strtotime($row[4])); 
+                   $valueObject->setEnd(strtotime($row[5])); 
           } else {
                //print " Object Not Found!";
                return false;
@@ -426,8 +426,8 @@ class ProgramDao {
                $temp->setTvChannelId($row[1]); 
                $temp->setTitle($row[2]); 
                $temp->setDescription($row[3]); 
-               $temp->setBegin($row[4]); 
-               $temp->setEnd($row[5]); 
+               $temp->setBegin(strtotime($row[4])); 
+               $temp->setEnd(strtotime($row[5])); 
                array_push($searchResults, $temp);
           }
 
@@ -446,8 +446,8 @@ class ProgramDao {
                $temp->setTvChannelId($row[1]); 
                $temp->setTitle($row[2]); 
                $temp->setDescription($row[3]); 
-               $temp->setBegin($row[4]); 
-               $temp->setEnd($row[5]); 
+               $temp->setBegin(strtotime($row[4])); 
+               $temp->setEnd(strtotime($row[5])); 
                
                if ($row[6] != null) {
 	               $recordingDao = new RecordingDao();

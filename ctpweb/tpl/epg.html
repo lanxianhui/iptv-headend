@@ -1,53 +1,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" epg:xmlns="http://code.google.com/p/iptv-headend/epgdata/1.0" xml:lang="en" lang="en">
 <head>
-<title>Electronic Programme Guide</title>
+<title>Electronic Program Guide</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <link rel="stylesheet" href="css/main.css" type="text/css"/>
 <script type="application/javascript" language="JavaScript" src="js/mootools-1.2.4-core-yc.js"></script>
+<script type="application/javascript" language="JavaScript" src="js/mootools-1.2.4.4-more.js"></script>
 <script type="application/javascript" language="JavaScript" src="js/epg.js"></script> 
 </head>
 <body>
-<div class="guide">
-	{foreach $channels as $channel}
-	<div class="channel">
-		<div class="header">
-			<h2>{$channel->getName()}</h2>
-		</div>
-		<div class="schedule">
-			{foreach $channel->getPrograms() as $program}
-				{if ($program->getRecording())}
-					{if (($program->getRecording()->getMode() == "WAITING") or ($program->getRecording()->getMode() == "PROCESSING"))}
-			<div class="program waiting">
-					{else if ($program->getRecording()->getMode() == "AVAILABLE")}
-			<div class="program available">
-					{/if}
-				{else}
-			<div class="program">
-				{/if}
-				<div class="data">
-					<div class="left">
-						<div class="begin">{$program->getBegin()|date_format:"%l:%M %p"|lower}</div>
-					</div>
-					<div class="right">
-						<h3>{$program->getTitle()}</h3>
-					</div>
-				</div>
-				<div class="flyout">
-					<div class="description">{$program->getDescription()}</div>
-					<div class="actions">
-						<ul>
-							<li><a href="#"><img src="img/control_record.png" /></a></li>
-							<li><a href="#"><img src="img/control_play.png" /></a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			{/foreach}
-		</div>
-	</div>
-	{/foreach}
+<div id="guide">
+	
 </div>
 </body>
 </html>
