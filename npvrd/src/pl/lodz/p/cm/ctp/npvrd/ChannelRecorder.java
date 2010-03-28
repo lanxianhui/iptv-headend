@@ -3,6 +3,7 @@ package pl.lodz.p.cm.ctp.npvrd;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.*;
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.Recording.Mode;
@@ -178,58 +179,25 @@ public class ChannelRecorder implements Runnable {
 							
 							fileMode = Mode.UNAVAILABLE;
 							
-							try {
-								byte[] buf = new byte[sock.getReceiveBufferSize()];
-								DatagramPacket recv = new DatagramPacket(buf, buf.length);
-								
-								if (System.currentTimeMillis() < beginRecordingNum) {
-									Npvrd.log(groupIp + ": Waiting for: " + task.getRecordingBegin().toGMTString());
-									Thread.sleep(beginRecordingNum - System.currentTimeMillis() - 10);
-								}
-								
-								OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
-								
-								while (System.currentTimeMillis() < beginRecordingNum) {
-									try {
-										sock.receive(recv);
-										if (!runMode.equals(RunMode.RUN)) {
-											fos.close();
-											throw new InterruptedException();
-										}
-									} catch (IOException e) {
-										// Do not report that source group is unavailable, if just waiting for program to start
-									}
-								}
-								
-								Npvrd.log(groupIp + ": Recording starts for " + task.getProgramName());
-								
-								try {
-									while (System.currentTimeMillis() < endRecordingNum) {
-										sock.receive(recv);
-										fos.write(recv.getData(), 0, recv.getLength());
-										if (!runMode.equals(RunMode.RUN)) {
-											fos.close();
-											fileMode = Mode.UNAVAILABLE;
-											task.setState(fileMode);
-											task.setResultFileName(null);
-											task.saveToDatabase();
-											throw new InterruptedException();
-										}
-									}
-									fileMode = Mode.AVAILABLE; // Recording ended successfully
-								} catch (IOException e) {
-									Npvrd.error(groupIp + ": Source channel is off-air: " + e.getMessage() + " Nothing to record.");
-								}
-								
-								Npvrd.log(groupIp + ": Recording ends.");			
-								
-								fos.close();
-								
-								// Make the file available
-								VlmManager vlm = new VlmManager(Npvrd.config.vlm);
-								vlm.createNewVod(fileName, path + fileName);
-							} catch (IOException ioe) {
-								Npvrd.error(groupIp + ": Destination file is unavailable: " + ioe.getMessage());
+							OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
+							
+							Queue<Queable> streamQueue = new LinkedBlockingQueue<Queable>();
+							MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), streamQueue, sock);
+							StreamQueueWriter streamQueueWriter = new StreamQueueWriter(streamQueue, fos);
+							
+							Thread listenerThread = new Thread(multicastListener);
+							Thread writerThread = new Thread(streamQueueWriter);
+							
+							listenerThread.start();
+							writerThread.start();
+							
+							listenerThread.join();
+							writerThread.join();
+							
+							if (multicastListener.getResult().equals(MulticastTimedListener.Result.OK)) {
+								fileMode = Mode.AVAILABLE;
+							} else {
+								fileMode = Mode.UNAVAILABLE;
 							}
 
 							// Announce that the file is available
