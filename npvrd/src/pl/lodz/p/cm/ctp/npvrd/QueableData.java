@@ -7,7 +7,7 @@ public class QueableData implements Queable {
 	private int offset;
 
 	public QueableData(byte[] data, int offset, int length) {
-		this.data = data.clone();
+		this.data = data;
 		this.offset = offset;
 		this.length = length;
 	}

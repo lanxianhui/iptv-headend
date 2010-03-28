@@ -48,6 +48,7 @@ public class MulticastTimedListener implements Runnable {
 			byte[] buf = new byte[socket.getReceiveBufferSize()];
 			DatagramPacket recv = new DatagramPacket(buf, buf.length);
 			
+			Npvrd.log("Waiting....");
 			if (System.currentTimeMillis() < beginRecording) {
 				try {
 					Thread.sleep(beginRecording - System.currentTimeMillis() - 10);
@@ -66,6 +67,7 @@ public class MulticastTimedListener implements Runnable {
 				}
 			}
 			
+			Npvrd.log("Recording....");
 			while (System.currentTimeMillis() < endRecording) {
 				try {
 					socket.receive(recv);
@@ -80,9 +82,8 @@ public class MulticastTimedListener implements Runnable {
 			
 			streamQueue.offer(new QueablePoison());
 			this.result = Result.OK;
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SocketException se) {
+			Npvrd.error("Unable to get receive buffer size");
 			streamQueue.offer(new QueablePoison());
 			this.result = Result.ERROR;
 		}
