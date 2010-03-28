@@ -14,7 +14,7 @@ public class MulticastTimedListener implements Runnable {
 	volatile private long beginRecording;
 	volatile private long endRecording;
 	
-	public enum Result { OK, ERROR, UNDEFINED };
+	public enum Result { OK, ERROR, ABORTED, UNDEFINED };
 	
 	private Result result;
 	
@@ -49,7 +49,13 @@ public class MulticastTimedListener implements Runnable {
 			DatagramPacket recv = new DatagramPacket(buf, buf.length);
 			
 			if (System.currentTimeMillis() < beginRecording) {
-				Thread.sleep(beginRecording - System.currentTimeMillis() - 10);
+				try {
+					Thread.sleep(beginRecording - System.currentTimeMillis() - 10);
+				} catch (InterruptedException e) {
+					streamQueue.offer(new QueablePoison());
+					this.result = Result.ABORTED;
+					return;
+				}
 			}
 			
 			while (System.currentTimeMillis() < beginRecording) {
@@ -65,7 +71,10 @@ public class MulticastTimedListener implements Runnable {
 					socket.receive(recv);
 					streamQueue.offer(new QueableData(recv.getData(), 0, recv.getLength()));
 				} catch (IOException e) {
-					throw new InterruptedException();
+					Npvrd.error("Trouble receiving - poisoning destination");
+					streamQueue.offer(new QueablePoison());
+					this.result = Result.ERROR;
+					return;
 				}
 			}
 			
@@ -74,9 +83,6 @@ public class MulticastTimedListener implements Runnable {
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			streamQueue.offer(new QueablePoison());
-			this.result = Result.ERROR;
-		} catch (InterruptedException e) {
 			streamQueue.offer(new QueablePoison());
 			this.result = Result.ERROR;
 		}

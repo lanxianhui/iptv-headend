@@ -42,8 +42,13 @@ public class ScheduleUpdater implements Runnable {
 					parentChannel.setRecheckSchedule(true);
 					if (!newFirstProgram.equals(lastProgram))
 					{
+						if (lastProgram == null) {
+							lastProgram = newFirstProgram;
+							parentThread.interrupt();
+						} else if (newFirstProgram.program.getBegin().getTime() < lastProgram.program.getBegin().getTime()) {
+							parentThread.interrupt();
+						}
 						lastProgram = newFirstProgram;
-						parentThread.interrupt();
 					}
 				}
 			} catch (DAOException e) {
