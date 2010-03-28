@@ -26,6 +26,7 @@ public class StreamQueueWriter implements Runnable {
 						Npvrd.error("Trouble closing file stream");
 						e.printStackTrace();
 					}
+					Npvrd.log("Stream writer finished stream");
 					return;
 				} else if (queable instanceof QueableData) {
 					QueableData queableData = (QueableData)queable;

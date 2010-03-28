@@ -127,7 +127,7 @@ public class ChannelRecorder implements Runnable {
 	 */
 	private String generateFileName(RecordingTask task) {
 		String plaintext = task.getRecordingBegin().toString() + task.getRecordingEnd().toString() + task.getProgramName();
-		return DAOUtil.hashMD5(plaintext) + ".m2t";
+		return DAOUtil.hashMD5(plaintext) + ".ts";
 	}
 
 	@SuppressWarnings("deprecation")
@@ -141,6 +141,10 @@ public class ChannelRecorder implements Runnable {
 			sock.setSoTimeout(10000);
 			sock.joinGroup(group);
 			
+			// Make the file available
+			Npvrd.log(groupIp + ": Creating a VLM manager.");
+            VlmManager vlm = new VlmManager(Npvrd.config.vlm);
+			
 			ScheduleUpdater updater = new ScheduleUpdater(this, Thread.currentThread());
 			this.scheduleUpdater = new Thread(updater);
 			this.scheduleUpdater.start();
@@ -149,64 +153,75 @@ public class ChannelRecorder implements Runnable {
 				RecordingTask task = null;
 				while ((this.getRecheckSchedule()) && (!this.isEmpty())) {
 					this.setRecheckSchedule(false);
+				
+					recordingScheduleLock.lock();
 					try {
-						recordingScheduleLock.lock();
-						try {
-							if (task != null) {
-								if (recordingSchedule.peekFirst().compareTo(task) < 0) {
-									task.setState(Mode.AVAILABLE);
-									task.saveToDatabase();
-									task = recordingSchedule.removeFirst();
-								}
-							} else {
+						if (task != null) {
+							if (recordingSchedule.peekFirst().compareTo(task) < 0) {
+								task.setState(Mode.AVAILABLE);
+								task.saveToDatabase();
 								task = recordingSchedule.removeFirst();
 							}
-						} finally {
-							recordingScheduleLock.unlock();
+						} else {
+							task = recordingSchedule.removeFirst();
 						}
+					} finally {
+						recordingScheduleLock.unlock();
+					}
+					
+					long endRecordingNum = task.getRecordingEnd().getTime();
+					
+					if (endRecordingNum > System.currentTimeMillis()) {
+						Mode fileMode = Mode.PROCESSING;
+						task.setState(fileMode);
+						task.saveToDatabase();
+						String path = Npvrd.config.recordings;
+						String fileName = generateFileName(task);
 						
-						long beginRecordingNum = task.getRecordingBegin().getTime();
-						long endRecordingNum = task.getRecordingEnd().getTime();
+						Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
 						
-						if (endRecordingNum > System.currentTimeMillis()) {
-							Mode fileMode = Mode.PROCESSING;
-							task.setState(fileMode);
-							task.saveToDatabase();
-							String path = Npvrd.config.recordings;
-							String fileName = generateFileName(task);
-							
-							Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
-							
-							fileMode = Mode.UNAVAILABLE;
-							
-							OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
-							
-							Queue<Queable> streamQueue = new LinkedBlockingQueue<Queable>();
-							MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), streamQueue, sock);
-							StreamQueueWriter streamQueueWriter = new StreamQueueWriter(streamQueue, fos);
-							
-							Thread listenerThread = new Thread(multicastListener);
-							Thread writerThread = new Thread(streamQueueWriter);
-							
-							listenerThread.start();
-							writerThread.start();
-							
+						fileMode = Mode.UNAVAILABLE;
+						
+						OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
+						
+						Queue<Queable> streamQueue = new LinkedBlockingQueue<Queable>();
+						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), streamQueue, sock);
+						StreamQueueWriter streamQueueWriter = new StreamQueueWriter(streamQueue, fos);
+						
+						Thread listenerThread = new Thread(multicastListener);
+						Thread writerThread = new Thread(streamQueueWriter);
+						
+						listenerThread.start();
+						writerThread.start();
+						
+						Npvrd.log(groupIp + ": Threads up and running, waiting for them to terminate.");
+						
+						try {
 							listenerThread.join();
-							writerThread.join();
-							
-							if (multicastListener.getResult().equals(MulticastTimedListener.Result.OK)) {
-								fileMode = Mode.AVAILABLE;
-							} else {
-								fileMode = Mode.UNAVAILABLE;
-							}
-
-							// Announce that the file is available
-							task.setState(fileMode);
-							task.setResultFileName(fileName);
-							task.saveToDatabase();
+						} catch (InterruptedException ie) {
+							Npvrd.log(groupIp + ": Interrupted while waiting, passing interrupt so that Listener can close.");
+							listenerThread.interrupt();
 						}
-					} catch (InterruptedException ie) {
 						
+						Npvrd.log(groupIp + ": Listener thread has terminated, checking results.");
+						
+						if (multicastListener.getResult().equals(MulticastTimedListener.Result.OK)) {
+							fileMode = Mode.AVAILABLE;
+							Npvrd.log(groupIp + ": Listener reported OK.");
+						} else if (multicastListener.getResult().equals(MulticastTimedListener.Result.ABORTED)) {
+							fileMode = Mode.WAITING;
+							Npvrd.log(groupIp + ": Listener reported recording aborted before start.");
+						} else {
+							fileMode = Mode.UNAVAILABLE;
+							Npvrd.log(groupIp + ": Listener reported Error.");
+						}
+
+						// Announce that the file is available
+						vlm.createNewVod(fileName, path + fileName);
+						
+						task.setState(fileMode);
+						task.setResultFileName(fileName);
+						task.saveToDatabase();
 					}
 				}
 				
@@ -214,7 +229,7 @@ public class ChannelRecorder implements Runnable {
 					try {
 						Thread.sleep(100000);
 					} catch (InterruptedException e) {
-						
+						Npvrd.error(groupIp + ": Uncaught InterruptedException.");
 					}
 				}
 			}
