@@ -45,9 +45,10 @@ function recalculateTimefall() {
 function createButton(element, classList, caption){
 	var newButton = new Element('button', {
 		'class': 'btn ' + classList,
-		'html': '<span><span>' + caption + '</span></span>' 
+		'html': '<span><span>' + caption + '</span></span>', 
 	})
 	element.adopt(newButton);
+	return newButton;
 }
 
 function addProgram(schedule, program){
@@ -95,8 +96,8 @@ function addProgram(schedule, program){
 	var newActions = new Element('div', {
 		'class' : 'actions'
 	})
-	createButton(newActions, "pill-l primary play", "Play");
-	createButton(newActions, "pill-r delete", "Delete");
+	playButton = createButton(newActions, "pill-l primary play", "Play");
+	deleteButton = createButton(newActions, "pill-r delete", "Delete");
 	newFlyout.adopt(newDescription);
 	newFlyout.adopt(newActions);
 	
@@ -118,7 +119,12 @@ function addProgram(schedule, program){
 	        openProgram = newProgram;
 	    }
 		recalculateTimefall();
-	    event.stop;
+	    event.stop();
+	});
+	
+	playButton.addEvent('click', function(event) {
+		alert('test!');
+		event.stop();
 	});
 		
 	schedule.adopt(newProgram);
