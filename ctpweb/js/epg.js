@@ -96,8 +96,39 @@ function addProgram(schedule, program){
 	var newActions = new Element('div', {
 		'class' : 'actions'
 	})
-	playButton = createButton(newActions, "pill-l primary play", "Play");
-	deleteButton = createButton(newActions, "pill-r delete", "Delete");
+	
+	if (program.recording == null) {
+		recordButton = createButton(newActions, "pill primary record", "Record");
+		
+		recordButton.addEvent('click', function(event) {
+			alert('record!');
+			
+			event.stop();
+		});
+	} else if (program.recording.mode == "WAITING") {
+		cancelRecordButton = createButton(newActions, "pill cancel", "Cancel");
+		
+		cancelRecordButton.addEvent('click', function(event) {
+			alert('cancel!');
+			
+			event.stop();
+		});
+	} else if (program.recording.mode == "AVAILABLE") {
+		playButton = createButton(newActions, "pill-l primary play", "Play");
+		deleteButton = createButton(newActions, "pill-r delete", "Delete");
+		
+		playButton.addEvent('click', function(event) {
+			alert('test!');
+			
+			event.stop();
+		});
+		deleteButton.addEvent('click', function(event) {
+			alet('delete!');
+			
+			event.stop();
+		});
+	}
+	
 	newFlyout.adopt(newDescription);
 	newFlyout.adopt(newActions);
 	
@@ -120,11 +151,6 @@ function addProgram(schedule, program){
 	    }
 		recalculateTimefall();
 	    event.stop();
-	});
-	
-	playButton.addEvent('click', function(event) {
-		alert('test!');
-		event.stop();
 	});
 		
 	schedule.adopt(newProgram);
