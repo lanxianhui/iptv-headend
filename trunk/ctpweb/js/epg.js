@@ -97,25 +97,27 @@ function addProgram(schedule, program){
 		'class' : 'actions'
 	})
 	
+	// TODO: Make Star'ing programs, and all actions user-aware. We need logins.
+	
 	if (program.recording == null) {
-		recordButton = createButton(newActions, "pill primary record", "Record");
+		monitorButton = createButton(newActions, "pill primary monitor", "Monitor");
 		
-		recordButton.addEvent('click', function(event) {
+		monitorButton.addEvent('click', function(event) {
 			alert('record!');
 			
 			event.stop();
 		});
 	} else if (program.recording.mode == "WAITING") {
-		cancelRecordButton = createButton(newActions, "pill cancel", "Cancel");
+		removeButton = createButton(newActions, "pill remove", "Remove");
 		
-		cancelRecordButton.addEvent('click', function(event) {
+		removeButton.addEvent('click', function(event) {
 			alert('cancel!');
 			
 			event.stop();
 		});
 	} else if (program.recording.mode == "AVAILABLE") {
 		playButton = createButton(newActions, "pill-l primary play", "Play");
-		deleteButton = createButton(newActions, "pill-r delete", "Delete");
+		deleteButton = createButton(newActions, "pill-r delete", "Remove");
 		
 		playButton.addEvent('click', function(event) {
 			alert('test!');
