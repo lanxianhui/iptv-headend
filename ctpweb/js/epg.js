@@ -26,6 +26,8 @@ function recalculateTimefall() {
 				totalHeight += program.getSize().y;
 				if (!program.hasClass("past"))
 					program.addClass("past");
+				if (program.hasClass("current"))
+					program.removeClass("current");
 				return;
 			} else {
 				startTime = program.retrieve("begin");
@@ -34,6 +36,8 @@ function recalculateTimefall() {
 					progressTime = currentTime.getTime() - startTime.getTime();
 					progress = progressTime / totalTime;
 					totalHeight += progress * program.getSize().y;
+					if (!program.hasClass("current"))
+						program.addClass("current");
 				}
 				return;
 			}
