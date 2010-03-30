@@ -45,7 +45,8 @@ public class MulticastTimedListener implements Runnable {
 	@Override
 	public void run() {
 		try {
-			byte[] buf = new byte[socket.getReceiveBufferSize()];
+			int bufLen = socket.getReceiveBufferSize();
+			byte[] buf = new byte[bufLen];
 			DatagramPacket recv = new DatagramPacket(buf, buf.length);
 			
 			Npvrd.log("Waiting....");
@@ -68,10 +69,14 @@ public class MulticastTimedListener implements Runnable {
 			}
 			
 			Npvrd.log("Recording....");
+			
 			while (System.currentTimeMillis() < endRecording) {
 				try {
 					socket.receive(recv);
-					streamQueue.offer(new QueableData(recv.getData().clone(), 0, recv.getLength()));
+					byte[] dataBuf = new byte[bufLen];
+					int dataBufLen = recv.getLength();
+					System.arraycopy(recv.getData(), 0, dataBuf, 0, dataBufLen);
+					streamQueue.offer(new QueableData(dataBuf, 0, dataBufLen));
 				} catch (IOException e) {
 					Npvrd.error("Trouble receiving - poisoning destination");
 					streamQueue.offer(new QueablePoison());
