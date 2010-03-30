@@ -3,7 +3,7 @@ package pl.lodz.p.cm.ctp.npvrd;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
+//import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.*;
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.Recording.Mode;
@@ -184,15 +184,15 @@ public class ChannelRecorder implements Runnable {
 						
 						OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
 						
-						Queue<Queable> streamQueue = new LinkedBlockingQueue<Queable>();
-						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), streamQueue, sock);
-						StreamQueueWriter streamQueueWriter = new StreamQueueWriter(streamQueue, fos);
+						//Queue<Queable> streamQueue = new LinkedBlockingQueue<Queable>();
+						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), fos, sock);
+						//StreamQueueWriter streamQueueWriter = new StreamQueueWriter(streamQueue, fos);
 						
 						Thread listenerThread = new Thread(multicastListener);
-						Thread writerThread = new Thread(streamQueueWriter);
+						//Thread writerThread = new Thread(streamQueueWriter);
 						
 						listenerThread.start();
-						writerThread.start();
+						//writerThread.start();
 						
 						Npvrd.log(groupIp + ": Threads up and running, waiting for them to terminate.");
 						
