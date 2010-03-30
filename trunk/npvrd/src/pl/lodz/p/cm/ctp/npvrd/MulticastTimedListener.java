@@ -71,7 +71,7 @@ public class MulticastTimedListener implements Runnable {
 			while (System.currentTimeMillis() < endRecording) {
 				try {
 					socket.receive(recv);
-					streamQueue.offer(new QueableData(recv.getData(), 0, recv.getLength()));
+					streamQueue.offer(new QueableData(recv.getData().clone(), 0, recv.getLength()));
 				} catch (IOException e) {
 					Npvrd.error("Trouble receiving - poisoning destination");
 					streamQueue.offer(new QueablePoison());
