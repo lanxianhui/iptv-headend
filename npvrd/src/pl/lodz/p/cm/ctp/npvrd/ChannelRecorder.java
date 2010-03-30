@@ -172,11 +172,12 @@ public class ChannelRecorder implements Runnable {
 					long endRecordingNum = task.getRecordingEnd().getTime();
 					
 					if (endRecordingNum > System.currentTimeMillis()) {
+						String fileName = generateFileName(task);
 						Mode fileMode = Mode.PROCESSING;
+						task.setResultFileName(fileName);
 						task.setState(fileMode);
 						task.saveToDatabase();
 						String path = Npvrd.config.recordings;
-						String fileName = generateFileName(task);
 						
 						Npvrd.log(groupIp + ": New task: " + task.getProgramName() + " at " + task.getRecordingBegin().toGMTString());
 						
@@ -184,15 +185,11 @@ public class ChannelRecorder implements Runnable {
 						
 						OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
 						
-						//Queue<Queable> streamQueue = new LinkedBlockingQueue<Queable>();
 						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), fos, sock);
-						//StreamQueueWriter streamQueueWriter = new StreamQueueWriter(streamQueue, fos);
 						
 						Thread listenerThread = new Thread(multicastListener);
-						//Thread writerThread = new Thread(streamQueueWriter);
 						
 						listenerThread.start();
-						//writerThread.start();
 						
 						Npvrd.log(groupIp + ": Threads up and running, waiting for them to terminate.");
 						
