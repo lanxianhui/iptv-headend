@@ -1,15 +1,17 @@
 package pl.lodz.p.cm.ctp.npvrd;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.util.Date;
-import java.util.Queue;
+//import java.util.Queue;
 
 public class MulticastTimedListener implements Runnable {
 	
-	private Queue<Queable> streamQueue;
+	//private Queue<Queable> streamQueue;
+	private OutputStream output;
 	private MulticastSocket socket;
 	volatile private long beginRecording;
 	volatile private long endRecording;
@@ -18,8 +20,9 @@ public class MulticastTimedListener implements Runnable {
 	
 	private Result result;
 	
-	public MulticastTimedListener(Date beginRecording, Date endRecording, Queue<Queable> streamQueue, MulticastSocket socket) {
-		this.streamQueue = streamQueue;
+	public MulticastTimedListener(Date beginRecording, Date endRecording, OutputStream output, MulticastSocket socket) {
+		//this.streamQueue = streamQueue;
+		this.output = output;
 		this.socket = socket;
 		this.beginRecording = beginRecording.getTime();
 		this.endRecording = endRecording.getTime();
@@ -54,7 +57,8 @@ public class MulticastTimedListener implements Runnable {
 				try {
 					Thread.sleep(beginRecording - System.currentTimeMillis() - 10);
 				} catch (InterruptedException e) {
-					streamQueue.offer(new QueablePoison());
+					//streamQueue.offer(new QueablePoison());
+					output.close();
 					this.result = Result.ABORTED;
 					return;
 				}
@@ -73,24 +77,35 @@ public class MulticastTimedListener implements Runnable {
 			while (System.currentTimeMillis() < endRecording) {
 				try {
 					socket.receive(recv);
-					byte[] dataBuf = new byte[bufLen];
-					int dataBufLen = recv.getLength();
-					System.arraycopy(recv.getData(), 0, dataBuf, 0, dataBufLen);
-					streamQueue.offer(new QueableData(dataBuf, 0, dataBufLen));
+					//byte[] dataBuf = new byte[bufLen];
+					//int dataBufLen = recv.getLength();
+					//System.arraycopy(recv.getData(), 0, dataBuf, 0, dataBufLen);
+					//streamQueue.offer(new QueableData(dataBuf, 0, dataBufLen));
+					output.write(recv.getData(), recv.getOffset(), recv.getLength());
 				} catch (IOException e) {
 					Npvrd.error("Trouble receiving - poisoning destination");
-					streamQueue.offer(new QueablePoison());
+					//streamQueue.offer(new QueablePoison());
+					output.close();
 					this.result = Result.ERROR;
 					return;
 				}
 			}
 			
-			streamQueue.offer(new QueablePoison());
+			//streamQueue.offer(new QueablePoison());
+			output.close();
 			this.result = Result.OK;
 		} catch (SocketException se) {
 			Npvrd.error("Unable to get receive buffer size");
-			streamQueue.offer(new QueablePoison());
+			//streamQueue.offer(new QueablePoison());
+			try {
+				output.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			this.result = Result.ERROR;
+		} catch (IOException ioe) {
+			Npvrd.error("Unable to close output");
 		}
 	}
 
