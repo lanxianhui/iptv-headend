@@ -195,7 +195,7 @@ public class ChannelRecorder implements Runnable {
 						
 						OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
 						
-						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), fos, this.sock);
+						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), fos, this.group, this.sock);
 						
 						Thread listenerThread = new Thread(multicastListener);
 						
