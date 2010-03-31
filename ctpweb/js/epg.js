@@ -106,9 +106,9 @@ function addProgram(schedule, program){
 		'class' : 'actions'
 	})
 	
-	// TODO: Make Star'ing programs, and all actions user-aware. We need logins.
+	// TODO Make Star'ing programs, and all actions user-aware. We need logins.
 	
-	if (program.recording == null) {
+	if ((program.recording == null) && (end > new Date())) {
 		monitorButton = createButton(newActions, "pill primary monitor", "Grip");
 		
 		monitorButton.addEvent('click', function(event) {
