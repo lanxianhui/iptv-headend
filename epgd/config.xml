@@ -14,6 +14,7 @@
 			<schedule>0 3 * * Mon</schedule> <!-- this is crontab-like syntax, for more lookup cron4j -->
 		</xmlTvGrabber>
 	</xmlTvGrabbers>
+	<recordAllPrograms>true</recordAllPrograms>
 	<cleaner>
 		<schedule>5 3 * * Mon</schedule>
 		<olderThanDays>14</olderThanDays>

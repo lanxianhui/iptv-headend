@@ -11,6 +11,7 @@ public class Configuration implements Serializable {
 	
 	public DatabaseConfiguration database;
 	public ArrayList<XmlTvGrabberConfig> xmlTvGrabbers;
+	public boolean recordAllPrograms;
 	public CleanerConfig cleaner;
 	
 }
