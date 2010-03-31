@@ -44,9 +44,9 @@ public class ChannelRecorder implements Runnable {
 			this.sock.setSoTimeout(10000);
 			this.sock.joinGroup(group);
 		} catch (UnknownHostException e) {
-			Npvrd.error(groupIp + ": Group IP address invalid");
+			Npvrd.error(groupIp + ": Group IP address invalid: " + e.getMessage());
 		} catch (IOException e) {
-			Npvrd.error(groupIp + ": Error while trying to set-up socket");
+			Npvrd.error(groupIp + ": Error while trying to set-up socket: " + e.getMessage());
 		}
 	}
 	
