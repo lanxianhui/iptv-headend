@@ -76,11 +76,9 @@ public class MulticastTimedListener implements Runnable {
 			while (System.currentTimeMillis() < endRecording) {
 				try {
 					socket.receive(recv);
-					if (recv.getAddress().equals(this.group)) {
-						output.write(recv.getData(), recv.getOffset(), recv.getLength());
-					}
+					output.write(recv.getData(), recv.getOffset(), recv.getLength());
 				} catch (IOException e) {
-					Npvrd.error("Trouble receiving - poisoning destination");
+					Npvrd.error("Finishing recording");
 					output.close();
 					this.result = Result.ERROR;
 					return;
