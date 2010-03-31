@@ -127,22 +127,21 @@ function addProgram(schedule, program){
 				event.stop();
 			});
 		}
-		else 
-			if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
-				playButton = createButton(newActions, "pill-l primary play", "Play");
-				deleteButton = createButton(newActions, "pill-r delete", "Let go");
+		else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
+			playButton = createButton(newActions, "pill-l primary play", "Play");
+			deleteButton = createButton(newActions, "pill-r delete", "Let go");
+			
+			playButton.addEvent('click', function(event){
+				alert('test!');
 				
-				playButton.addEvent('click', function(event){
-					alert('test!');
-					
-					event.stop();
-				});
-				deleteButton.addEvent('click', function(event){
-					alet('delete!');
-					
-					event.stop();
-				});
-			}
+				event.stop();
+			});
+			deleteButton.addEvent('click', function(event){
+				alet('delete!');
+				
+				event.stop();
+			});
+		}
 	}
 	
 	newFlyout.adopt(newDescription);

@@ -72,12 +72,12 @@ a img {
 }
 
 #guide div.program h3 {
-    font-size: 1.09m;
+    font-size: 1.09em;
     font-weight: bold;
 }
 
 #guide div.program h3.past {
-    font-size: 1.09m;
+    font-size: 1.09em;
     font-weight: normal;
 }
 
