@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.Program;
+import pl.lodz.p.cm.ctp.dao.model.Recording;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -82,6 +83,7 @@ public class ProgramUpdater implements Runnable {
 			
 			DAOFactory dbase = DAOFactory.getInstance(Epgd.config.database);
 			ProgramDAO programDAO = dbase.getProgramDAO();
+			RecordingDAO recordingDAO = dbase.getRecordingDAO();
 			
 			ObjectInputStream ois = xs.createObjectInputStream(new FileInputStream(myConfig.resultFile));
 			int progCounter = 0;
@@ -99,9 +101,16 @@ public class ProgramUpdater implements Runnable {
 							
 							if (mappedId != null) {
 								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime()), new Timestamp(rp.getStopDate().getTime()));
+								long programId;
 								try {
 									programDAO.save(prog);
+									programId = prog.getId();
 									progCounter++;
+									
+									if (Epgd.config.recordAllPrograms) {
+										Recording record = new Recording(null, programId, Recording.Mode.WAITING, null);
+										recordingDAO.save(record);
+									}
 								} catch (DAOException e) {
 									Epgd.error("Database error: " + e.getMessage());
 								}
