@@ -111,33 +111,38 @@ function addProgram(schedule, program){
 	if ((program.recording == null) && (end > new Date())) {
 		monitorButton = createButton(newActions, "pill primary monitor", "Grip");
 		
-		monitorButton.addEvent('click', function(event) {
+		monitorButton.addEvent('click', function(event){
 			alert('record!');
 			
 			event.stop();
 		});
-	} else if (program.recording.mode == "WAITING") {
-		removeButton = createButton(newActions, "pill remove", "Let go");
-		
-		removeButton.addEvent('click', function(event) {
-			alert('cancel!');
+	}
+	else if (program.recording != null) {
+		if (program.recording.mode == "WAITING") {
+			removeButton = createButton(newActions, "pill remove", "Let go");
 			
-			event.stop();
-		});
-	} else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
-		playButton = createButton(newActions, "pill-l primary play", "Play");
-		deleteButton = createButton(newActions, "pill-r delete", "Let go");
-		
-		playButton.addEvent('click', function(event) {
-			alert('test!');
-			
-			event.stop();
-		});
-		deleteButton.addEvent('click', function(event) {
-			alet('delete!');
-			
-			event.stop();
-		});
+			removeButton.addEvent('click', function(event){
+				alert('cancel!');
+				
+				event.stop();
+			});
+		}
+		else 
+			if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
+				playButton = createButton(newActions, "pill-l primary play", "Play");
+				deleteButton = createButton(newActions, "pill-r delete", "Let go");
+				
+				playButton.addEvent('click', function(event){
+					alert('test!');
+					
+					event.stop();
+				});
+				deleteButton.addEvent('click', function(event){
+					alet('delete!');
+					
+					event.stop();
+				});
+			}
 	}
 	
 	newFlyout.adopt(newDescription);
