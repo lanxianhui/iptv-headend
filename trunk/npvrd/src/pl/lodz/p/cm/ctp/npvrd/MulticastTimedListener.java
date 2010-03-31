@@ -3,7 +3,6 @@ package pl.lodz.p.cm.ctp.npvrd;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.util.Date;
@@ -12,7 +11,6 @@ public class MulticastTimedListener implements Runnable {
 	
 	private OutputStream output;
 	private MulticastSocket socket;
-	private InetAddress group;
 	volatile private long beginRecording;
 	volatile private long endRecording;
 	
@@ -20,10 +18,9 @@ public class MulticastTimedListener implements Runnable {
 	
 	private Result result;
 	
-	public MulticastTimedListener(Date beginRecording, Date endRecording, OutputStream output, InetAddress group, MulticastSocket socket) {
+	public MulticastTimedListener(Date beginRecording, Date endRecording, OutputStream output, MulticastSocket socket) {
 		this.output = output;
 		this.socket = socket;
-		this.group = group;
 		this.beginRecording = beginRecording.getTime();
 		this.endRecording = endRecording.getTime();
 		this.result = Result.UNDEFINED;
@@ -73,9 +70,13 @@ public class MulticastTimedListener implements Runnable {
 			
 			Npvrd.log("Recording....");
 			
+			//SocketAddress socketAddress = new InetSocketAddress(group, socket.getLocalPort());
+			
 			while (System.currentTimeMillis() < endRecording) {
 				try {
 					socket.receive(recv);
+					//if (recv.getSocketAddress().equals(socketAddress))
+					//System.out.println(((InetSocketAddress)recv.getSocketAddress()).toString());
 					output.write(recv.getData(), recv.getOffset(), recv.getLength());
 				} catch (IOException e) {
 					Npvrd.error("Finishing recording");
