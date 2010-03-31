@@ -20,6 +20,9 @@ public class ChannelRecorder implements Runnable {
 	private volatile boolean recheckSchedule; 
 	private RunMode runMode;
 	
+	private MulticastSocket sock;
+	private InetAddress group;
+	
 	/**
 	 * Creates a new channel recorder listening on a given multicast IP address and port.
 	 * @param groupIp Multicast group IP to listen to.
@@ -31,6 +34,20 @@ public class ChannelRecorder implements Runnable {
 		this.groupPort = groupPort;
 		this.recordingSchedule = new LinkedList<RecordingTask>();
 		this.runMode = RunMode.RUN;
+		
+		// Synchronous socket setup to solve crosstalk issues
+		Npvrd.log(groupIp + ": Setting up socket.");
+		try {
+			this.group = InetAddress.getByName(this.groupIp);
+			this.sock = new MulticastSocket(this.groupPort);
+			this.sock.setLoopbackMode(true);
+			this.sock.setSoTimeout(10000);
+			this.sock.joinGroup(group);
+		} catch (UnknownHostException e) {
+			Npvrd.error(groupIp + ": Group IP address invalid");
+		} catch (IOException e) {
+			Npvrd.error(groupIp + ": Error while trying to set-up socket");
+		}
 	}
 	
 	public long getChannelId() {
@@ -134,13 +151,6 @@ public class ChannelRecorder implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Npvrd.log(groupIp + ": Setting up socket.");
-			InetAddress group = InetAddress.getByName(groupIp);
-			MulticastSocket sock = new MulticastSocket(groupPort);
-			sock.setLoopbackMode(true);
-			sock.setSoTimeout(10000);
-			sock.joinGroup(group);
-			
 			// Make the file available
 			Npvrd.log(groupIp + ": Creating a VLM manager.");
             VlmManager vlm = new VlmManager(Npvrd.config.vlm);
@@ -185,7 +195,7 @@ public class ChannelRecorder implements Runnable {
 						
 						OutputStream fos = new BufferedOutputStream(new FileOutputStream(path + fileName));
 						
-						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), fos, sock);
+						MulticastTimedListener multicastListener = new MulticastTimedListener(task.getRecordingBegin(), task.getRecordingEnd(), fos, this.sock);
 						
 						Thread listenerThread = new Thread(multicastListener);
 						
@@ -208,9 +218,12 @@ public class ChannelRecorder implements Runnable {
 						} else if (multicastListener.getResult().equals(MulticastTimedListener.Result.ABORTED)) {
 							fileMode = Mode.WAITING;
 							Npvrd.log(groupIp + ": Listener reported recording aborted before start.");
-						} else {
+						} else if (multicastListener.getResult().equals(MulticastTimedListener.Result.ERROR)) {
 							fileMode = Mode.UNAVAILABLE;
 							Npvrd.log(groupIp + ": Listener reported Error.");
+						} else {
+							fileMode = Mode.UNAVAILABLE;
+							Npvrd.log(groupIp + ": Ooops! Seems like we've interrupted listener in a bad moment.");
 						}
 
 						// Announce that the file is available
@@ -235,12 +248,10 @@ public class ChannelRecorder implements Runnable {
 			
 			Npvrd.log(groupIp + ": Shutting down");
 			
-			sock.leaveGroup(group);
-			sock.close();
-		} catch (UnknownHostException e) {
-			Npvrd.error(groupIp + ": Group IP address invalid");
+			this.sock.leaveGroup(group);
+			this.sock.close();
 		} catch (IOException e) {
-			Npvrd.error(groupIp + ": Listening port busy");
+			Npvrd.error(groupIp + ": Input/Output error: " + e.getMessage());
 		}
 	}
 
