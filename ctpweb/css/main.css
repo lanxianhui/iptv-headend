@@ -76,9 +76,12 @@ a img {
     font-weight: bold;
 }
 
-#guide div.program h3.past {
-    font-size: 1.09em;
+#guide div.program.past h3 {
     font-weight: normal;
+}
+
+#guide div.program.current h3 {
+	color: #001F53;
 }
 
 #guide div.program div.onhover {
