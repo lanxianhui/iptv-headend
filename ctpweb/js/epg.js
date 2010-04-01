@@ -3,7 +3,7 @@ var timeFormat = "%I:%M%p";
 var timefallUpdater = null;
 var timefallPrecision = 60;
 var epgUpdater = null;
-var epgPrecision = 60 * 10;
+var epgPrecision = 60 * 7;
 
 function downloadData(url, callback){
     var jsonRequest = new Request.JSON({
@@ -18,6 +18,7 @@ function downloadData(url, callback){
 }
 
 function recalculateTimefall() {
+	timefallUpdater = setTimeout(recalculateTimefall, 1000 * timefallPrecision);
 	$each($$(".channel"), function(channel){
 		var currentTimefall = channel.retrieve("timefall");
 		var totalHeight = 0;
@@ -202,16 +203,13 @@ function addChannel(guide, channel){
 
 function loadGuide(guide){
 	if (timefallUpdater != null)
-		clearInterval(timefallUpdater);
+		clearTimeout(timefallUpdater);
 	$("guide").empty();
     $each(guide, function(channel){
         addChannel($("guide"), channel);
     });
 	recalculateTimefall();
-	timefallUpdater = setInterval(recalculateTimefall, 1000 * timefallPrecision);
-	if (epgUpdater != null)
-		clearInterval(epgUpdater);
-	epgUpdater = setInterval(updateGuide, 1000 * epgPrecision);
+	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
 }
 
 function updateGuide(){
