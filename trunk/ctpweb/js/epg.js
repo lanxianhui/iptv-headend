@@ -2,6 +2,8 @@ var openProgram = null;
 var timeFormat = "%I:%M%p";
 var timefallUpdater = null;
 var timefallPrecision = 60;
+var epgUpdater = null;
+var epgPrecision = 60 * 10;
 
 function downloadData(url, callback){
     var jsonRequest = new Request.JSON({
@@ -88,7 +90,7 @@ function addProgram(schedule, program){
 		'html': program.title
 	});
 	if (end < new Date()) {
-		newTitle.addClass('past');
+		newProgram.addClass('past');
 	}
 	newRightColumn.adopt(newTitle);
 	newData.adopt(newLeftColumn);
@@ -207,6 +209,9 @@ function loadGuide(guide){
     });
 	recalculateTimefall();
 	timefallUpdater = setInterval(recalculateTimefall, 1000 * timefallPrecision);
+	if (epgUpdater != null)
+		clearInterval(epgUpdater);
+	epgUpdater = setInterval(updateGuide, 1000 * epgPrecision);
 }
 
 function updateGuide(){
