@@ -38,7 +38,9 @@ class TvChannel {
     var $name;
     var $ipAdress;
     var $port;
+    var $lcn;
     var $icon;
+    var $enabled;
 
     var $programs;
 
@@ -102,6 +104,20 @@ class TvChannel {
           $this->icon = $iconIn;
     }
     
+    function getLCN() {
+    	  return $this->lcn;
+    }
+    function setLCN($lcnIn) {
+    	  $this->lcn = $lcnIn;
+    }
+    
+    function getEnabled() {
+    	  return $this->enabled;
+    }
+	function setEnabled($enabledIn) {
+    	  $this->enabled = $enabledIn;
+    }
+    
     function getPrograms() {
     	  return $this->programs;
     }
@@ -123,12 +139,16 @@ class TvChannel {
           $nameIn,
           $ipAdressIn,
           $portIn,
-          $iconIn) {
+          $lcnIn,
+          $iconIn,
+          $enabledIn) {
           $this->id = $idIn;
           $this->name = $nameIn;
           $this->ipAdress = $ipAdressIn;
           $this->port = $portIn;
+          $this->lcn = $lcnIn;
           $this->icon = $iconIn;
+          $this->enabled = $enabledIn;
     }
 
 
@@ -153,7 +173,13 @@ class TvChannel {
           if ($valueObject->getPort() != $this->port) {
                     return(false);
           }
+    	  if ($valueObject->getLCN() != $this->lcn) {
+                    return(false);
+          }
           if ($valueObject->getIcon() != $this->icon) {
+                    return(false);
+          }
+    	  if ($valueObject->getEnabled() != $this->enabled) {
                     return(false);
           }
 
@@ -175,7 +201,9 @@ class TvChannel {
         $out = $out."name = ".$this->name."\n"; 
         $out = $out."ipAdress = ".$this->ipAdress."\n"; 
         $out = $out."port = ".$this->port."\n"; 
-        $out = $out."icon = ".$this->icon."\n"; 
+        $out = $out."lcn = ".$this->lcn."\n";
+        $out = $out."icon = ".$this->icon."\n";
+        $out = $out."enabled = ".$this->enabled."\n"; 
         return $out;
     }
 /**
@@ -192,6 +220,8 @@ class TvChannel {
         $cloned->setIpAdress($this->ipAdress); 
         $cloned->setPort($this->port); 
         $cloned->setIcon($this->icon); 
+        $cloned->setLCN($this->lcn);
+        $cloned->setEnabled($this->enabled);
 
         return $cloned;
     }
