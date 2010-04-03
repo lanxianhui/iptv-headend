@@ -6,7 +6,9 @@ public class TvChannel {
 	private String name;
 	private String ipAdress;
 	private Integer port;
+	private Integer lcn;
 	private String icon;
+	private Boolean enabled;
 	
 	public TvChannel() {
 		
@@ -22,6 +24,12 @@ public class TvChannel {
 	public TvChannel(Long id, String name, String ipAdress, Integer port, String icon) {
 		this(id, name, ipAdress, port);
 		this.icon = icon;
+	}
+	
+	public TvChannel(Long id, String name, String ipAdress, Integer port, Integer lcn, String icon, Boolean enabled) {
+		this(id, name, ipAdress, port, icon);
+		this.lcn = lcn;
+		this.enabled = enabled;
 	}
 
 	public Long getId() {
@@ -60,6 +68,22 @@ public class TvChannel {
 		return icon;
 	}
 
+	public Integer getLCN() {
+		return lcn;
+	}
+
+	public void setLCN(Integer lcn) {
+		this.lcn = lcn;
+	}
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public void setIcon(String icon) {
 		this.icon = icon;
 	}
@@ -73,7 +97,7 @@ public class TvChannel {
     }
 
 	public String toString() {
-		return String.format("TvChannel[id=%d,name=%s,ipAdress=%s,port=%d,icon=%s]", 
-	            id, name, ipAdress, port, icon);
+		return String.format("TvChannel[id=%d,name=%s,ipAdress=%s,port=%d,lcn=%d,icon=%s,enabled=%b]", 
+	            id, name, ipAdress, port, lcn, icon, enabled);
 	}
 }
