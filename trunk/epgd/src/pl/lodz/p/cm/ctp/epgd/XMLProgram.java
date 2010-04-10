@@ -14,6 +14,7 @@ public class XMLProgram implements Serializable {
 	private String subTitle;
 	private String description;
 	private String category;
+	private String altTimeZone = null;
 	
 	public String getStart() {
 		return start;
@@ -38,6 +39,12 @@ public class XMLProgram implements Serializable {
 	}
 	public void setChannelId(String channelId) {
 		this.channelId = channelId;
+	}
+	public String getAltTimeZone() {
+		return this.altTimeZone;
+	}
+	public void setAltTimeZone(String altTimeZone) {
+		this.altTimeZone = altTimeZone;
 	}
 	public String getTitle() {
 		return title;
@@ -74,6 +81,9 @@ public class XMLProgram implements Serializable {
 		String minute = xmlDate.substring(10, 12);
 		String second = xmlDate.substring(12, 14);
 		String timeZone = xmlDate.substring(15);
+		
+		if (this.altTimeZone != null)
+			timeZone = this.altTimeZone;
 		
 		if ((timeZone.charAt(0) == '-') | (timeZone.charAt(0) == '+')) {
 			timeZone = "GMT" + timeZone;

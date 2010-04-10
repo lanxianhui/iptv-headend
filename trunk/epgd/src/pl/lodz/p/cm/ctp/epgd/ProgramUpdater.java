@@ -14,13 +14,13 @@ public class ProgramUpdater implements Runnable {
 	
 	private XmlTvGrabberConfig myConfig;
 	private Hashtable<String, Long> channelMap;
-	private Hashtable<Long, TimeCorrection> timeCorrectionMap;
+	private Hashtable<Long, String> timeCorrectionMap;
 	
 	public ProgramUpdater(XmlTvGrabberConfig config) {
 		this.myConfig = config;
 		
 		this.channelMap = new Hashtable<String, Long>();
-		this.timeCorrectionMap = new Hashtable<Long, TimeCorrection>();
+		this.timeCorrectionMap = new Hashtable<Long, String>();
 		
 		try {
 			XStream xs = new XStream();
@@ -37,7 +37,9 @@ public class ProgramUpdater implements Runnable {
 						if (ro instanceof XMLMap) {
 							XMLMap rm = (XMLMap)ro;
 							channelMap.put(rm.getExternalId(), rm.getInternalId());
-							timeCorrectionMap.put(rm.getInternalId(), new TimeCorrection(rm.getTimeCorrection()));
+							
+							if (rm.getTimeCorrection() != null)
+								timeCorrectionMap.put(rm.getInternalId(), rm.getTimeCorrection());
 						}
 					} catch (ClassNotFoundException e) {
 						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
@@ -103,9 +105,14 @@ public class ProgramUpdater implements Runnable {
 							Long mappedId = channelMap.get(extChannelId);
 							
 							if (mappedId != null) {
-								TimeCorrection localTimeCorrection = timeCorrectionMap.get(mappedId);
+								String localTimeCorrection = timeCorrectionMap.get(mappedId);
 								
-								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime() + localTimeCorrection.getOffset()), new Timestamp(rp.getStopDate().getTime() + localTimeCorrection.getOffset()));
+								if (localTimeCorrection != null) {
+									rp.setAltTimeZone(localTimeCorrection);
+								}
+								
+								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime()), new Timestamp(rp.getStopDate().getTime()));
+								
 								long programId;
 								try {
 									programDAO.save(prog);
