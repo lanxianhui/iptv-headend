@@ -9,6 +9,7 @@ public class XMLMap implements Serializable {
 	private String name;
 	private String externalId;
 	private long internalId;
+	private String timeCorrection = "+0000";
 
 	public XMLMap(String externalId, int internalId) {
 		this.externalId = externalId;
@@ -37,6 +38,12 @@ public class XMLMap implements Serializable {
 	}
 	public void setInternalId(long internalId) {
 		this.internalId = internalId;
+	}
+	public String getTimeCorrection() {
+		return this.timeCorrection;
+	}
+	public void setTimeCorrection(String timeCorrection) {
+		this.timeCorrection = timeCorrection;
 	}
 	
 }

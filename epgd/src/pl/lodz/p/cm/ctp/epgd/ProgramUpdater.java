@@ -14,11 +14,13 @@ public class ProgramUpdater implements Runnable {
 	
 	private XmlTvGrabberConfig myConfig;
 	private Hashtable<String, Long> channelMap;
+	private Hashtable<Long, TimeCorrection> timeCorrectionMap;
 	
 	public ProgramUpdater(XmlTvGrabberConfig config) {
 		this.myConfig = config;
 		
 		this.channelMap = new Hashtable<String, Long>();
+		this.timeCorrectionMap = new Hashtable<Long, TimeCorrection>();
 		
 		try {
 			XStream xs = new XStream();
@@ -35,6 +37,7 @@ public class ProgramUpdater implements Runnable {
 						if (ro instanceof XMLMap) {
 							XMLMap rm = (XMLMap)ro;
 							channelMap.put(rm.getExternalId(), rm.getInternalId());
+							timeCorrectionMap.put(rm.getInternalId(), new TimeCorrection(rm.getTimeCorrection()));
 						}
 					} catch (ClassNotFoundException e) {
 						System.err.println("Unknown object in XMLTV file: " + e.getMessage());
@@ -100,7 +103,9 @@ public class ProgramUpdater implements Runnable {
 							Long mappedId = channelMap.get(extChannelId);
 							
 							if (mappedId != null) {
-								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime()), new Timestamp(rp.getStopDate().getTime()));
+								TimeCorrection localTimeCorrection = timeCorrectionMap.get(mappedId);
+								
+								Program prog = new Program(null, mappedId, rp.getTitle(), rp.getDescription(), new Timestamp(rp.getStartDate().getTime() + localTimeCorrection.getOffset()), new Timestamp(rp.getStopDate().getTime() + localTimeCorrection.getOffset()));
 								long programId;
 								try {
 									programDAO.save(prog);
