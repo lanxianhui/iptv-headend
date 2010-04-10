@@ -5,6 +5,11 @@ var timefallPrecision = 60;
 var epgUpdater = null;
 var epgPrecision = 60 * 7;
 
+function openMiniWindow(url, name, width, height) {
+	var popupWindow = window.open(url, name, "width=" + width + ",height=" + height + ",menubar=no,location=no,resizable=yes,scrollbars=no,status=no,centerscreen=yes,directories=no");
+	popupWindow.focus();
+}
+
 function downloadData(url, callback){
     var jsonRequest = new Request.JSON({
         method: "get",
@@ -135,7 +140,8 @@ function addProgram(schedule, program){
 			deleteButton = createButton(newActions, "pill-r delete", "Let go");
 			
 			playButton.addEvent('click', function(event){
-				alert('test!');
+				//alert('test!');
+				openMiniWindow('mediaplayer.php#program,'+program.id, 'playerWindow', 640, 500);
 				
 				event.stop();
 			});
@@ -217,7 +223,8 @@ function updateGuide(){
 }
 
 function bootScripts(){
-    updateGuide();
+	updateGuide();
 }
 
 window.addEvent('domready', bootScripts);
+

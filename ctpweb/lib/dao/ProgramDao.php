@@ -56,6 +56,14 @@ class ProgramDao {
           $this->load(&$conn, &$valueObject);
           return $valueObject;
     }
+    
+	function getObjectWithRecording(&$conn, $id) {
+
+          $valueObject = $this->createValueObject();
+          $valueObject->setId($id);
+          $this->loadWithRecording(&$conn, &$valueObject);
+          return $valueObject;
+    }
 
 
     /**
@@ -83,6 +91,22 @@ class ProgramDao {
                return true;
           else
                return false;
+    }
+    
+    function loadWithRecording(&$conn, &$valueObject) {
+    	
+    	if (!$valueObject->getId()) {
+               //print "Can not select without Primary-Key!";
+               return false;
+          }
+
+          $sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId WHERE (Program.id = ".$valueObject->getId().") "; 
+
+          if ($this->singleQueryRecording(&$conn, $sql, &$valueObject))
+               return true;
+          else
+               return false;
+    	
     }
     
     
@@ -398,6 +422,34 @@ class ProgramDao {
                    $valueObject->setDescription($row[3]); 
                    $valueObject->setBegin(strtotime($row[4])); 
                    $valueObject->setEnd(strtotime($row[5])); 
+          } else {
+               //print " Object Not Found!";
+               return false;
+          }
+          return true;
+    }
+    
+    function singleQueryRecording(&$conn, &$sql, &$valueObject) {
+    	  $result = $conn->execute($sql);
+
+          if ($row = $conn->nextRow($result)) {
+
+                   $valueObject->setId($row[0]); 
+                   $valueObject->setTvChannelId($row[1]); 
+                   $valueObject->setTitle($row[2]); 
+                   $valueObject->setDescription($row[3]); 
+                   $valueObject->setBegin(strtotime($row[4])); 
+                   $valueObject->setEnd(strtotime($row[5]));
+
+		           if ($row[6] != null) {
+			               $recordingDao = new RecordingDao();
+			               $tempRecording = $recordingDao->createValueObject();
+			               $tempRecording->setId($row[6]);
+			               $tempRecording->setProgramId($row[7]);
+			               $tempRecording->setMode($row[8]);
+			               $tempRecording->setFileName($row[9]);
+			               $valueObject->setRecording($tempRecording);
+		           }
           } else {
                //print " Object Not Found!";
                return false;
