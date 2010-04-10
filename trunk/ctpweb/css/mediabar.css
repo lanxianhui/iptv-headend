@@ -1,0 +1,159 @@
+@CHARSET "UTF-8";
+
+.controler {
+	font: 12px Arial, Helvetica, sans-serif;
+	width: 100%;
+}
+
+.controler .hide {
+	display: none !important;
+}
+
+.controler > div {
+	display: block;
+	float: left;
+}
+
+.controler .b {
+	background-image: url('../img/player-buttons.png');
+	display: inline-block;
+	width: 22px;
+	height: 22px;
+}
+
+.controler .b.play {
+	background-position: 0 0;
+}
+.controler .b.play.down {
+	background-position: 0 22px;
+}
+
+.controler .b.pause {
+	background-position: -22px 0;
+}
+.controler .b.pause.down {
+	background-position: -22px 22px;
+}
+
+.controler .b.live {
+	background-position: -44px 0;
+}
+.controler .b.live.down {
+	background-position: -44px 22px;
+}
+
+.controler .b.chplus {
+	background-position: -66px 0;
+}
+.controler .b.chplus.down {
+	background-position: -66px 22px;
+}
+
+.controler .b.chminus {
+	background-position: -88px 0;
+}
+.controler .b.chminus.down {
+	background-position: -88px 22px;
+}
+
+.controler .scrubbar {
+	width: 500px;
+	display: inline-block;
+	background-image: url('../img/scrub-b.png');
+	background-position: center;
+	background-repeat: repeat-x;
+	position: relative;
+	height: 22px;
+	margin-left: 5px;
+}
+
+.controler .scrubbar .secondary {
+	position: absolute;
+	top: 7px;
+	left: 1px;
+	width: 120px;
+	height: 7px;
+	background-image: url('../img/scrub-s.png');
+	background-repeat: repeat-x;
+	z-order: 1;
+}
+
+.controler .scrubbar .primary {
+	position: absolute;
+	top: 7px;
+	left: 1px;
+	width: 60px;
+	height: 7px;
+	background-image: url('../img/scrub-p.png');
+	background-repeat: repeat-x;
+	z-order: 2;
+}
+
+.controler .scrubbar .b.knob {
+	position: absolute;
+	top: 0px;
+	left: 20px;
+	background-position: -220px 0;
+	z-order: 3;
+}
+.controler .scrubbar .b.knob:hover {
+	background-position: -220px 22px;
+}
+
+.controler .time {
+	font-size: 0.8em;
+	line-height: 22px;
+	width: 90px;
+	padding: 0 5px 0 5px;
+	text-align: right;
+}
+
+.controler .b.volume {
+	position: relative;
+	background-position: -243px 0px;
+	width: 87px;
+}
+.controler .b.volume.muted {
+	background-position: -243px 22px;
+}
+
+.controler .b.volume-bkg {
+	position: absolute;
+	background-position: -155px 22px;
+	left: 22px;
+	width: 66px;
+}
+
+.controler .b.volume-knob {
+	background-position: -155px 0;
+	width: 33px;
+}
+
+.controler .b.fullscreen {
+	background-position: -108px 0;
+}
+.controler .b.fullscreen.down {
+	background-position: -108px 22px;
+}
+
+.controler .b.context {
+	background-position: -130px 0;
+}
+.controler .b.context.down {
+	background-position: -130px 22px;
+}
+
+.controler .buttons.left {
+	border-right: 1px solid #D3D3D3;
+	padding-right: 5px;
+}
+
+.controler .time {
+	border-right: 1px solid #D3D3D3;
+	cursor: default;
+}
+
+.controler .buttons.right .b {
+	border-left: 1px solid #D3D3D3;
+	padding: 0 2px 0 2px;
+}

@@ -27,12 +27,12 @@ revolunet.VLCObject = function(id, w, h, ver) {
 				__vlc_unloadHandler = function(){};
 				__vlc_savedUnloadHandler = function(){};
 				window.attachEvent("onunload", revolunet.VLCObjectUtil.cleanupVLCs);
-			}
+			};
 			window.attachEvent("onbeforeunload", revolunet.VLCObjectUtil.prepUnload);
 			revolunet.unloadSet = true;
 		}
 	}
-}
+};
 revolunet.VLCObject.prototype = {
 	setAttribute: function(name, value){
 		this.attributes[name] = value;
@@ -106,7 +106,7 @@ revolunet.VLCObject.prototype = {
 		return false;
 	}
 	 
-}
+};
 
 /* ---- detection functions ---- */
 revolunet.VLCObjectUtil.getPlayerVersion = function(){
@@ -149,12 +149,12 @@ revolunet.VLCObjectUtil.getPlayerVersion = function(){
 	}
  
 	return PlayerVersion;
-}
+};
 revolunet.PlayerVersion = function(arrVersion){
 	this.major = arrVersion[0] != null ? parseInt(arrVersion[0]) : 0;
 	this.minor = arrVersion[1] != null ? parseInt(arrVersion[1]) : 0;
 	this.rev = arrVersion[2] != null ? parseInt(arrVersion[2]) : 0;
-	}
+	};
 revolunet.PlayerVersion.prototype.versionIsValid = function(fv){
 	if(this.major < fv.major) return false;
 	if(this.major > fv.major) return true;
@@ -162,7 +162,7 @@ revolunet.PlayerVersion.prototype.versionIsValid = function(fv){
 	if(this.minor > fv.minor) return true;
 	if(this.rev < fv.rev) return false;
 	return true;
-}
+};
 /* ---- get value of query string param ---- */
 revolunet.util = {
 	getRequestParameter: function(param) {
@@ -178,7 +178,7 @@ revolunet.util = {
 		}
 		return "";
 	}
-}
+};
 
 revolunet.VLCObjectUtil.cleanupVLCs = function() {
 	var objects = document.getElementsByTagName("OBJECT");
@@ -190,9 +190,9 @@ revolunet.VLCObjectUtil.cleanupVLCs = function() {
 			}
 		}
 	}
-}
+};
 /* add document.getElementById if needed (mobile IE < 5) */
-if (!document.getElementById && document.all) { document.getElementById = function(id) { return document.all[id]; }}
+if (!document.getElementById && document.all) { document.getElementById = function(id) { return document.all[id]; }; }
 
 /* add some aliases for ease of use/backwards compatibility */
 var getQueryParamValue = revolunet.util.getRequestParameter;
