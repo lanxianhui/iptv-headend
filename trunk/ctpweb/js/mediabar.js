@@ -788,8 +788,11 @@ function refreshVlc() {
 		mediabarElement.setPauseVisible(false);
 		mediabarElement.setPlayVisible(true);	
 	}
+	else if (state == 6) {
+		mediabarElement.setPauseVisible(false);
+		mediabarElement.setPlayVisible(true);
+	}
 	
-	mediabarElement.setTotalTime(20 * 60 * 1000);
 	mediabarElement.setCurrentPosition(position);
 }
 
@@ -808,7 +811,11 @@ function Media(element, startMrl) {
 	
 	this.getPlayer = function() {
 		return $('myVlc');
-	}
+	};
+	
+	this.getMediabar = function() {
+		return mediabarElement;
+	};
 	
 	element.adopt(vlcPlaceholder);
 	element.adopt(mediabarPlaceholder);

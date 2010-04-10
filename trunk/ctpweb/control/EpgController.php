@@ -18,6 +18,7 @@ class EpgController {
 		}
 		
 		if (($_SERVER["HTTP_ACCEPT"] == "application/json") | ($_GET["format"] == "json")) {
+			header('Content-type: application/json');
 			print(json_encode($channels));
 			exit;
 		} else {
