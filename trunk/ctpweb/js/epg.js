@@ -218,12 +218,14 @@ function loadGuide(guide){
     });
 	recalculateTimefall();
 	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
+	dayscrubElement.hideThrobber();
 }
 
 function updateGuide(){
 	var urlExploded = location.href.split('#');
 	var extUrl = "";
 	
+	dayscrubElement.showThrobber();
 	if (urlExploded.length > 1) {
 		var date = urlExploded[urlExploded.length - 1];
 		extUrl = "?day=" + date;

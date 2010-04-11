@@ -1,3 +1,5 @@
+var throbber;
+
 function padZeros(number) {
 	if ((number < 10) && (number >= 0))
 		return "0" + number;
@@ -59,6 +61,20 @@ function Dayscrub(element, beginDate, span) {
 	
 	target.addClass('dayscrub');
 	
+	throbber = new Element('div', {
+		'class': 'throb hide'
+	});
+	
+	this.showThrobber = function() {
+		if (throbber.hasClass('hide'))
+			throbber.removeClass('hide');
+	};
+	
+	this.hideThrobber = function() {
+		if (!throbber.hasClass('hide'))
+			throbber.addClass('hide');
+	};
+	
 	this.addDay = function(date) {
 		var newDay = new Element('div', {
 			'class': 'day'
@@ -100,6 +116,8 @@ function Dayscrub(element, beginDate, span) {
 	};
 	
 	target.empty();
+	
+	target.adopt(throbber);
 	
 	var monthNumber = 0;
 	var monthElement = null;
