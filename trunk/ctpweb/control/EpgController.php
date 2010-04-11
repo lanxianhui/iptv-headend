@@ -11,8 +11,14 @@ class EpgController {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
 	
 		$channels = EpgLogic::getChannels(&$conn);
+		
+		$date = time();
+		
+		if (isset($_GET["day"])) {
+			$date = strtotime($_GET["day"]);
+		}
+		
 		foreach ($channels as &$channel) {
-			$date = time();
 			$programs = EpgLogic::getProgramsWithRecordings(&$conn, &$channel, $date);
 			$channel->setPrograms($programs);
 		}

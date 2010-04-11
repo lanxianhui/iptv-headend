@@ -1,0 +1,54 @@
+@CHARSET "UTF-8";
+
+body {
+	font: 0.72em Arial, Helvetica, sans-serif;
+    color: #000;
+}
+
+.dayscrub {
+	background-color: #6694E3;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	cursor: default;
+	margin-bottom: 10px;
+}
+
+.dayscrub .month {
+	display: inline-block;
+}
+
+.dayscrub .month .desc {
+	background-color: #CAD4E6;
+	width: 25px;
+	font-size: 0.8em;
+	line-height: 1.3em;
+	text-align: center;
+	margin: 5px 0 0 5px;
+} 
+
+.dayscrub .day {
+	display: inline-block;
+	background-color: #fff;
+	width: 25px;
+	font-weight: bold;
+	font-size: 1.0em;
+	line-height: 2.0em;
+	text-align: center;
+	margin: 5px 0 5px 5px;
+	cursor: pointer;
+}
+
+.dayscrub .day .dow {
+	font-size: 0.7em;
+	line-height: 1.00em;
+	font-weight: normal;
+	padding-bottom: 0.3em;
+}
+
+.dayscrub .day.today {
+	background-color: #CAD4E6;
+}
+
+.dayscrub .day.current {
+	background-color: #ACC6F0;
+}

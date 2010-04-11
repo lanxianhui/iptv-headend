@@ -1,5 +1,6 @@
 @CHARSET "UTF-8";
 @import url(buttons.css);
+@import url(dayscrub.css);
 body, h1, h2, h3, h4, h5, h6, p, ul {
     font-size: 1.0em;
     margin: 0;

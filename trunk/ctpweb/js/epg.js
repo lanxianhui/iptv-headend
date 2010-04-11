@@ -1,8 +1,10 @@
+var lastUrl = "";
 var openProgram = null;
 var timeFormat = "%I:%M%p";
 var timefallUpdater = null;
 var timefallPrecision = 60;
 var epgUpdater = null;
+var dayscrubElement = null;
 var epgPrecision = 60 * 7;
 
 function openMiniWindow(url, name, width, height) {
@@ -219,11 +221,30 @@ function loadGuide(guide){
 }
 
 function updateGuide(){
-    downloadData("index.php", loadGuide);
+	var urlExploded = location.href.split('#');
+	var extUrl = "";
+	
+	if (urlExploded.length > 1) {
+		var date = urlExploded[urlExploded.length - 1];
+		extUrl = "?day=" + date;
+	}
+    downloadData("index.php" + extUrl, loadGuide);
+}
+
+function hasUrlChanged() {
+	var currentUrl = location.href;
+	
+	if (currentUrl != lastUrl) {
+		updateGuide();
+		lastUrl = currentUrl;
+	}
+	
+	setTimeout(hasUrlChanged, 200);
 }
 
 function bootScripts(){
-	updateGuide();
+	dayscrubElement = new Dayscrub($('daylist'), new Date().decrement('day', 7), 14);
+	hasUrlChanged();
 }
 
 window.addEvent('domready', bootScripts);
