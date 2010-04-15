@@ -63,5 +63,6 @@ body {
 }
 
 .dayscrub .day.current {
-	background-color: #ACC6F0;
+	background-color: transparent !important;
+	color: #fff;
 }
