@@ -55,8 +55,17 @@ function toDayName(number) {
 	}
 }
 
+function compareDates(dateA, dateB) {
+	if (dateA.get('Year') == dateB.get('Year'))
+		if (dateA.get('Month') == dateB.get('Month'))
+			if (dateA.get('Date') == dateB.get('Date'))
+				return true;
+	return false;
+}
+
 function Dayscrub(element, beginDate, span) {
 	var target = element;
+	var days = [];
 	this.rootElement = element;
 	
 	target.addClass('dayscrub');
@@ -73,6 +82,22 @@ function Dayscrub(element, beginDate, span) {
 	this.hideThrobber = function() {
 		if (!throbber.hasClass('hide'))
 			throbber.addClass('hide');
+	};
+	
+	this.refreshCurrent = function() {
+		days.forEach(function(dayItem) {
+			elementDate = dayItem.retrieve('date')
+			if (compareDates(elementDate, currentDate)) {
+				if (!dayItem.hasClass('current')) {
+					dayItem.addClass('current');
+				}
+			}
+			else {
+				if (dayItem.hasClass('current')) {
+					dayItem.removeClass('current');
+				}
+			}
+		});
 	};
 	
 	this.addDay = function(date) {
@@ -99,7 +124,11 @@ function Dayscrub(element, beginDate, span) {
 		
 		newDay.addEvent('click', onClick);
 		
-		newDay.store(date);
+		date.clearTime();
+		newDay.store('date', date);
+		
+		days.include(newDay);
+		
 		return newDay;
 	};
 	
@@ -123,13 +152,13 @@ function Dayscrub(element, beginDate, span) {
 	var monthElement = null;
 	
 	for (i = 0; i < span; i++) {
-		var currentDate = new Date(beginDate).increment('day', i);
-		if ((currentDate.get('month') + 1) != monthNumber) {
-			monthNumber = currentDate.get('month') + 1;
-			monthElement = this.addMonth(currentDate);
+		var iDate = new Date(beginDate).increment('day', i);
+		if ((iDate.get('month') + 1) != monthNumber) {
+			monthNumber = iDate.get('month') + 1;
+			monthElement = this.addMonth(iDate);
 			target.adopt(monthElement);
 		}
-		var newDayElement = this.addDay(currentDate);
+		var newDayElement = this.addDay(iDate);
 		monthElement.adopt(newDayElement);
 	}
 };

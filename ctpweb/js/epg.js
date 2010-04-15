@@ -1,4 +1,5 @@
 var lastUrl = "";
+var currentDate = null;
 var openProgram = null;
 var timeFormat = "%I:%M%p";
 var timefallUpdater = null;
@@ -64,8 +65,8 @@ function createImageButton(element, classList, image, caption){
 function createButton(element, classList, caption){
 	var newButton = new Element('button', {
 		'class': 'btn ' + classList,
-		'html': '<span><span>' + caption + '</span></span>', 
-	})
+		'html': '<span><span>' + caption + '</span></span>'
+	});
 	element.adopt(newButton);
 	return newButton;
 }
@@ -111,15 +112,15 @@ function addProgram(schedule, program){
 	var newDescription = new Element('div', {
 		'class': 'description',
 		'html': program.description
-	})
+	});
 	var newActions = new Element('div', {
 		'class' : 'actions'
-	})
+	});
 	
 	// TODO Make Star'ing programs, and all actions user-aware. We need logins.
 	
 	if ((program.recording == null) && (end > new Date())) {
-		monitorButton = createButton(newActions, "pill primary monitor", "Grip");
+		monitorButton = createButton(newActions, "pill primary grip", "Grip");
 		
 		monitorButton.addEvent('click', function(event){
 			alert('record!');
@@ -129,7 +130,7 @@ function addProgram(schedule, program){
 	}
 	else if (program.recording != null) {
 		if (program.recording.mode == "WAITING") {
-			removeButton = createButton(newActions, "pill remove", "Let go");
+			removeButton = createButton(newActions, "pill letgo", "Let go");
 			
 			removeButton.addEvent('click', function(event){
 				alert('cancel!');
@@ -139,7 +140,7 @@ function addProgram(schedule, program){
 		}
 		else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
 			playButton = createButton(newActions, "pill-l primary play", "Play");
-			deleteButton = createButton(newActions, "pill-r delete", "Let go");
+			deleteButton = createButton(newActions, "pill-r letgo", "Let go");
 			
 			playButton.addEvent('click', function(event){
 				//alert('test!');
@@ -218,14 +219,29 @@ function loadGuide(guide){
     });
 	recalculateTimefall();
 	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
+	
 	dayscrubElement.hideThrobber();
 }
 
 function updateGuide(){
+	dayscrubElement.showThrobber();
+	
 	var urlExploded = location.href.split('#');
 	var extUrl = "";
 	
-	dayscrubElement.showThrobber();
+	var explodeDate = urlExploded[urlExploded.length - 1].split('-');
+	var year = explodeDate[0];
+	var month = explodeDate[1];
+	var day = explodeDate[2];
+	
+	currentDate = new Date();
+	currentDate.set('Date', day);
+	currentDate.set('Month', month - 1);
+	currentDate.set('Year', year);
+	currentDate.clearTime();
+	
+	dayscrubElement.refreshCurrent();
+	
 	if (urlExploded.length > 1) {
 		var date = urlExploded[urlExploded.length - 1];
 		extUrl = "?day=" + date;
@@ -245,7 +261,12 @@ function hasUrlChanged() {
 }
 
 function bootScripts(){
+	currentDate = new Date();
+	currentDate.clearTime();
+	
 	dayscrubElement = new Dayscrub($('daylist'), new Date().decrement('day', 7), 14);
+	dayscrubElement.refreshCurrent();
+	
 	hasUrlChanged();
 }
 
