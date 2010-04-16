@@ -220,7 +220,7 @@ function loadGuide(guide){
 	recalculateTimefall();
 	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
 	
-	dayscrubElement.hideThrobber();
+	hideNotification();
 }
 
 function padZeros(number) {
@@ -231,7 +231,7 @@ function padZeros(number) {
 }
 
 function updateGuide(){
-	dayscrubElement.showThrobber();
+	showNotification("Loading...");
 	
 	var urlExploded = location.href.split('#');
 	var extUrl = "";

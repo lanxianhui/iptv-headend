@@ -11,6 +11,7 @@ body {
 	-webkit-border-radius: 5px;
 	cursor: default;
 	margin-bottom: 10px;
+	border-radius: 5px;
 }
 
 .dayscrub .hide {
