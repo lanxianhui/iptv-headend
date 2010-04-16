@@ -223,29 +223,43 @@ function loadGuide(guide){
 	dayscrubElement.hideThrobber();
 }
 
+function padZeros(number) {
+	if ((number < 10) && (number >= 0))
+		return "0" + number;
+	else
+		return number;
+}
+
 function updateGuide(){
 	dayscrubElement.showThrobber();
 	
 	var urlExploded = location.href.split('#');
 	var extUrl = "";
 	
-	var explodeDate = urlExploded[urlExploded.length - 1].split('-');
-	var year = explodeDate[0];
-	var month = explodeDate[1];
-	var day = explodeDate[2];
+	if (urlExploded.length > 1) {
+		var explodeDate = urlExploded[urlExploded.length - 1].split('-');
+		var year = explodeDate[0];
+		var month = explodeDate[1];
+		var day = explodeDate[2];
+	}
 	
 	currentDate = new Date();
-	currentDate.set('Date', day);
-	currentDate.set('Month', month - 1);
-	currentDate.set('Year', year);
+	if ((urlExploded.length > 1) && (day > 0)) {
+		currentDate.set('Date', day);
+		currentDate.set('Month', month - 1);
+		currentDate.set('Year', year);
+	}
 	currentDate.clearTime();
 	
 	dayscrubElement.refreshCurrent();
 	
-	if (urlExploded.length > 1) {
-		var date = urlExploded[urlExploded.length - 1];
-		extUrl = "?day=" + date;
-	}
+	var yearForS = currentDate.get('Year', day);
+	var monthForS = padZeros(currentDate.get('Month', month) + 1);
+	var dayForS = padZeros(currentDate.get('Date', day));
+	
+	var date = yearForS + "-" + monthForS + "-" + dayForS; 
+	extUrl = "?day=" + date;
+	
     downloadData("index.php" + extUrl, loadGuide);
 }
 
