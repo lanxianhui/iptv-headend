@@ -70,20 +70,6 @@ function Dayscrub(element, beginDate, span) {
 	
 	target.addClass('dayscrub');
 	
-	throbber = new Element('div', {
-		'class': 'throb hide'
-	});
-	
-	this.showThrobber = function() {
-		if (throbber.hasClass('hide'))
-			throbber.removeClass('hide');
-	};
-	
-	this.hideThrobber = function() {
-		if (!throbber.hasClass('hide'))
-			throbber.addClass('hide');
-	};
-	
 	this.refreshCurrent = function() {
 		days.forEach(function(dayItem) {
 			elementDate = dayItem.retrieve('date')
