@@ -2,6 +2,8 @@ var rootElement;
 
 var mediabarElement;
 
+var tempTime;
+
 var oldMouseX = 0;
 var oldMouseY = 0;
 
@@ -127,6 +129,8 @@ function scrubbarMove(event) {
 	mediabarElement.currentTime = position * mediabarElement.getTotalTime();
 	mediabarElement.updateTimeText();
 	
+	tempTime = position * mediabarElement.getTotalTime();
+	
 	mediabarElement.inSeek = true;
 	
 	event.stop();
@@ -140,7 +144,7 @@ function scrubbarEnd(event) {
 	
 	event.stop();
 	
-	mediabarElement.onseek(mediabarElement.getCurrentTime());
+	mediabarElement.onseek(tempTime);
 	
 	mediabarElement.inSeek = false;
 	
