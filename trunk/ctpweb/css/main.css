@@ -93,9 +93,17 @@ a {
 }
 
 #guide div.channel {
-    width: 24.1%;
+    width: 23.8%;
     float: left;
     margin-right: 10px;
+}
+
+#guide.fits3 div.channel {
+	width: 32%;
+}
+
+#guide.fits2 div.channel {
+	width: 48%;
 }
 
 #guide div.header {
@@ -136,7 +144,7 @@ a {
 
 #guide div.program div.right {
     float: right;
-    width: 79.3%;
+    width: 77%;
 }
 
 #guide div.program h3 {
