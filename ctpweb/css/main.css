@@ -10,11 +10,58 @@ body, h1, h2, h3, h4, h5, h6, p, ul {
 body {
     font: 0.72em Arial, Helvetica, sans-serif;
     color: #000;
-    margin: 10px 5%;
+}
+
+.pageContainer {
+	margin: 10px 5%;
 }
 
 a img {
     border: 0;
+}
+
+a {
+	color: #2055AE;
+}
+
+.topMenu {
+	border-bottom: 1px solid #ccc;
+	line-height: 1.1em;
+	padding: 6px 8px;
+}
+
+.topMenu ul#menu {
+	display: block;
+}
+
+.topMenu ul#menu li {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.topMenu ul#menu li.current {
+	color: #000;
+	font-weight: bold;
+}
+
+.topMenu div#loginInfo {
+	float: right;
+}
+
+.topMenu div#loginInfo a {
+	display: inline-block;
+	padding: 0 5px;
+	border-right: 1px solid #000;
+}
+
+.topMenu div#loginInfo a.logout {
+	border-right: none;
+}
+
+.topMenu div#loginInfo a.loginName {
+	font-weight: bold;
+	color: #000;
+	text-decoration: none;
 }
 
 #guide div.timefall {
