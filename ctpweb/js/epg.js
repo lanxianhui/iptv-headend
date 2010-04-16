@@ -8,6 +8,8 @@ var epgUpdater = null;
 var dayscrubElement = null;
 var epgPrecision = 60 * 7;
 
+var fits = 4;
+
 function openMiniWindow(url, name, width, height) {
 	var popupWindow = window.open(url, name, "width=" + width + ",height=" + height + ",menubar=no,location=no,resizable=yes,scrollbars=no,status=no,centerscreen=yes,directories=no");
 	popupWindow.focus();
@@ -274,7 +276,33 @@ function hasUrlChanged() {
 	setTimeout(hasUrlChanged, 200);
 }
 
-function bootScripts(){
+function clearFits(element) {
+	element.removeClass("fits5");
+	element.removeClass("fits3");
+	element.removeClass("fits2");
+}
+
+function windowResize() {
+	var rootElement = $("guide");
+	elementWidth = rootElement.clientWidth;
+	
+	if ((elementWidth >= 980) && (fits != 4)) {
+		clearFits(rootElement);
+		fits = 4;
+	}
+	else if ((elementWidth >= 750) && (elementWidth < 980) && (fits != 3)) {
+		clearFits(rootElement);
+		rootElement.addClass("fits3");
+		fits = 3;
+	}
+	else if ((elementWidth < 750) && (fits != 2)) {
+		clearFits(rootElement);
+		rootElement.addClass("fits2");
+		fits = 2;
+	}
+}
+
+function bootScripts() {
 	currentDate = new Date();
 	currentDate.clearTime();
 	
@@ -282,7 +310,9 @@ function bootScripts(){
 	dayscrubElement.refreshCurrent();
 	
 	hasUrlChanged();
+	windowResize();
 }
 
 window.addEvent('domready', bootScripts);
+window.addEvent('resize', windowResize);
 
