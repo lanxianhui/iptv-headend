@@ -140,6 +140,7 @@ a {
 #guide div.program div.left {
     float: left;
     width: 20%;
+	padding-top: 0.1em;
 }
 
 #guide div.program div.right {
