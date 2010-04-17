@@ -6,7 +6,7 @@ var timefallUpdater = null;
 var timefallPrecision = 60;
 var epgUpdater = null;
 var dayscrubElement = null;
-var epgPrecision = 60 * 7;
+var epgPrecision = 60 * 10;
 
 var fits = 4;
 
@@ -215,11 +215,15 @@ function addChannel(guide, channel){
 function loadGuide(guide){
 	if (timefallUpdater != null)
 		clearTimeout(timefallUpdater);
+	if (epgUpdater != null)
+		clearTimeout(epgUpdater);
+	
 	$("guide").empty();
     $each(guide, function(channel){
         addChannel($("guide"), channel);
     });
 	recalculateTimefall();
+	
 	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
 	
 	hideNotification();
@@ -233,6 +237,8 @@ function padZeros(number) {
 }
 
 function updateGuide(){
+	// console.log("Reloading Guide: " + (new Date()));
+	
 	showNotification("Loading...");
 	
 	var urlExploded = location.href.split('#');
