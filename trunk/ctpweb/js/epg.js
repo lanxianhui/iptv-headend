@@ -141,8 +141,9 @@ function addProgram(schedule, program){
 			});
 		}
 		else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
+			deleteButton = createButton(newActions, "pill letgo space", "Let go");
 			playButton = createButton(newActions, "pill-l primary play", "Play");
-			deleteButton = createButton(newActions, "pill-r letgo", "Let go");
+			playMoreButton = createImageButton(newActions, "pill-r playMore", "img/arrow.png", "v");
 			
 			playButton.addEvent('click', function(event){
 				//alert('test!');

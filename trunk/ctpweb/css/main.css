@@ -26,8 +26,9 @@ a {
 
 .topMenu {
 	border-bottom: 1px solid #ccc;
-	line-height: 1.1em;
-	padding: 6px 8px;
+	font-size: 1.1em;
+	line-height: 1em;
+	padding: 6px 0 5px 8px;
 }
 
 .topMenu ul#menu {
@@ -193,4 +194,8 @@ div.hidden {
 
 div.actions {
     text-align: right;
+}
+
+.pill.space {
+	padding-right: 2px;
 }
