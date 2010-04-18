@@ -1,6 +1,24 @@
 var notificationBox;
 var notification;
 
+function getPageY(oElement) {
+	var iReturnValue = 0;
+	while(oElement != null) {
+		iReturnValue += oElement.offsetTop;
+		oElement = oElement.offsetParent;
+	}
+	return iReturnValue;
+}
+
+function getPageX(oElement) {
+	var iReturnValue = 0;
+	while(oElement != null) {
+		iReturnValue += oElement.offsetLeft;
+		oElement = oElement.offsetParent;
+	}
+	return iReturnValue;
+}
+
 function showNotification(text) {
 	if (notificationBox.hasClass('hidden'))
 		notificationBox.removeClass('hidden');

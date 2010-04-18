@@ -14,6 +14,8 @@ body {
 
 .pageContainer {
 	margin: 10px 5%;
+	overflow: auto;
+	width: 90%
 }
 
 a img {
@@ -198,4 +200,48 @@ div.actions {
 
 .pill.space {
 	padding-right: 2px;
+}
+
+button.btn img {
+	position: relative;
+	top: -1px;
+	left: -1px;
+} 
+
+button.btn.narrow img {
+	left: 0;
+	margin-left: -2px;
+}
+
+.dropMenu {
+	position: absolute;
+	width: 150px;
+	
+	background-color: #fff;
+	
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #999;
+	border-bottom: 1px solid #999;
+}
+
+.dropMenu .menuItem {
+	line-height: 1.2em;
+	padding: 5px 7px;
+	cursor: default;
+}
+
+.dropMenu .menuItem.default {
+	font-weight: bold;	
+}
+
+.dropMenu .menuItem:hover {
+	background-color: #E0EDFE;
+}
+
+.dropMenu .break {
+	height: 1px;
+	border: none;
+	border-top: 1px solid #ccc;
+	margin: 1px 2px;
 }

@@ -8,7 +8,101 @@ var epgUpdater = null;
 var dayscrubElement = null;
 var epgPrecision = 60 * 10;
 
+var openContextMenu = null;
+
 var fits = 4;
+
+function ContextMenu(element) {
+	this.menuElement = null;
+	
+	this.attachmentElement = typeof(element) != 'undefined' ? element : null;
+	
+	this.show = function(x, y) {
+		if (this.attachmentElement != null) {
+			this.menuElement.style.left = (getPageX(this.attachmentElement) - 132) + "px";
+			this.menuElement.style.top = (getPageY(this.attachmentElement) + 23) + "px";
+		}
+		else {
+			this.menuElement.style.left = x + "px";
+			this.menuElement.style.top = y + "px";
+		}
+		
+		if (this.menuElement.hasClass('hidden')) {
+			this.menuElement.removeClass('hidden');
+		}
+		
+		openContextMenu = this;
+		
+		var bodyElement = $(document.body);
+		bodyElement.addEvent('click', function(event) {
+			if (openContextMenu != null) {
+				openContextMenu.hide();
+				event.stop();
+			}
+		});
+	};
+	
+	this.hide = function() {
+		bodyElement.removeEvent('click', openContextMenu.hide);
+		
+		if (!openContextMenu.menuElement.hasClass('hidden')) {
+			openContextMenu.menuElement.addClass('hidden');
+		}
+		
+		openContextMenu.dispose();
+		openContextMenu = null;
+	};
+	
+	this.addMenuItem = function(caption, callback, isDefault) {
+		isDefault = typeof(isDefault) != 'undefined' ? isDefault : false;
+		
+		if (isDefault) {
+			extraClass = ' default';
+		}
+		else {
+			extraClass = '';
+		}
+		
+		newMenuItem = new Element('div', {
+			'class': 'menuItem' + extraClass
+		});
+		
+		newMenuItem.innerHTML = caption;
+		
+		newMenuItem.addEvent('click', callback);
+		
+		this.menuElement.adopt(newMenuItem);
+	};
+	
+	this.addBreak = function() {
+		newMenuItem = new Element('hr', {
+			'class': 'break'
+		});
+		
+		this.menuElement.adopt(newMenuItem);
+	};
+	
+	this.dispose = function() {
+		this.menuElement.dispose();
+	};
+	
+	this.menuElement = new Element('div', {
+		'class': 'dropMenu hidden',
+		'styles': {
+			'top': '0',
+			'left': '0'
+		}
+	});
+	
+	var bodyElement = $(document.body);
+	bodyElement.adopt(this.menuElement);
+};
+
+function contextMenuHide() {
+	if (openContextMenu != null) {
+        openContextMenu.hide();
+    }
+}
 
 function openMiniWindow(url, name, width, height) {
 	var popupWindow = window.open(url, name, "width=" + width + ",height=" + height + ",menubar=no,location=no,resizable=yes,scrollbars=no,status=no,centerscreen=yes,directories=no");
@@ -119,6 +213,10 @@ function addProgram(schedule, program){
 		'class' : 'actions'
 	});
 	
+	var playProgram = function(id) {
+		openMiniWindow('mediaplayer.php#program,'+id, 'playerWindow', 640, 500);
+	};
+	
 	// TODO Make Star'ing programs, and all actions user-aware. We need logins.
 	
 	if ((program.recording == null) && (end > new Date())) {
@@ -141,20 +239,47 @@ function addProgram(schedule, program){
 			});
 		}
 		else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
-			deleteButton = createButton(newActions, "pill letgo space", "Let go");
-			playButton = createButton(newActions, "pill-l primary play", "Play");
-			playMoreButton = createImageButton(newActions, "pill-r playMore", "img/arrow.png", "v");
+			var deleteButton = createButton(newActions, "pill letgo space", "Let go");
+			var playButton = createButton(newActions, "pill-l primary play", "Play");
+			var playMoreButton = createImageButton(newActions, "pill-r playMore narrow", "img/arrow.png", "v");
 			
 			playButton.addEvent('click', function(event){
-				//alert('test!');
-				openMiniWindow('mediaplayer.php#program,'+program.id, 'playerWindow', 640, 500);
+				playProgram(program.id);
+				
+				contextMenuHide();
 				
 				event.stop();
 			});
 			deleteButton.addEvent('click', function(event){
 				alet('delete!');
 				
+				contextMenuHide();
+				
 				event.stop();
+			});
+			playMoreButton.addEvent('click', function(event){
+				if (openContextMenu == null) {
+					this.contextMenu = new ContextMenu(playMoreButton);
+					this.contextMenu.addMenuItem("Play timeshifted", function() {
+						playProgram(program.id);
+						
+						contextMenuHide();
+					}, true);
+					this.contextMenu.addBreak();
+					this.contextMenu.addMenuItem("Play live", function() {
+						contextMenuHide();
+					});
+					
+					this.contextMenu.show();
+					
+					event.stop();
+				}
+				else {
+					openContextMenu.hide();
+					openContextMenu = null;
+					
+					event.stop();
+				}
 			});
 		}
 	}
@@ -170,11 +295,15 @@ function addProgram(schedule, program){
 	    if (newProgram.hasClass("active")) {
 	        newProgram.removeClass("active");
 	        openProgram = null;
+	        
+	        contextMenuHide();
 	    }
 	    else {
 	        if (openProgram != null) {
 	            openProgram.removeClass("active");
 	            openProgram = null;
+	            
+	            contextMenuHide();
 	        }
 	        newProgram.addClass("active");
 	        openProgram = newProgram;
@@ -238,8 +367,6 @@ function padZeros(number) {
 }
 
 function updateGuide(){
-	// console.log("Reloading Guide: " + (new Date()));
-	
 	showNotification("Loading...");
 	
 	var urlExploded = location.href.split('#');
