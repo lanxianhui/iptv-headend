@@ -827,7 +827,8 @@ function Media(element, startMrl) {
 	var vlcWidth = rootElement.clientWidth;
 	var vlcHeight = (typeof window.innerHeight != 'undefined' ? window.innerHeight : document.body.offsetHeight) - 40;
 	
-	var myVlc = new VLCObject("myVlc", vlcWidth, vlcHeight, "0.9.0");
+	//var myVlc = new VLCObject("myVlc", vlcWidth, vlcHeight, "0.9.0");
+	var myVlc = new VLCObject("myVlc", vlcWidth, vlcHeight, "0.8.6");
     //myVlc.addParam("MRL","udp://@239.100.0.3:1233");
 	//myVlc.addParam("MRL", "http://vegas.cm.p.lodz.pl/pvr/0a15f0b09d8046457ac159fd2ad8d47b.ts");
 	//myVlc.addParam("MRL", "http://212.51.216.109:8081/bynumber/1");
