@@ -17,7 +17,7 @@ public class NullGuide {
 	static Date end;
 	static int intervalMinutes = 60;
 	static String dummyProgram = "No Data";
-	static String[] programIds;
+	static String[] channelIds;
 	static String outputFile = "nullprogram.xml";
 	static String timeZone = "+0000";
 	
@@ -58,8 +58,8 @@ public class NullGuide {
 				intervalMinutes = Integer.parseInt(args[++i]);
 			} else if (args[i].equals("-t")) {
 				dummyProgram = args[++i];
-			} else if (args[i].equals("-p")) {
-				programIds = args[++i].split(",");
+			} else if (args[i].equals("-c")) {
+				channelIds = args[++i].split(",");
 			} else if (args[i].equals("-o")) {
 				outputFile = args[++i];
 			} else if (args[i].equals("-z")) {
@@ -67,39 +67,69 @@ public class NullGuide {
 			}
 		}
 		
-		Calendar c = Calendar.getInstance();
-		c.setTime(baseDate);
-		Date currentBegin = new Date(c.getTimeInMillis() + begin.getTime());
-		Date currentEnd;
+		begin.setTime(baseDate.getTime() + begin.getTime());
+		end.setTime(baseDate.getTime() + end.getTime());
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		
 		try {
-			XmlWriter xmltvWriter = new XmlWriter(new FileWriter(outputFile));
+			FileWriter fWriter = new FileWriter(outputFile);
+			XmlWriter xmltvWriter = new XmlWriter(fWriter);
 			
 			xmltvWriter.writeEntity("tv");
 			xmltvWriter.writeAttribute("generator-info-name", "CTP NullGuide Generator");
 			
-			while (currentBegin.before(end)) {
-				currentBegin = c.getTime();
-				c.add(Calendar.MINUTE, intervalMinutes);
-				currentEnd = c.getTime();
+			for (String id : channelIds) {
+				Calendar c = Calendar.getInstance();
+				c.setTime(begin);
+				Date currentBegin = new Date(begin.getTime());
+				Date currentEnd;
 				
-				xmltvWriter.writeEntity("programme");
-				xmltvWriter.writeAttribute("start", sdf.format(currentBegin) + " " + timeZone);
-				xmltvWriter.writeAttribute("stop", sdf.format(currentEnd) + " " + timeZone);
-				xmltvWriter.writeAttribute("channel", "1");
-				
-					xmltvWriter.writeEntity("title");
-					xmltvWriter.writeText(dummyProgram);
+				while (currentBegin.before(end)) {
+					currentBegin = c.getTime();
+					c.add(Calendar.MINUTE, intervalMinutes);
+					currentEnd = c.getTime();
+					
+					xmltvWriter.writeEntity("programme");
+					xmltvWriter.writeAttribute("start", sdf.format(currentBegin) + " " + timeZone);
+					xmltvWriter.writeAttribute("stop", sdf.format(currentEnd) + " " + timeZone);
+					xmltvWriter.writeAttribute("channel", id);
+					
+						xmltvWriter.writeEntity("title");
+						xmltvWriter.writeText(dummyProgram);
+						xmltvWriter.endEntity();
+						
+						xmltvWriter.writeEntity("sub-title");
+						xmltvWriter.writeText("");
+						xmltvWriter.endEntity();
+						
+						xmltvWriter.writeEntity("desc");
+						xmltvWriter.writeText("");
+						xmltvWriter.endEntity();
+						
+						xmltvWriter.writeEntity("category");
+						xmltvWriter.writeText("");
+						xmltvWriter.endEntity();
+					
 					xmltvWriter.endEntity();
-				
+				}
+			}
+			
+			for (String id : channelIds) {
+				// <channel id="457"><display-name lang="pl">Euronews</display-name></channel>
+				xmltvWriter.writeEntity("channel");
+				xmltvWriter.writeAttribute("id", id);
+					xmltvWriter.writeEntity("display-name");
+					xmltvWriter.writeAttribute("lang", "eo");
+						xmltvWriter.writeText("Unknown name");
+					xmltvWriter.endEntity();
 				xmltvWriter.endEntity();
 			}
 			
 			xmltvWriter.endEntity();
 			
 			xmltvWriter.close();
+			fWriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
