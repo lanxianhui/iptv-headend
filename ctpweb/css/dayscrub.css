@@ -5,13 +5,43 @@ body {
     color: #000;
 }
 
-.dayscrub {
+.multiscrub {
 	background-color: #6694E3;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	cursor: default;
 	margin-bottom: 10px;
 	border-radius: 5px;
+}
+
+.channelscrub {
+	float: right;
+	margin: 21px 0 5px 0;
+}
+
+.channelscrub .channelButton {
+	float: left;
+	width: 30px;
+	height: 30px;
+	background-color: #fff;
+	margin-right: 5px;
+	padding: 2px;
+	cursor: pointer;
+}
+
+.channelscrub .channelKnob {
+	position: absolute;
+	background-color: #CAD4E6;
+	height: 7px;
+	z-index: 0;
+	margin-top: -12px;
+	background-position: center center;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+.dayscrub {
+	float: left;
 }
 
 .dayscrub .hide {
