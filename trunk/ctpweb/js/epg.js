@@ -6,11 +6,15 @@ var timefallUpdater = null;
 var timefallPrecision = 60;
 var epgUpdater = null;
 var dayscrubElement = null;
+var channelscrubElement = null;
 var epgPrecision = 60 * 10;
+
+var currentGuide = null;
 
 var notification;
 
 var fits = 4;
+var startsForFit = 0;
 
 function openMiniWindow(url, name, width, height) {
 	var popupWindow = window.open(url, name, "width=" + width + ",height=" + height + ",menubar=no,location=no,resizable=yes,scrollbars=no,status=no,centerscreen=yes,directories=no");
@@ -75,7 +79,7 @@ function createButton(element, classList, caption){
 	return newButton;
 }
 
-function addProgram(schedule, program){
+function addProgram(schedule, program, channel){
 	var newProgram = new Element('div', {
 		'class': 'program'
 	});
@@ -148,8 +152,42 @@ function addProgram(schedule, program){
 		}
 		else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
 			var deleteButton = createButton(newActions, "pill letgo space", "Let go");
-			var playButton = createButton(newActions, "pill-l primary play", "Play");
-			var playMoreButton = createImageButton(newActions, "pill-r playMore narrow", "img/arrow.png", "v");
+			
+			if (program.recording.mode == "PROCESSING")
+				playButtonType = "pill-l";
+			else
+				playButtonType = "pill";
+			
+			var playButton = createButton(newActions, playButtonType + " primary play", "Play");
+			
+			if (program.recording.mode == "PROCESSING") {
+				var playMoreButton = createImageButton(newActions, "pill-r playMore narrow", "img/arrow.png", "v");
+				
+				playMoreButton.addEvent('click', function(event){
+					if (openContextMenu == null) {
+						this.contextMenu = new ContextMenu(playMoreButton);
+						this.contextMenu.addMenuItem("Play timeshifted", function() {
+							playProgram(program.id);
+							
+							contextMenuHide();
+						}, true);
+						this.contextMenu.addBreak();
+						this.contextMenu.addMenuItem("Play live", function() {
+							contextMenuHide();
+						});
+						
+						this.contextMenu.show();
+						
+						event.stop();
+					}
+					else {
+						openContextMenu.hide();
+						openContextMenu = null;
+						
+						event.stop();
+					}
+				});
+			}
 			
 			playButton.addEvent('click', function(event){
 				playProgram(program.id);
@@ -159,35 +197,11 @@ function addProgram(schedule, program){
 				event.stop();
 			});
 			deleteButton.addEvent('click', function(event){
-				alet('delete!');
+				alert('delete!');
 				
 				contextMenuHide();
 				
 				event.stop();
-			});
-			playMoreButton.addEvent('click', function(event){
-				if (openContextMenu == null) {
-					this.contextMenu = new ContextMenu(playMoreButton);
-					this.contextMenu.addMenuItem("Play timeshifted", function() {
-						playProgram(program.id);
-						
-						contextMenuHide();
-					}, true);
-					this.contextMenu.addBreak();
-					this.contextMenu.addMenuItem("Play live", function() {
-						contextMenuHide();
-					});
-					
-					this.contextMenu.show();
-					
-					event.stop();
-				}
-				else {
-					openContextMenu.hide();
-					openContextMenu = null;
-					
-					event.stop();
-				}
 			});
 		}
 	}
@@ -221,6 +235,8 @@ function addProgram(schedule, program){
 	});
 		
 	schedule.adopt(newProgram);
+	
+	return newProgram;
 }
 
 function addChannel(guide, channel){
@@ -244,25 +260,83 @@ function addChannel(guide, channel){
 	newSchedule.adopt(newTimefall);
 	
 	$each(channel.programs, function(program) {
-		addProgram(newSchedule, program);
+		addProgram(newSchedule, program, channel);
 	});
 	
 	guide.adopt(newChannel);
+	
+	return newChannel;
 }
 
-function loadGuide(guide){
+function movedChannelOffset() {
+	var channels = $$(".channel");
+	
+	var localFit = startsForFit+fits;
+	
+	for (i = 0; i < channels.length; i++) {
+		if ((i < startsForFit) | (i >= localFit)) {
+			if (!channels[i].hasClass("hidden")) {
+				channels[i].addClass("hidden");
+			}
+		} else {
+			if (channels[i].hasClass("hidden")) {
+				channels[i].removeClass("hidden");
+			}
+		}
+	}
+	
+	recalculateTimefall();
+}
+
+function setFits(newFits) {
+	fits = newFits;
+	
+	movedChannelOffset();
+	
+	channelscrubElement.refreshKnobPosition(fits, startsForFit);
+}
+
+function repaintGuide() {
+	var guideElement = $("guide");
+	guideElement.empty();
+	
+    /* $each(guide, function(channel){
+        addChannel($("guide"), channel);
+    }); */
+	
+	var localFit = (startsForFit+fits < currentGuide.length) ? (startsForFit+fits) : currentGuide.length;
+	
+	for (i = 0; i < currentGuide.length; i++) {
+		channel = addChannel(guideElement, currentGuide[i]);
+		
+		if ((i < startsForFit) | (i >= localFit)) {
+			channel.addClass("hidden");
+		}
+	}
+	
+	recalculateTimefall();
+}
+
+function changeChannelStart(newStart) {
+	startsForFit = newStart;
+	
+	movedChannelOffset();
+}
+
+function loadGuide(guide) {
+	currentGuide = guide;
+	
 	if (timefallUpdater != null)
 		clearTimeout(timefallUpdater);
 	if (epgUpdater != null)
 		clearTimeout(epgUpdater);
 	
-	$("guide").empty();
-    $each(guide, function(channel){
-        addChannel($("guide"), channel);
-    });
-	recalculateTimefall();
+	repaintGuide();
 	
 	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
+	
+	channelscrubElement.refreshChannels(guide);
+	channelscrubElement.refreshKnobPosition(fits, startsForFit);
 	
 	notificationHide();
 }
@@ -328,19 +402,24 @@ function windowResize() {
 	var rootElement = $("guide");
 	elementWidth = rootElement.clientWidth;
 	
-	if ((elementWidth >= 980) && (fits != 4)) {
+	if ((elementWidth >= 1225) && (fits != 5)) {
 		clearFits(rootElement);
-		fits = 4;
+		rootElement.addClass("fits5");
+		setFits(5);
+	}
+	else if ((elementWidth >= 980) && (elementWidth < 1225) && (fits != 4)) {
+		clearFits(rootElement);
+		setFits(4);
 	}
 	else if ((elementWidth >= 750) && (elementWidth < 980) && (fits != 3)) {
 		clearFits(rootElement);
 		rootElement.addClass("fits3");
-		fits = 3;
+		setFits(3);
 	}
 	else if ((elementWidth < 750) && (fits != 2)) {
 		clearFits(rootElement);
 		rootElement.addClass("fits2");
-		fits = 2;
+		setFits(2);
 	}
 }
 
@@ -350,6 +429,9 @@ function bootScripts() {
 	
 	dayscrubElement = new Dayscrub($('daylist'), new Date().decrement('day', 7), 14);
 	dayscrubElement.refreshCurrent();
+	
+	channelscrubElement = new Channelscrub($('channellist'));
+	channelscrubElement.addEvent('change', changeChannelStart);
 	
 	notification = new Notification($(document.body));
 	

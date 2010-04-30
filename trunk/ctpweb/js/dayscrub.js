@@ -148,3 +148,149 @@ function Dayscrub(element, beginDate, span) {
 		monthElement.adopt(newDayElement);
 	}
 };
+
+function Channelscrub(element) {
+	var target = element;
+	
+	var oldMouseX = 0;
+	var oldMouseY = 0;
+	
+	this.rootElement = element;
+	var knobMoving = false;
+	var knobBaseOffset = 0;
+	var knobTempOffset = 0;
+	
+	target.empty();
+	
+	target.addClass("channelscrub");
+	
+	var channelKnobWidth = 0;
+	var channelKnobOffset = 0;
+	
+	var totalChannels = 0;
+	
+	var emptyFunction = function() { return; };
+	
+	var changeCallback = emptyFunction;
+	
+	var newChannelKnob = new Element('div', {
+		'class': 'channelKnob',
+		'styles': {
+			'width': channelKnobWidth + 'px',
+			'margin-left': channelKnobOffset + 'px'
+		}
+	});
+	
+	var lastFitsStarts = 0;
+	
+	var knobMove = function(event) {
+		knobTempOffset = (knobBaseOffset + event.page.x - oldMouseX);
+		
+		if (knobTempOffset > (39 * totalChannels - 5 - channelKnobWidth)) {
+			knobTempOffset = (39 * totalChannels - 5 - channelKnobWidth);
+		}
+		
+		if (knobTempOffset < 0) {
+			knobTempOffset = 0;
+		}
+		
+		var newFitsStarts = Math.round(knobTempOffset / 39);
+		if (lastFitsStarts != newFitsStarts) {
+			lastFitsStarts = newFitsStarts;
+			changeCallback(newFitsStarts);
+		}
+		
+		newChannelKnob.style.marginLeft = knobTempOffset + 'px';
+	};
+	
+	var knobEnd = function(event) {
+		window.removeEvent('mousemove', knobMove);
+		window.removeEvent('mouseup', knobEnd);
+		knobMoving = false;
+		
+		channelKnobOffset = knobTempOffset;
+		
+		channelKnobModulo = channelKnobOffset % 39;
+		
+		if (channelKnobModulo != 0) {
+			var targetKnobOffset = channelKnobOffset;
+			if (channelKnobModulo < 19) {
+				targetKnobOffset = channelKnobOffset - channelKnobModulo;
+			} else if (channelKnobModulo >= 19) {
+				targetKnobOffset = channelKnobOffset + (39 - channelKnobModulo);
+			}
+			
+			var knobTween = new Fx.Tween(newChannelKnob, {
+				'property': 'margin-left',
+				'unit': 'px',
+				'duration': 'short',
+				'transition': 'sine:out'
+			});
+			knobTween.start(targetKnobOffset);
+			
+			channelKnobOffset = targetKnobOffset;
+		}
+		
+		var newFitsStarts = channelKnobOffset / 39;
+		
+		if (lastFitsStarts != newFitsStarts) {
+			lastFitsStarts = newFitsStarts;
+			changeCallback(newFitsStarts);
+		}
+	};
+	
+	newChannelKnob.addEvent('mousedown', function(event) {
+		knobMoving = true;
+		oldMouseX = event.page.x;
+		oldMouseY = event.page.y;
+		
+		knobBaseOffset = channelKnobOffset;
+		
+		lastFitsStarts = channelKnobOffset / 39;
+		
+		window.addEvent('mousemove', knobMove);
+		window.addEvent('mouseup', knobEnd);
+		
+		event.stop();
+		
+		return false;
+	});
+	
+	var newChannelList = new Element('div', {
+		'class': 'channelButtons'
+	});
+	
+	this.refreshKnobPosition =  function(fits, startsForFit) {
+		channelKnobWidth = 39 * fits - 5;
+		channelKnobOffset = 39 * startsForFit;
+		
+		newChannelKnob.style.width = channelKnobWidth + 'px';
+		newChannelKnob.style.marginLeft = channelKnobOffset + 'px';
+	};
+	
+	this.addEvent = function(eventName, newCallback) {
+		switch(eventName) {
+			case 'change':
+				changeCallback = newCallback;
+				break;
+		}
+	};
+	
+	this.refreshChannels = function(guide) {
+		newChannelList.empty();
+		
+		$each(guide, function(channel) {
+			var newChannel = new Element('div', {
+				'class': 'channelButton',
+				'html': '<img src="img/logos/' + channel.icon + '" width="30" height="30" alt="' + channel.name + '"/>'
+			}); 
+			this.adopt(newChannel);
+		},
+		newChannelList);
+		
+		totalChannels = guide.length;
+	};
+	
+	target.adopt(newChannelList);
+	target.adopt(newChannelKnob);
+}
