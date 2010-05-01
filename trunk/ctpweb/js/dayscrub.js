@@ -167,6 +167,10 @@ function Channelscrub(element) {
 	var channelKnobWidth = 0;
 	var channelKnobOffset = 0;
 	
+	// Even in JavaScript some double entandre is nice ;)
+	var knobExtended = false;
+	var knobMouseIn = false;
+	
 	var totalChannels = 0;
 	
 	var emptyFunction = function() { return; };
@@ -177,7 +181,56 @@ function Channelscrub(element) {
 		'class': 'channelKnob',
 		'styles': {
 			'width': channelKnobWidth + 'px',
-			'margin-left': channelKnobOffset + 'px'
+			'margin-left': channelKnobOffset + 'px',
+			'height': '5px',
+			'margin-top': '-10px'
+		}
+	});
+	
+	var knobExtend = function() {
+		knobExtended = true;
+		var knobMarginTween = new Fx.Tween(newChannelKnob, {
+			'property': 'margin-top',
+			'unit': 'px',
+			'duration': 100,
+			'transition': 'sine:in:out'
+		});
+		var knobHeightTween = new Fx.Tween(newChannelKnob, {
+			'property': 'height',
+			'unit': 'px',
+			'duration': 100,
+			'transition': 'sine:in:out'
+		});
+		knobMarginTween.start(-16);
+		knobHeightTween.start(11);
+	};
+	
+	var knobCollapse = function() {
+		knobExtended = false;
+		var knobMarginTween = new Fx.Tween(newChannelKnob, {
+			'property': 'margin-top',
+			'unit': 'px',
+			'duration': 100,
+			'transition': 'sine:in:out'
+		});
+		var knobHeightTween = new Fx.Tween(newChannelKnob, {
+			'property': 'height',
+			'unit': 'px',
+			'duration': 100,
+			'transition': 'sine:in:out'
+		});
+		knobMarginTween.start(-10);
+		knobHeightTween.start(5);
+	};
+	
+	target.parentNode.addEvent('mouseenter', function(event) {
+		knobMouseIn = true;
+		knobExtend();
+	});
+	target.parentNode.addEvent('mouseleave', function(event) {
+		knobMouseIn = false;
+		if (!knobMoving) {
+			knobCollapse();
 		}
 	});
 	
@@ -229,6 +282,10 @@ function Channelscrub(element) {
 			knobTween.start(targetKnobOffset);
 			
 			channelKnobOffset = targetKnobOffset;
+		}
+		
+		if (knobExtended && (!knobMouseIn)) {
+			knobCollapse();
 		}
 		
 		var newFitsStarts = channelKnobOffset / 39;
