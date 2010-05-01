@@ -98,18 +98,6 @@ public class NullGuide {
 						xmltvWriter.writeEntity("title");
 						xmltvWriter.writeText(dummyProgram);
 						xmltvWriter.endEntity();
-						
-						xmltvWriter.writeEntity("sub-title");
-						xmltvWriter.writeText("");
-						xmltvWriter.endEntity();
-						
-						xmltvWriter.writeEntity("desc");
-						xmltvWriter.writeText("");
-						xmltvWriter.endEntity();
-						
-						xmltvWriter.writeEntity("category");
-						xmltvWriter.writeText("");
-						xmltvWriter.endEntity();
 					
 					xmltvWriter.endEntity();
 				}
