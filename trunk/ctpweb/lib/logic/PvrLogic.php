@@ -48,6 +48,11 @@ class PvrLogic {
 		return $userRecordingDAO->delete($conn, &$deleteUserRecording);
 	}
 	
+	/**
+	 * List all recordings (for a given user)
+	 * @param unknown_type $conn The Datasource object containing the database connection
+	 * @param unknown_type $user The User, for which to list the recording objects. If null, all recordings set up in the system will be returned.
+	 */
 	function listRecordings(&$conn, &$user = null) {
 		if ($user === null) {
 			$recordingDao = new RecordingDao();

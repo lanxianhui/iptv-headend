@@ -1,5 +1,5 @@
 <?php
-class UserLogic {
+class UserAdministrationLogic {
 	
 	function UserLogic() {
 		
@@ -14,10 +14,6 @@ class UserLogic {
 	}
 	
 	function DeleteUser(&$conn, &$user) {
-		
-	}
-	
-	function LoginUser(&$conn, $userName, $password) {
 		
 	}
 	
