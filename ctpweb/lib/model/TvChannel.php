@@ -38,6 +38,7 @@ class TvChannel {
     var $name;
     var $ipAdress;
     var $port;
+    var $unicastUrl;
     var $lcn;
     var $icon;
     var $enabled;
@@ -96,6 +97,13 @@ class TvChannel {
     function setPort($portIn) {
           $this->port = $portIn;
     }
+    
+	function getUnicastUrl() {
+          return $this->unicastUrl;
+    }
+    function setUnicastUrl($unicastUrlIn) {
+          $this->unicastUrl = $unicastUrlIn;
+    }
 
     function getIcon() {
           return $this->icon;
@@ -139,6 +147,7 @@ class TvChannel {
           $nameIn,
           $ipAdressIn,
           $portIn,
+          $unicastUrlIn,
           $lcnIn,
           $iconIn,
           $enabledIn) {
@@ -146,6 +155,7 @@ class TvChannel {
           $this->name = $nameIn;
           $this->ipAdress = $ipAdressIn;
           $this->port = $portIn;
+          $this->unicastUrl = $unicastUrlIn;
           $this->lcn = $lcnIn;
           $this->icon = $iconIn;
           $this->enabled = $enabledIn;
@@ -171,6 +181,9 @@ class TvChannel {
                     return(false);
           }
           if ($valueObject->getPort() != $this->port) {
+                    return(false);
+          }
+    	  if ($valueObject->getUnicastUrl() != $this->unicastUrl) {
                     return(false);
           }
     	  if ($valueObject->getLCN() != $this->lcn) {
@@ -218,7 +231,8 @@ class TvChannel {
         $cloned->setId($this->id); 
         $cloned->setName($this->name); 
         $cloned->setIpAdress($this->ipAdress); 
-        $cloned->setPort($this->port); 
+        $cloned->setPort($this->port);
+        $cloned->setUnicastUrl($this->unicastUrl);  
         $cloned->setIcon($this->icon); 
         $cloned->setLCN($this->lcn);
         $cloned->setEnabled($this->enabled);
