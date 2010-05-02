@@ -29,7 +29,6 @@
 
 class TvChannelDao {
 
-
     /**
      * createValueObject-method. This method is used when the Dao class needs
      * to create new value object instance. The reason why this method exists
@@ -38,6 +37,7 @@ class TvChannelDao {
      * NOTE: If you extend the valueObject class, make sure to override the
      * clone() method in it!
      */
+	
     function createValueObject() {
           return new TvChannel();
     }
@@ -122,10 +122,11 @@ class TvChannelDao {
      */
     function create(&$conn, &$valueObject) {
 
-          $sql = "INSERT INTO TvChannel ( name, ipAdress, port, lcn, ";
+          $sql = "INSERT INTO TvChannel ( name, ipAdress, port, unicastUrl, lcn, ";
           $sql = $sql."icon, enabled) VALUES ('".$valueObject->getName()."', ";
           $sql = $sql."'".$valueObject->getIpAdress()."', ";
           $sql = $sql."".$valueObject->getPort().", ";
+          $sql = $sql."'".$valueObject->getUnicastUrl()."', "; 
           $sql = $sql."".$valueObject->getLCN().", ";
           $sql = $sql."'".$valueObject->getIcon()."', ";
           $sql = $sql."'".($valueObject->getEnabled()?"TRUE":"FALSE")."') ";
@@ -169,6 +170,7 @@ class TvChannelDao {
           $sql = "UPDATE TvChannel SET name = '".$valueObject->getName()."', ";
           $sql = $sql."ipAdress = '".$valueObject->getIpAdress()."', ";
           $sql = $sql."port = ".$valueObject->getPort().", ";
+          $sql = $sql."unicastUrl = '".$valueObject->getUnicastUrl()."', ";
           $sql = $sql."lcn = ".$valueObject->getLCN().", ";
           $sql = $sql."icon = '".$valueObject->getIcon()."' ";
           $sql = $sql."enabled = '".($valueObject->getEnabled()?"TRUE":"FALSE")."'";
@@ -295,6 +297,11 @@ class TvChannelDao {
               $sql = $sql."AND port = ".$valueObject->getPort()." ";
           }
           
+    	  if ($valueObject->getUnicastUrl() != 0) {
+              if ($first) { $first = false; }
+              $sql = $sql."AND unicastUrl LIKE '".$valueObject->getUnicastUrl()."%' ";
+          }
+          
     	  if ($valueObject->getLCN() != 0) {
               if ($first) { $first = false; }
               $sql = $sql."AND lcn = ".$valueObject->getLCN()." ";
@@ -370,9 +377,10 @@ class TvChannelDao {
                    $valueObject->setName($row[1]); 
                    $valueObject->setIpAdress($row[2]); 
                    $valueObject->setPort($row[3]); 
-                   $valueObject->setLCN($row[4]);
-                   $valueObject->setIcon($row[5]);
-                   $valueObject->setEnabled((($row[6]==="TRUE")?true:false));; 
+                   $valueObject->setUnicastUrl($row[4]);
+                   $valueObject->setLCN($row[5]);
+                   $valueObject->setIcon($row[6]);
+                   $valueObject->setEnabled((($row[7]==="TRUE")?true:false));; 
           } else {
                //print " Object Not Found!";
                return false;
@@ -400,10 +408,11 @@ class TvChannelDao {
                $temp->setId($row[0]); 
                $temp->setName($row[1]); 
                $temp->setIpAdress($row[2]); 
-               $temp->setPort($row[3]); 
-               $temp->setLCN($row[4]);
-               $temp->setIcon($row[5]);
-               $temp->setEnabled((($row[6]==="TRUE")?true:false)); 
+               $temp->setPort($row[3]);
+               $temp->setUnicastUrl($row[4]);
+               $temp->setLCN($row[5]);
+               $temp->setIcon($row[6]);
+               $temp->setEnabled((($row[7]==="TRUE")?true:false)); 
                array_push($searchResults, $temp);
           }
 
