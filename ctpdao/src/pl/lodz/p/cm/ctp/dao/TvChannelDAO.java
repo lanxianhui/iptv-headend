@@ -10,15 +10,15 @@ import static pl.lodz.p.cm.ctp.dao.DAOUtil.*;
 public final class TvChannelDAO {
 	
 	private static final String SQL_FIND_BY_ID =
-        "SELECT id, name, ipAdress, port, lcn, icon, enabled FROM TvChannel WHERE id = ?";
+        "SELECT id, name, ipAdress, port, unicastUrl, lcn, icon, enabled FROM TvChannel WHERE id = ?";
     private static final String SQL_FIND_BY_NAME =
-        "SELECT id, name, ipAdress, port, lcn, icon, enabled FROM TvChannel WHERE name = ?";
+        "SELECT id, name, ipAdress, port, unicastUrl, lcn, icon, enabled FROM TvChannel WHERE name = ?";
     private static final String SQL_LIST_ORDER_BY_ID =
-        "SELECT id, name, ipAdress, port, lcn, icon, enabled FROM TvChannel ORDER BY id";
+        "SELECT id, name, ipAdress, port, unicastUrl, lcn, icon, enabled FROM TvChannel ORDER BY id";
     private static final String SQL_INSERT =
-        "INSERT INTO TvChannel (name, ipAdress, port, lcn, icon, enabled) VALUES (?, ?, ?, ?, ?, ?)";
+        "INSERT INTO TvChannel (name, ipAdress, port, unicastUrl, lcn, icon, enabled) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE =
-        "UPDATE TvChannel SET name = ?, ipAdress = ?, port = ?, lcn = ?, icon = ?, enabled = ? WHERE id = ?";
+        "UPDATE TvChannel SET name = ?, ipAdress = ?, port = ?, unicastUrl = ?, lcn = ?, icon = ?, enabled = ? WHERE id = ?";
     private static final String SQL_DELETE =
         "DELETE FROM TvChannel WHERE id = ?";
     private static final String SQL_EXIST_NAME =
@@ -91,6 +91,7 @@ public final class TvChannelDAO {
             tvChannel.getName(),
             tvChannel.getIpAdress(),
             tvChannel.getPort(),
+            tvChannel.getUnicastUrl(),
             tvChannel.getLCN(),
             tvChannel.getIcon(),
             tvChannel.getEnabled().toString().toUpperCase()
@@ -129,6 +130,7 @@ public final class TvChannelDAO {
             tvChannel.getName(),
             tvChannel.getIpAdress(),
             tvChannel.getPort(),
+            tvChannel.getUnicastUrl(),
             tvChannel.getLCN(),
             tvChannel.getIcon(),
             tvChannel.getEnabled().toString().toUpperCase(),
@@ -212,6 +214,7 @@ public final class TvChannelDAO {
             resultSet.getString("name"),
             resultSet.getString("ipAdress"),
             resultSet.getInt("port"),
+            resultSet.getString("unicastUrl"),
             resultSet.getInt("lcn"),
             resultSet.getObject("icon") != null ? resultSet.getString("icon") : null,
             resultSet.getString("enabled").equals("TRUE") ? true : false
