@@ -6,6 +6,7 @@ public class TvChannel {
 	private String name;
 	private String ipAdress;
 	private Integer port;
+	private String unicastUrl;
 	private Integer lcn;
 	private String icon;
 	private Boolean enabled;
@@ -30,6 +31,11 @@ public class TvChannel {
 		this(id, name, ipAdress, port, icon);
 		this.lcn = lcn;
 		this.enabled = enabled;
+	}
+	
+	public TvChannel(Long id, String name, String ipAdress, Integer port, String unicastUrl, Integer lcn, String icon, Boolean enabled) {
+		this(id, name, ipAdress, port, lcn, icon, enabled);
+		this.unicastUrl = unicastUrl;
 	}
 
 	public Long getId() {
@@ -62,6 +68,14 @@ public class TvChannel {
 
 	public void setPort(Integer port) {
 		this.port = port;
+	}
+	
+	public String getUnicastUrl() {
+		return unicastUrl;
+	}
+
+	public void setUnicastUrl(String unicastUrl) {
+		this.unicastUrl = unicastUrl;
 	}
 
 	public String getIcon() {
