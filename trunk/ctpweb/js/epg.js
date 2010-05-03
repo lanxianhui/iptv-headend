@@ -259,6 +259,14 @@ function addChannel(guide, channel){
 	newChannel.store("timefall", newTimefall);
 	newSchedule.adopt(newTimefall);
 	
+	var playChannel = function(id) {
+		openMiniWindow('mediaplayer.php#channel,'+id, 'playerWindow', 640, 500);
+	};
+	
+	newHeader.addEvent('click', function(event) {
+		playChannel(channel.id);
+	});
+	
 	$each(channel.programs, function(program) {
 		addProgram(newSchedule, program, channel);
 	});
@@ -378,7 +386,7 @@ function updateGuide(){
 	var date = yearForS + "-" + monthForS + "-" + dayForS; 
 	extUrl = "?day=" + date;
 	
-    downloadData("index.php" + extUrl, loadGuide);
+    downloadData("epg.php" + extUrl, loadGuide);
 }
 
 function hasUrlChanged() {
