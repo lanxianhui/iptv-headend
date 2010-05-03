@@ -162,6 +162,11 @@ function playbackPlayPause() {
 	}
 }
 
+function fullScreen() {
+	var vlc = mediaplayer.getPlayer();
+	vlc.video.toggleFullscreen();
+}
+
 function soundPlus() {
 	var mediabar = mediaplayer.getMediabar();
 	var volume = mediabar.getVolume();
@@ -224,16 +229,18 @@ function bootscripts() {
 	});
 	window.addEvent('keyup', function(event) {
 		//console.log(event);
-		if (event.code == 33) {
+		if ((event.code == 33) | (event.code == 176)) {
 			channelPlus();
-		} else if (event.code == 34) {
+		} else if ((event.code == 34) | (event.code == 177)) {
 			channelMinus();
-		} else if (event.code == 32) {
+		} else if ((event.code == 32) | (event.code == 179)) {
 			playbackPlayPause();
 		} else if (event.code == 38) {
 			soundPlus();
 		} else if (event.code == 40) {
 			soundMinus();
+		} else if ((event.code == 13) && (event.alt == true)) {
+			fullScreen();
 		}
 	});
 	
