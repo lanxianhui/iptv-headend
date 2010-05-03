@@ -22,8 +22,8 @@ class AccountLogic {
 		if (isset($_SESSION["userName"]) && isset($_SESSION["password"])) {
 			$userName = $_SESSION["userName"];
 			$passwordMD5 = $_SESSION["password"];	
-		} else if (isset($_COOKIE["CTPA"])) {
-			$persistentLoginData = json_decode(base64_decode($_COOKIE["CTPA"]));
+		} else if (isset($_COOKIE["userData"])) {
+			$persistentLoginData = json_decode(base64_decode($_COOKIE["userData"]));
 			$userName = $persistentLoginData["userName"];
 			$passwordMD5 = $persistentLoginData["password"];
 			$usedPersistent = true;
@@ -108,7 +108,7 @@ class AccountLogic {
 			$_SESSION = array();
 			session_destroy();
 			
-			if (isset($_COOKIE["CTPA"])) {
+			if (isset($_COOKIE["userData"])) {
 				setcookie("userData", null, 1, '/');
 			}
 	}

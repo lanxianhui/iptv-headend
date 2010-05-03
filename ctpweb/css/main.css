@@ -117,6 +117,12 @@ a {
 #guide div.header h2 {
     font-size: 1.27em;
     font-weight: bold;
+	cursor: pointer;
+}
+
+#guide div.header:hover h2 {
+    text-decoration: underline;
+	color: #333;
 }
 
 #guide div.program {
