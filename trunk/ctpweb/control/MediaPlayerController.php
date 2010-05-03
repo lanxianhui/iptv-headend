@@ -19,20 +19,20 @@ class MediaPlayerController {
 			$channel->setPrograms($programs);
 		} */
 		
-		$program = null;
+		$data = null;
 		
 		if (isset($_GET['id'])) {
 			if ($_GET['type'] == 'program') {
 				$programId = $_GET['id'];
-				$program = EpgLogic::getProgramRecordingByProgramId(&$conn, $programId);
-			} else if ($_GET['type'] == 'channel') {
-				
+				$data = EpgLogic::getProgramRecordingByProgramId(&$conn, $programId);
 			}
+		} else if ($_GET['type'] == 'channels') {
+			$data = EpgLogic::getChannels(&$conn);
 		}
 		
 		if (($_SERVER["HTTP_ACCEPT"] == "application/json") | ($_GET["format"] == "json")) {
 			header('Content-type: application/json');
-			print(json_encode($program));
+			print(json_encode($data));
 			exit;
 		} else {
 			$smarty = new Smarty();
