@@ -2,14 +2,19 @@ var mediaplayer;
 var lastUrl = "";
 
 var localChannels = null;
+var localProgram = null;
 var channelPointer = 0;
 var channelId = 0;
+var isLive = false;
 
 function Settings(volume) {
 	this.volume = volume;
 }
 
 function loadProgram(program) {
+	isLive = false;
+	localProgram = program;
+	document.title = program.title;
 	var totalTime = (program.end - program.begin) * 1000;
 	var mediabar = mediaplayer.getMediabar();
 	mediabar.setTotalTime(totalTime);
@@ -32,8 +37,14 @@ function findChannel(id, channels) {
 }
 
 function loadChannels(channels) {
+	isLive = true;
 	localChannels = channels;
 	channelPointer = findChannel(channelId, localChannels);
+	
+	if (channelPointer == -1)
+		channelPointer = 0;
+	
+	document.title = channels[channelPointer].name;
 	
 	var mediabar = mediaplayer.getMediabar();
 	mediabar.setLive(true);
@@ -76,7 +87,12 @@ function beginPlaybackFromUrl() {
 		downloadData("mediaplayer.php?id=" + id + "&type=" + type);
 	} else if (type == "channel") {
 		channelId = id;
-		downloadData("mediaplayer.php?type=channels");
+		if (localChannels == null) {
+			downloadData("mediaplayer.php?type=channels");
+		} else {
+			// We skip downloading the channel list - we use the list that already has been downloaded
+			loadChannels(localChannels);
+		}
 	}
 }
 
@@ -111,8 +127,116 @@ function loadSettings() {
 	} 
 }
 
+function channelPlus() {
+	if (isLive) {
+		var nextChannelPointer = channelPointer + 1;
+		if (nextChannelPointer < 0)
+			nextChannelPointer = localChannels.length - 1;
+		if (nextChannelPointer >= localChannels.length)
+			nextChannelPointer = 0;
+		var nextChannel = localChannels[nextChannelPointer].id;
+		
+		var urlParams = location.href.split("#");
+		location.href = urlParams[0] + "#" + 'channel' + ',' + nextChannel;
+	}
+}
+
+function channelMinus() {
+	if (isLive) {
+		var previousChannelPointer = channelPointer - 1;
+		if (previousChannelPointer < 0)
+			previousChannelPointer = localChannels.length - 1;
+		if (previousChannelPointer >= localChannels.length)
+			previousChannelPointer = 0;
+		var previousChannel = localChannels[previousChannelPointer].id;
+		
+		var urlParams = location.href.split("#");
+		location.href = urlParams[0] + "#" + 'channel' + ',' + previousChannel;
+	}
+}
+
+function playbackPlayPause() {
+	if (!isLive) {
+		var vlc = mediaplayer.getPlayer();
+		vlc.playlist.togglePause();
+	}
+}
+
+function soundPlus() {
+	var mediabar = mediaplayer.getMediabar();
+	var volume = mediabar.getVolume();
+	
+	volume = volume + 0.05;
+	
+	if (volume < 0) {
+		volume = 0;
+	} else if (volume > 1) {
+		volume = 1;
+	}
+	
+	mediabar.setVolume(volume);
+	if (volume == 0) {
+		mediabar.setMute(true);
+	} else {
+		mediabar.setMute(false);
+	}
+	
+	var vlc = mediaplayer.getPlayer();
+	vlc.audio.volume = volume * 100;
+}
+
+function soundMinus() {
+	var mediabar = mediaplayer.getMediabar();
+	var volume = mediabar.getVolume();
+	
+	volume = volume - 0.05;
+	
+	if (volume < 0) {
+		volume = 0;
+	} else if (volume > 1) {
+		volume = 1;
+	}
+	
+	mediabar.setVolume(volume);
+	if (volume == 0) {
+		mediabar.setMute(true);
+	} else {
+		mediabar.setMute(false);
+	}
+	
+	var vlc = mediaplayer.getPlayer();
+	vlc.audio.volume = volume * 100;
+}
+
 function bootscripts() {
 	mediaplayer = new Media($('media'), "");
+	
+	var mediabar = mediaplayer.getMediabar();
+	mediabar.addEvent('liveclick', function(event) {
+		var urlParams = location.href.split("#");
+		location.href = urlParams[0] + "#" + 'channel' + ',' + localProgram.tvChannelId;
+	});
+	mediabar.addEvent('chplusclick', function(event) {
+		channelPlus();
+	});
+	mediabar.addEvent('chminusclick', function(event) {
+		channelMinus();
+	});
+	window.addEvent('keyup', function(event) {
+		//console.log(event);
+		if (event.code == 33) {
+			channelPlus();
+		} else if (event.code == 34) {
+			channelMinus();
+		} else if (event.code == 32) {
+			playbackPlayPause();
+		} else if (event.code == 38) {
+			soundPlus();
+		} else if (event.code == 40) {
+			soundMinus();
+		}
+	});
+	
 	hasUrlChanged();
 	loadSettings();
 }
