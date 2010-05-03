@@ -462,6 +462,8 @@ function Mediabar(element) {
 	
 	this.inSeek = false;
 	
+	this.isLive = false;
+	
 	this.knobVisible = true;
 	
 	this.volume = 0;
@@ -486,6 +488,16 @@ function Mediabar(element) {
 	this.setCurrentPosition = function(newCurrentPosition) {
 		this.currentTime = newCurrentPosition * this.totalTime;
 		this.timeChanged();
+	};
+	
+	this.setLive = function(newSetLive) {
+		this.setPlayVisible(!newSetLive);
+		this.setPauseVisible(!newSetLive);
+		this.setLiveVisible(!newSetLive);
+		this.setChPlusVisible(newSetLive);
+		this.setChMinusVisible(newSetLive);
+		this.setKnobVisible(!newSetLive);
+		this.isLive = newSetLive;
 	};
 	
 	this.getKnobVisible = function() {
@@ -595,7 +607,7 @@ function Mediabar(element) {
 			if (!this.liveButton.hasClass('hide')) this.liveButton.addClass('hide');
 		}
 	};
-	this.getliveVisible = function() {
+	this.getLiveVisible = function() {
 		return (!this.liveButton.hasClass('hide'));
 	};
 	
@@ -748,12 +760,7 @@ function handlePause() {
 }
 
 function handleLive() {
-	mediabarElement.setPlayVisible(false);
-	mediabarElement.setPauseVisible(false);
-	mediabarElement.setLiveVisible(false);
-	mediabarElement.setChPlusVisible(true);
-	mediabarElement.setChMinusVisible(true);
-	mediabarElement.setKnobVisible(false);
+	mediabarElement.setLive(true);
 }
 
 function handleFullscreen() {
@@ -767,14 +774,14 @@ function vlcResizeHandler() {
 	vlc.height = (typeof window.innerHeight != 'undefined' ? window.innerHeight : document.body.offsetHeight) - 40;
 }
 
-function bootVlc(volume) {
+function bootVlc() {
 	var vlc = $('myVlc');
 	if (typeof vlc.audio != 'undefined') {
-		vlc.audio.volume = volume * 100;
+		vlc.audio.volume = mediabarElement.volume * 100;
 		window.setInterval(this.refreshVlc, 500);	
 	}
 	else {
-		window.setTimeout(this.bootVlc, 500, volume);
+		window.setTimeout(this.bootVlc, 500);
 	}
 }
 
@@ -784,20 +791,24 @@ function refreshVlc() {
 	var position = vlc.input.position;
 	var state = vlc.input.state;
 	
-	if (state == 3) {
-		mediabarElement.setPlayVisible(false);
-		mediabarElement.setPauseVisible(true);
+	if (!mediabarElement.isLive) {
+		if (state == 3) {
+			mediabarElement.setPlayVisible(false);
+			mediabarElement.setPauseVisible(true);
+		}
+		else if (state == 4) {
+			mediabarElement.setPauseVisible(false);
+			mediabarElement.setPlayVisible(true);	
+		}
+		else if (state == 6) {
+			mediabarElement.setPauseVisible(false);
+			mediabarElement.setPlayVisible(true);
+		}
+		
+		mediabarElement.setCurrentPosition(position);
+	} else {
+		
 	}
-	else if (state == 4) {
-		mediabarElement.setPauseVisible(false);
-		mediabarElement.setPlayVisible(true);	
-	}
-	else if (state == 6) {
-		mediabarElement.setPauseVisible(false);
-		mediabarElement.setPlayVisible(true);
-	}
-	
-	mediabarElement.setCurrentPosition(position);
 }
 
 function Media(element, startMrl) {
@@ -859,5 +870,5 @@ function Media(element, startMrl) {
 	mediabarElement.addEvent('volumechange', handleVolume);
 	mediabarElement.addEvent('mute', handleMuted);
 	
-	window.setTimeout(this.bootVlc, 500, 1.0);
+	window.setTimeout(this.bootVlc, 500);
 }
