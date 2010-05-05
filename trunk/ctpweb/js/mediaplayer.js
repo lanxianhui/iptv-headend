@@ -253,7 +253,9 @@ function handleUnload(){
 	var volume = (vlc.audio.volume / 100);
 	settings = new Settings(volume);
 	
-	var settingsCookie = Cookie.write('settings', JSON.encode(settings));
+	var settingsCookie = Cookie.write('settings', JSON.encode(settings), {
+		duration: 366
+	});
 }
 
 window.addEvent('domready', bootscripts);
