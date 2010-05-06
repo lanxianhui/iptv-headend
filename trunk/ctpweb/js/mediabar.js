@@ -125,11 +125,22 @@ function scrubbarMove(event) {
 	
 	knob.style.left = scrubbarKnobLeft + "px";
 	
-	var position = (scrubbarKnobLeft + 5) / (scrubbarWidth - 20 + 5);
-	mediabarElement.currentTime = position * mediabarElement.getTotalTime();
+	var position = 0;
+	if (mediabarElement.isTrickplay) {
+		position = (scrubbarKnobLeft + 5) / ((mediabarElement.getPrimaryTime() / mediabarElement.getTotalTime()) * (scrubbarWidth - 20 + 5));
+		mediabarElement.currentTime = position * mediabarElement.getPrimaryTime();
+	} else {
+		position = (scrubbarKnobLeft + 5) / (scrubbarWidth - 20 + 5);
+		mediabarElement.currentTime = position * mediabarElement.getTotalTime();
+	}
+	//console.log("Position: " + position);
 	mediabarElement.updateTimeText();
 	
-	tempTime = position * mediabarElement.getTotalTime();
+	if (mediabarElement.isTrickplay) {
+		tempTime = position * mediabarElement.getPrimaryTime();
+	} else {
+		tempTime = position * mediabarElement.getTotalTime();
+	}
 	
 	mediabarElement.inSeek = true;
 	
@@ -218,8 +229,14 @@ function createScrubbar(element) {
 			
 			event.stop();
 			
-			var position = (scrubbarKnobLeft + 5) / (scrubbarWidth - 20 + 5);
-			mediabarObject.currentTime = position * mediabarObject.getTotalTime();
+			var position = 0;
+			if (mediabarObject.isTrickplay) {
+				position = (scrubbarKnobLeft + 5) / ((mediabarElement.getPrimaryTime() / mediabarElement.getTotalTime()) * (scrubbarWidth - 20 + 5));
+				mediabarObject.currentTime = position * mediabarObject.getPrimaryTime();
+			} else {
+				position = (scrubbarKnobLeft + 5) / (scrubbarWidth - 20 + 5);
+				mediabarObject.currentTime = position * mediabarObject.getTotalTime();
+			}
 			mediabarObject.updateTimeText();
 			
 			mediabarObject.onseek(mediabarObject.getCurrentTime());
@@ -414,15 +431,7 @@ function updateTimeText() {
 }
 
 function timeChanged() {
-	if (!this.inSeek) {
-		this.updateTimeText();
-		
-		var totalWidth = scrubbarWidth + 5 - 20;
-		var ratioPosition = this.currentTime / this.totalTime;
-		scrubbarKnobLeft = (ratioPosition * totalWidth) - 5;
-		
-		this.knob.style.left = scrubbarKnobLeft + "px";
-	}
+	var ratioPosition = 0;
 	
 	ratioPosition = this.primaryTime / this.totalTime;
 	primaryWidth = (ratioPosition * (scrubbarWidth - 2));
@@ -431,6 +440,23 @@ function timeChanged() {
 	ratioPosition = this.secondaryTime / this.totalTime;
 	secondaryWidth = (ratioPosition * (scrubbarWidth - 2));
 	this.secondary.style.width = secondaryWidth + "px";
+	
+	if (!this.inSeek) {
+		this.updateTimeText();
+		
+		var totalWidth = scrubbarWidth + 5 - 20;
+		var scrubbarKnobLeft = 0;
+		if (this.isTrickplay) {
+			//console.log("Using trickplay in timeChanged!");
+			ratioPosition = this.currentTime / this.primaryTime;
+			scrubbarKnobLeft = (ratioPosition * primaryWidth) - 5;
+		} else {
+			ratioPosition = this.currentTime / this.totalTime;
+			scrubbarKnobLeft = (ratioPosition * totalWidth) - 5;
+		}
+		
+		this.knob.style.left = scrubbarKnobLeft + "px";
+	}
 }
 
 function Mediabar(element) {
@@ -461,7 +487,7 @@ function Mediabar(element) {
 	this.primaryTime = 0.0;
 	
 	this.inSeek = false;
-	
+	this.isTrickplay = false;
 	this.isLive = false;
 	
 	this.knobVisible = true;
@@ -469,6 +495,16 @@ function Mediabar(element) {
 	this.volume = 0;
 	
 	this.width = 288 + scrubbarWidth;
+	
+	this.reset = function () {
+		this.totalTime = 0.0;
+		this.currentTime = 0.0;
+		this.primaryTime = 0.0;
+		this.secondaryTime = 0.0;
+		this.isLive = false;
+		this.isTrickplay = false;
+		tempTime = 0;
+	};
 	
 	this.setTotalTime = function(newTotalTime) {
 		this.totalTime = newTotalTime;
@@ -486,7 +522,12 @@ function Mediabar(element) {
 		this.timeChanged();
 	};
 	this.setCurrentPosition = function(newCurrentPosition) {
-		this.currentTime = newCurrentPosition * this.totalTime;
+		if (this.isTrickplay) {
+			//console.log("Using trickplay in setCurrentPosition!");
+			this.currentTime = newCurrentPosition * this.primaryTime;
+		} else {
+			this.currentTime = newCurrentPosition * this.totalTime;
+		}
 		this.timeChanged();
 	};
 	
@@ -498,6 +539,10 @@ function Mediabar(element) {
 		this.setChMinusVisible(newSetLive);
 		this.setKnobVisible(!newSetLive);
 		this.isLive = newSetLive;
+	};
+	
+	this.setTrickplay = function(newTrickplay) {
+		this.isTrickplay = newTrickplay;
 	};
 	
 	this.getKnobVisible = function() {
@@ -721,7 +766,12 @@ function Mediabar(element) {
 function handleSeek(newTimePosition) {
 	//console.log(newTimePosition);
 	var vlc = $('myVlc');
-	var newPosition = newTimePosition / mediabarElement.getTotalTime();
+	var newPosition = 0;
+	if (mediabarElement.isTrickplay) {
+		newPosition = newTimePosition / mediabarElement.getPrimaryTime();
+	} else {
+		newPosition = newTimePosition / mediabarElement.getTotalTime();
+	}
 	if (newPosition < 0.00001)
 		vlc.input.position = 0.00001;
 	else

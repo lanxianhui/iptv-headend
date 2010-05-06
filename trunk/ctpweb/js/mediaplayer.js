@@ -16,8 +16,19 @@ function loadProgram(program) {
 	localProgram = program;
 	document.title = program.title;
 	var totalTime = (program.end - program.begin) * 1000;
+	
 	var mediabar = mediaplayer.getMediabar();
+	mediabar.reset();
 	mediabar.setTotalTime(totalTime);
+	if (program.recording.mode == "PROCESSING") {
+		var currentDate = new Date().getTime();
+		var primaryTime = currentDate - (program.begin * 1000);
+		mediabar.setPrimaryTime(primaryTime);
+		mediabar.setTrickplay(true);
+	} else {
+		mediabar.setPrimaryTime(0);
+		mediabar.setTrickplay(false);
+	}
 	mediabar.setLive(false);
 	
 	var vlc = mediaplayer.getPlayer();
@@ -47,7 +58,11 @@ function loadChannels(channels) {
 	document.title = channels[channelPointer].name;
 	
 	var mediabar = mediaplayer.getMediabar();
+	mediabar.reset();
 	mediabar.setLive(true);
+	mediabar.setTrickplay(false);
+	mediabar.setTotalTime(0);
+	mediabar.setPrimaryTime(0);
 	/* var totalTime = (program.end - program.begin) * 1000;
 	mediabar.setTotalTime(totalTime); */
 	
