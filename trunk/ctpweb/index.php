@@ -1,3 +1,3 @@
 <?php
-	header('Location: epg.php');
+	header('Location: login.php');
 ?>

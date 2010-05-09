@@ -14,7 +14,7 @@
 <body>
 <div class="topMenu">
 	<div id="loginInfo">
-		<a class="loginName" href="#">jan.starzak</a><a class="settings" href="#">Settings</a><a class="logout" href="#">Log out</a>
+		<a class="loginName" href="#">{$currentUser->getFullName()}</a><a class="settings" href="#">Settings</a><a class="logout" href="login.php?logout">Log out</a>
 	</div>
 	<ul id="menu">
 		<li><a class="list" href="#">Channels</a></li><li class="current">Program Guide</li><li><a class="list" href="#">My List</a></li><li><a class="news" href="#">News</a></li>

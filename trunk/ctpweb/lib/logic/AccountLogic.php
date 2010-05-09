@@ -6,13 +6,27 @@ class AccountLogic {
 		
 	}
 	
+	function getLastUser() {
+		global $lastUserName;
+		if (!isset($_COOKIE["CTP_lastUser"])) {
+			return $lastUserName;
+		} else {
+			return $_COOKIE["CTP_lastUser"];
+		}
+	}
+	
+	function getCurrentUser() {
+		return $_SESSION["userObject"];
+	}
+	
 	/**
 	 * Check if the current user is authorized to use the system. As this function
 	 * will setup the session cookie, it should be called before any output is made.
 	 * @param $conn The Datasource object containing the database connection
 	 */
-	function IsAuthorised(&$conn) {
-		session_set_cookie_params(1 * 3600, '/');
+	function isAuthorised(&$conn) {
+		session_name('CTP_SID');
+		session_set_cookie_params(0, '/');
 		session_start();
 		
 		$userName = "";
@@ -22,10 +36,10 @@ class AccountLogic {
 		if (isset($_SESSION["userName"]) && isset($_SESSION["password"])) {
 			$userName = $_SESSION["userName"];
 			$passwordMD5 = $_SESSION["password"];	
-		} else if (isset($_COOKIE["userData"])) {
-			$persistentLoginData = json_decode(base64_decode($_COOKIE["userData"]));
-			$userName = $persistentLoginData["userName"];
-			$passwordMD5 = $persistentLoginData["password"];
+		} else if (isset($_COOKIE["CTP_freezeDriedUser"])) {
+			$persistentLoginData = json_decode(base64_decode($_COOKIE["CTP_freezeDriedUser"]));
+			$userName = $persistentLoginData->userName;
+			$passwordMD5 = $persistentLoginData->password;
 			$usedPersistent = true;
 		} else if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 			$userName = $_SERVER['PHP_AUTH_USER'];
@@ -41,20 +55,23 @@ class AccountLogic {
 		$userList = $userDAO->searchMatching(&$conn, $userToBeFound);
 		
 		if (count($userList) == 1) {
-			if ($usedPersistent) {
-				// TODO Make the system save a last login information if the session has been created from the persistent login cookie 
+			$selectedUser = $userList[0];
+			if ($selectedUser->getEnabled() == true) {
+				if ($usedPersistent) {
+					// TODO Make the system save a last login information if the session has been created from the persistent login cookie 
+				}
+				
+				$_SESSION["userObject"] = $userList[0];
+				$_SESSION["userName"] = $userName;
+				$_SESSION["password"] = $passwordMD5;
+				return true;
 			}
-			
-			$_SESSION["userObject"] = $userList[0];
-			$_SESSION["userName"] = $userName;
-			$_SESSION["password"] = $passwordMD5;
-			return true;
 		} else {
 			unset($_SESSION["userName"]);
 			unset($_SESSION["password"]);
 			
-			if (isset($_COOKIE["userData"])) {
-				setcookie("userData", null, 1, '/');
+			if (isset($_COOKIE["CTP_freezeDriedUser"])) {
+				setcookie("CTP_freezeDriedUser", null, 1, '/');
 			}
 			
 			return false;
@@ -69,9 +86,14 @@ class AccountLogic {
 	 * @param $userName User's username
 	 * @param $password User's password (plaintext)
 	 * @param $keepLoggedIn Should the system keep the user logged in for an indefinite amount of time.
+	 * @param $plainText If the password is provided in plain text, should be set to true, otherwise optional
 	 */
-	function LoginUser(&$conn, $userName, $password, $keepLoggedIn) {
-		$passwordMD5 = md5($password);
+	function loginUser(&$conn, $userName, $password, $keepLoggedIn, $plainText = false) {
+		if ($plainText) {
+			$passwordMD5 = md5($password);
+		} else {
+			$passwordMD5 = $password;
+		}
 		$userDAO = new UserDao();
 		$userToBeFound = new User();
 		$userToBeFound->setUserName($userName);
@@ -88,7 +110,7 @@ class AccountLogic {
 			if ($keepLoggedIn) {
 				$persistentLoginData["userName"] = $userName;
 				$persistentLoginData["password"] = $passwordMD5;
-				setcookie("userData", base64_encode(json_encode($persistentLoginData)), time()+60*60*24*365, '/');
+				setcookie("CTP_freezeDriedUser", base64_encode(json_encode($persistentLoginData)), time()+60*60*24*365, '/');
 			}
 			
 			return true;
@@ -104,13 +126,18 @@ class AccountLogic {
 	 * is made.
 	 * @param $conn The Datasource object containing the database connection
 	 */
-	function LogoutUser() {
-			$_SESSION = array();
-			session_destroy();
-			
-			if (isset($_COOKIE["userData"])) {
-				setcookie("userData", null, 1, '/');
-			}
+	function logoutUser() {
+		global $lastUserName;
+		$currentUser = AccountLogic::GetCurrentUser();
+		setcookie("CTP_lastUser", $currentUser->getUserName(), 1 * 3600, '/');
+		$lastUserName = $currentUser->getUserName();
+		
+		$_SESSION = array();
+		session_destroy();
+		
+		if (isset($_COOKIE["CTP_freezeDriedUser"])) {
+			setcookie("CTP_freezeDriedUser", "", 0, '/');
+		}
 	}
 	
 }
