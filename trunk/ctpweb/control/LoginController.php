@@ -10,7 +10,7 @@ class LoginController {
 		die();
 	}
 	
-	function LoginController($config) {
+	public function LoginController($config) {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
 		
 		if (AccountLogic::isAuthorised(&$conn)) {

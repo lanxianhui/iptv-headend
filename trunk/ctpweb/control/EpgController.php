@@ -8,7 +8,7 @@ class EpgController {
 	
 	var $channels;
 	
-	function EpgController($config) {
+	public function EpgController($config) {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
 	
 		if (AccountLogic::isAuthorised(&$conn)) {

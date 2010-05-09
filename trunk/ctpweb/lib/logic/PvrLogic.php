@@ -2,7 +2,7 @@
 
 class PvrLogic {
 	
-	function PvrLogic() {
+	public function PvrLogic() {
 		
 	}
 	
@@ -13,7 +13,7 @@ class PvrLogic {
 	 * @param User $user The User, whose recordings list is to be modified
 	 * @return True if the recording was successfully added, false if it failed
 	 */
-	function recordProgram(&$conn, &$program, &$user) {
+	public function recordProgram(&$conn, &$program, &$user) {
 		$recordingDAO = new RecordingDao();
 		$recording = $recordingDAO->getObject(&$conn, null, $program->getId());
 		if (!$recording->getId()) {
@@ -41,7 +41,7 @@ class PvrLogic {
 	 * @param $user The User, whose recordings list is to be modified
 	 * @return True if it succeded in deleting the recording, false otherwise
 	 */
-	function deleteRecording(&$conn, &$recording, &$user) {
+	public function deleteRecording(&$conn, &$recording, &$user) {
 		$deleteUserRecording = new UserRecording();
 		$deleteUserRecording->setAll($recording->getId(), $user->getId());
 		$userRecordingDAO = new UserRecordingDao();
@@ -53,7 +53,7 @@ class PvrLogic {
 	 * @param unknown_type $conn The Datasource object containing the database connection
 	 * @param unknown_type $user The User, for which to list the recording objects. If null, all recordings set up in the system will be returned.
 	 */
-	function listRecordings(&$conn, &$user = null) {
+	public function listRecordings(&$conn, &$user = null) {
 		if ($user === null) {
 			$recordingDao = new RecordingDao();
 			return $recordingDao->loadAll(&$conn);
