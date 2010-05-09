@@ -386,7 +386,7 @@ class UserDao {
                    $valueObject->setPassword($row[2]); 
                    $valueObject->setAuthToken($row[3]); 
                    $valueObject->setQuota($row[4]); 
-                   $valueObject->setEnabled($row[5]); 
+                   $valueObject->setEnabled($row[5] == "TRUE" ? TRUE : FALSE); 
                    $valueObject->setFullName($row[6]); 
                    $valueObject->setCreatedOn($row[7]); 
                    $valueObject->setLastLogin($row[8]); 
@@ -419,7 +419,7 @@ class UserDao {
                $temp->setPassword($row[2]); 
                $temp->setAuthToken($row[3]); 
                $temp->setQuota($row[4]); 
-               $temp->setEnabled($row[5]); 
+               $temp->setEnabled($row[5] == "TRUE" ? TRUE : FALSE); 
                $temp->setFullName($row[6]); 
                $temp->setCreatedOn($row[7]); 
                $temp->setLastLogin($row[8]); 

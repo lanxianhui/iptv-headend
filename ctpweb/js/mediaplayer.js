@@ -258,6 +258,21 @@ function bootscripts() {
 			fullScreen();
 		}
 	});
+	// Support for mouse wheel sound changing
+	window.addEvent('mousewheel', function(event) {
+		var rolled;
+		if (event.wheelDelta === undefined) {   // Firefox
+			rolled = -40 * event.detail;
+	    }
+	    else {
+	        rolled = event.wheelDelta;
+	    }
+		if (rolled < 0) {
+			soundMinus();
+		} else if (rolled > 0) {
+			soundPlus();
+		}
+	});
 	
 	hasUrlChanged();
 	loadSettings();

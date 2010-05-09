@@ -65,20 +65,6 @@ function recalculateTimefall() {
 	});
 }
 
-function createImageButton(element, classList, image, caption){
-	var newButton = createButton(element, classList, "<img src=\"" + image + "\" alt=\"" + caption + "\"/>");
-	return newButton;
-}
-
-function createButton(element, classList, caption){
-	var newButton = new Element('button', {
-		'class': 'btn ' + classList,
-		'html': '<span><span>' + caption + '</span></span>'
-	});
-	element.adopt(newButton);
-	return newButton;
-}
-
 function addProgram(schedule, program, channel){
 	var newProgram = new Element('div', {
 		'class': 'program'

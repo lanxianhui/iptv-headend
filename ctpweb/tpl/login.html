@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Login</title>
+<link rel="stylesheet" href="css/main.css" type="text/css"/>
+<script src="js/mootools-1.2.4-core-yc.js" type="text/javascript"></script>
+<script src="js/common.js" type="text/javascript"></script>
+</head>
+<body class="single">
+<div class="topLogo">
+	<img src="img/ctp-logo-standard.png" width="90" height="47" alt="CTP"/>
+</div>
+<div class="content">
+	<h1>Revolutionize your television</h1>
+	<p>Liberate yoursef from dictatorship of TV schedules and prime-time tyranny!</p>
+	<p>Discover a new way of experiencing television. Enjoy television wherever you are: during a break at the cafe, in the dorm - you choose.</p>
+</div>
+<div class="twoBoxContainer">
+	<div class="boxLeft">
+		<div class="registerBox">
+			<h2>Don't have an account yet?</h2>
+			<p>This system is currently in closed testing, and you have to be <strong>invited</strong> to participate. If you do have an invitation code, you may register using your student ID.</p>
+			<p class="center">Go now to <a href="" class="registerAction">registration</a>.</p>
+		</div>
+	</div>
+	<div class="boxRight">
+		<div class="loginBox">
+			<h2>Log in</h2>
+			<form method="POST" action="{$formAction}">
+				<div class="row"><label for="userName">User ID:</label><input type="text" name="userName" id="userName" value="{$userName}" class="text" /></div>
+				<div class="row"><label for="password">Password:</label><input type="password" name="password" id="password" value="" class="text" /></div>
+				<div class="row alt"><input type="checkbox" name="remember" id="remember" value="true" {if $remember}checked="checked"{/if}/><label for="remember">Keep me logged in</label></div>
+				{if $error}
+					<div class="row error">User ID or password you entered is incorrect.</div>
+				{/if}
+				<div class="row"><button type="submit">Log in</button></div>
+			</form>
+		</div>
+	</div>
+	<div class="clear"></div>
+</div>
+</body>
+</html>
