@@ -2,7 +2,7 @@
 
 class EpgLogic {
 	
-	function EpgLogic() {
+	public function EpgLogic() {
 		
 	}
 	
@@ -11,7 +11,7 @@ class EpgLogic {
 	 * @param $conn The Datasource connection to be used
 	 * @return An array of all the channels in the system
 	 */
-	function getChannels(&$conn, $start = null, $number = null) {
+	public function getChannels(&$conn, $start = null, $number = null) {
 		$channelDAO = new TvChannelDAO();
 		if (($start === null) && ($number === null))
 			return $channelDAO->loadAll(&$conn);
@@ -24,7 +24,7 @@ class EpgLogic {
 	 * @param $conn The Datasource connection to be used
 	 * @return A number of all the channels
 	 */
-	function getNumberOfChannels(&$conn) {
+	public function getNumberOfChannels(&$conn) {
 		$channelDAO = new TvChannelDAO();
 		return $channelDAO->countAll(&$conn);
 	}
@@ -36,22 +36,22 @@ class EpgLogic {
 	 * @param $date The date in Unix timestamp format
 	 * @return An array of Program
 	 */
-	function getPrograms(&$conn, &$channel, $date) {
+	public function getPrograms(&$conn, &$channel, $date) {
 		$programDAO = new ProgramDAO();
 		return $programDAO->loadDay(&$conn, &$channel, $date);
 	}
 	
-	function getProgramsWithRecordings(&$conn, &$channel, $date) {
+	public function getProgramsWithRecordings(&$conn, &$channel, $date) {
 		$programRecordingDAO = new ProgramDAO();
 		return $programRecordingDAO->loadDayWithRecordings(&$conn, &$channel, $date);
 	}
 	
-	function getProgramById(&$conn, $id) {
+	public function getProgramById(&$conn, $id) {
 		$programDAO = new ProgramDAO();
 		return $programDAO->getObject($id);
 	}
 	
-	function getProgramRecordingByProgramId(&$conn, $id) {
+	public function getProgramRecordingByProgramId(&$conn, $id) {
 		$programRecordingDAO = new ProgramDAO();
 		return $programRecordingDAO->getObjectWithRecording(&$conn, $id);
 	}

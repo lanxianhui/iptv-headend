@@ -2,20 +2,21 @@
 
 class AccountLogic {
 	
-	function AccountLogic() {
+	public function AccountLogic() {
 		
 	}
 	
-	function getLastUser() {
-		global $lastUserName;
+	private static $lastUserName;
+	
+	public function getLastUser() {
 		if (!isset($_COOKIE["CTP_lastUser"])) {
-			return $lastUserName;
+			return self::$lastUserName;
 		} else {
 			return $_COOKIE["CTP_lastUser"];
 		}
 	}
 	
-	function getCurrentUser() {
+	public function getCurrentUser() {
 		return $_SESSION["userObject"];
 	}
 	
@@ -24,7 +25,7 @@ class AccountLogic {
 	 * will setup the session cookie, it should be called before any output is made.
 	 * @param $conn The Datasource object containing the database connection
 	 */
-	function isAuthorised(&$conn) {
+	public function isAuthorised(&$conn) {
 		session_name('CTP_SID');
 		session_set_cookie_params(0, '/');
 		session_start();
@@ -126,9 +127,8 @@ class AccountLogic {
 	 * is made.
 	 * @param $conn The Datasource object containing the database connection
 	 */
-	function logoutUser() {
-		global $lastUserName;
-		$currentUser = AccountLogic::GetCurrentUser();
+	public function logoutUser() {
+		self::$currentUser = AccountLogic::GetCurrentUser();
 		$lastUserName = $currentUser->getUserName();
 		// We store the last user name for 6 hours. If the user doesn't
 		// return by then, the login will be blank - useful for internet cafes

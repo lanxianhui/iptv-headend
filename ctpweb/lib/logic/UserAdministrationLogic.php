@@ -1,23 +1,23 @@
 <?php
 class UserAdministrationLogic {
 	
-	function UserLogic() {
+	public function UserLogic() {
 		
 	}
 	
-	function CreateNewUser(&$conn, $userName, $password, $enabled) {
+	public function CreateNewUser(&$conn, $userName, $password, $enabled) {
 		
 	}
 	
-	function EditUser(&$conn, &$user) {
+	public function EditUser(&$conn, &$user) {
 		
 	}
 	
-	function DeleteUser(&$conn, &$user) {
+	public function DeleteUser(&$conn, &$user) {
 		
 	}
 	
-	function ListUsers(&$conn) {
+	public function ListUsers(&$conn) {
 		
 	} 
 	
