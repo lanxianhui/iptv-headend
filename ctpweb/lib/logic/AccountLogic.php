@@ -71,7 +71,7 @@ class AccountLogic {
 			unset($_SESSION["password"]);
 			
 			if (isset($_COOKIE["CTP_freezeDriedUser"])) {
-				setcookie("CTP_freezeDriedUser", null, 1, '/');
+				setcookie("CTP_freezeDriedUser", "", 0, '/');
 			}
 			
 			return false;
@@ -129,8 +129,10 @@ class AccountLogic {
 	function logoutUser() {
 		global $lastUserName;
 		$currentUser = AccountLogic::GetCurrentUser();
-		setcookie("CTP_lastUser", $currentUser->getUserName(), 1 * 3600, '/');
 		$lastUserName = $currentUser->getUserName();
+		// We store the last user name for 6 hours. If the user doesn't
+		// return by then, the login will be blank - useful for internet cafes
+		setcookie("CTP_lastUser", $lastUserName, time() + (6 * 3600), '/');
 		
 		$_SESSION = array();
 		session_destroy();
