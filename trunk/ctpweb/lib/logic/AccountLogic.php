@@ -128,11 +128,11 @@ class AccountLogic {
 	 * @param $conn The Datasource object containing the database connection
 	 */
 	public function logoutUser() {
-		self::$currentUser = AccountLogic::GetCurrentUser();
-		$lastUserName = $currentUser->getUserName();
+		$currentUser = AccountLogic::GetCurrentUser();
+		self::$lastUserName = $currentUser->getUserName();
 		// We store the last user name for 6 hours. If the user doesn't
 		// return by then, the login will be blank - useful for internet cafes
-		setcookie("CTP_lastUser", $lastUserName, time() + (6 * 3600), '/');
+		setcookie("CTP_lastUser", self::$lastUserName, time() + (6 * 3600), '/');
 		
 		$_SESSION = array();
 		session_destroy();
