@@ -8,6 +8,7 @@ body, h1, h2, h3, h4, h5, h6, p, ul {
 }
 
 body {
+	background-color: #fff;
     font: 0.72em Arial, Helvetica, sans-serif;
     color: #000;
 }
