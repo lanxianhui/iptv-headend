@@ -15,24 +15,31 @@ import pl.lodz.p.cm.ctp.dao.model.*;
 
 public final class ProgramRecordingDAO {
 	
-	private static final String SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN =
+	private static final String SQL_LIST_BY_TVCHANNELID_YOUNGER_BY_BEGIN =
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
         "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? ORDER BY Program.begin ASC";
 	
-	private static final String SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN =
+	private static final String SQL_LIST_BY_TVCHANNELID_YOUNGER_THAN_NOW_BY_BEGIN =
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
         "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
-        "AND Program.end > NOW() AND Recording.mode = 'WAITING'" +
+        "AND Program.end > NOW() AND Recording.mode = 'WAITING' " +
         "ORDER BY Program.begin ASC LIMIT ?";
 	
-	private static final String SQL_LIST_BY_TVCHANNELID_OLDER_THAN_DATE_BY_BEGIN =
+	private static final String SQL_LIST_BY_TVCHANNELID_YOUNGER_THAN_DATE_BY_BEGIN =
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
         "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
-        "AND Program.end > ? AND Recording.mode = 'WAITING'" +
+        "AND Program.end > ? AND Recording.mode = 'WAITING' " +
         "ORDER BY Program.begin ASC LIMIT ?";
+	
+	private static final String SQL_LIST_BY_TVCHANNELID_OLDER_THAN_HOURS =
+        "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
+        "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
+        "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
+        "AND TIMESTAMPDIFF(HOUR, Program.end, NOW()) > ? AND Recording.mode = 'WAITING' " +
+        "ORDER BY Program.begin ASC";
 	
 	private DAOFactory daoFactory;
 
@@ -40,16 +47,20 @@ public final class ProgramRecordingDAO {
 		this.daoFactory = daoFactory;
 	}
 	
-	public List<ProgramRecording> listOlderThanNow(long tvChannelId, int limit) throws DAOException {
-		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN, tvChannelId, limit);
+	public List<ProgramRecording> listYoungerThanNow(long tvChannelId, int limit) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_YOUNGER_THAN_NOW_BY_BEGIN, tvChannelId, limit);
 	}
 	
-	public List<ProgramRecording> listOlderThanDate(long tvChannelId, Timestamp date, int limit) throws DAOException {
-		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_DATE_BY_BEGIN, tvChannelId, date, limit);
+	public List<ProgramRecording> listYoungerThanDate(long tvChannelId, Timestamp date, int limit) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_YOUNGER_THAN_DATE_BY_BEGIN, tvChannelId, date, limit);
+	}
+	
+	public List<ProgramRecording> listOlderThanHours(long tvChannelId, int hours) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_HOURS, tvChannelId, hours);
 	}
 	
 	public List<ProgramRecording> list(long tvChannelId) throws DAOException {
-		return list(SQL_LIST_BY_TVCHANNELID_ORDER_BY_BEGIN, tvChannelId);
+		return list(SQL_LIST_BY_TVCHANNELID_YOUNGER_BY_BEGIN, tvChannelId);
 	}
 	
 	public List<ProgramRecording> list(String sql, Object... values) throws DAOException {
