@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,14 @@ public final class ProgramRecordingDAO {
         "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
         "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
         "AND Program.end > NOW() AND Recording.mode = 'WAITING'" +
-        "ORDER BY Program.begin ASC";
+        "ORDER BY Program.begin ASC LIMIT ?";
+	
+	private static final String SQL_LIST_BY_TVCHANNELID_OLDER_THAN_DATE_BY_BEGIN =
+        "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
+        "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
+        "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
+        "AND Program.end > ? AND Recording.mode = 'WAITING'" +
+        "ORDER BY Program.begin ASC LIMIT ?";
 	
 	private DAOFactory daoFactory;
 
@@ -32,8 +40,12 @@ public final class ProgramRecordingDAO {
 		this.daoFactory = daoFactory;
 	}
 	
-	public List<ProgramRecording> listOlderThanNow(long tvChannelId) throws DAOException {
-		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN, tvChannelId);
+	public List<ProgramRecording> listOlderThanNow(long tvChannelId, int limit) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_NOW_BY_BEGIN, tvChannelId, limit);
+	}
+	
+	public List<ProgramRecording> listOlderThanDate(long tvChannelId, Timestamp date, int limit) throws DAOException {
+		return list(SQL_LIST_BY_TVCHANNELID_OLDER_THAN_DATE_BY_BEGIN, tvChannelId, date, limit);
 	}
 	
 	public List<ProgramRecording> list(long tvChannelId) throws DAOException {
