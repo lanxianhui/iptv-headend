@@ -78,7 +78,7 @@ public class ScheduleUpdater implements Runnable {
         int channelPreRollMillis = parentChannel.getTvChannel().getPreRoll() * 1000;
         int channelPostRollMillis = parentChannel.getTvChannel().getPostRoll() * 1000;
         // The window of opportunity is 2 seconds
-        int waitTimeMillis = 2 * 1000;
+        int waitTimeMillis = Npvrd.config.prepTime * 1000;
 		
         // We run this thread while our parent's RunMode is set tu Run
 		while (parentChannel.getRunMode().equals(ChannelListener.RunMode.RUN)) {
@@ -89,7 +89,7 @@ public class ScheduleUpdater implements Runnable {
 			// First we check if there are new sinks to be added
 	        try {
 	        	// Get 5 top ProgramRecordings which end is after now
-				List<ProgramRecording> topProgramSchedule = programDvrScheduleDAO.listOlderThanDate(parentChannel.getTvChannel().getId(), lastAdded, 5);
+				List<ProgramRecording> topProgramSchedule = programDvrScheduleDAO.listYoungerThanDate(parentChannel.getTvChannel().getId(), lastAdded, 5);
 				List<Sink> tempSinks = new LinkedList<Sink>();
 				
 				// If any where found
@@ -98,7 +98,7 @@ public class ScheduleUpdater implements Runnable {
 					for (ProgramRecording cpr : topProgramSchedule) {
 						// We check if given PR is about to begin, if it is, we set smthUseful flag to true
 						long beginMillis = cpr.program.getBegin().getTime() - channelPreRollMillis;
-						if (beginMillis >= System.currentTimeMillis() - waitTimeMillis) {
+						if (beginMillis - waitTimeMillis < System.currentTimeMillis()) {
 							long endMillis = cpr.program.getEnd().getTime() + channelPostRollMillis;
 							String fileName = generateFileName(cpr);
 							lastAdded = cpr.program.getEnd();

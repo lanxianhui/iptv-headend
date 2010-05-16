@@ -9,7 +9,9 @@ public class Configuration implements Serializable {
 	
 	public DatabaseConfiguration database;
 	public String recordings;
-	public Long schedUpdaterInterval;
+	public Integer prepTime;
+	public Integer cleanerResolution;
+	public Integer cleanerTolerance;
 	public VlmConfig vlm;
 
 }
