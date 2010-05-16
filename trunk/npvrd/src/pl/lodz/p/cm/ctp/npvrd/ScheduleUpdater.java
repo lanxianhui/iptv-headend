@@ -35,9 +35,8 @@ public class ScheduleUpdater implements Runnable {
 	}
 
 	/**
-	 * Generates a unique file name for a program. Uses a MD5 digest on begining and
-	 * end times of the task and the task name.
-	 * @param task Task to generate the name for.
+	 * Generates a unique file name for a program. The result is an MD5 digest.
+	 * @param pr ProgramRecording object describing the recording to be made
 	 * @return A unique file name.
 	 */
 	private static String generateFileName(ProgramRecording pr) {
@@ -45,7 +44,13 @@ public class ScheduleUpdater implements Runnable {
 		return DAOUtil.hashMD5(plaintext) + ".ts";
 	}
 	
-	private static ProgramRecordingSink findPRSInListBySink(LinkedList<ProgramRecordingSink> prsList, Sink sink) {
+	/**
+	 * Find a given sink in a haystack of ProgramRecordingSink list
+	 * @param prsList The haystack to search through
+	 * @param sink The sink to be found
+	 * @return The sink found, or null if not found
+	 */
+	private static ProgramRecordingSink findPRSInListBySink(List<ProgramRecordingSink> prsList, Sink sink) {
 		ProgramRecordingSink foundPrs = null;
 		for (ProgramRecordingSink tempPrs : prsList) {
 			if (tempPrs.sink.equals(sink)) {
@@ -192,7 +197,26 @@ public class ScheduleUpdater implements Runnable {
 				// We sleep as long as it should take to the next update
 				Thread.sleep(nextRefreshAt - System.currentTimeMillis());
 			} catch (InterruptedException e) {
-				
+				// We've been interrupted - perhaps as a result of a changing RunMode
+				// Anyway, it's worth rechecking everything.
+			}
+		}
+		
+		// If any Sinks are outstanding, we should do something about them
+		for (ProgramRecordingSink cprs : prsStore) {
+			// If the sink is still Active or in Error we should mark the recording as Unavailable
+			if (cprs.sink.isActive() | cprs.sink.isError()) {
+				cprs.recording.setMode(Mode.UNAVAILABLE);
+			} else {
+				cprs.recording.setMode(Mode.AVAILABLE);
+			}
+			// Close the sink
+			cprs.sink.close();
+			try {
+				// Save the new mode to database
+				recordingDAO.save(cprs.recording);
+			} catch (DAOException e) {
+				Npvrd.error("Unable to set new mode for recording: " + e.getMessage());
 			}
 		}
 		

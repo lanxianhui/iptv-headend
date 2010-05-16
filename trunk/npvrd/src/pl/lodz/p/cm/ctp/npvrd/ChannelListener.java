@@ -69,6 +69,7 @@ public class ChannelListener implements Runnable {
 		// We initialize by creating a local ScheduleUpdater
 		ScheduleUpdater scheduleUpdaterObject = new ScheduleUpdater(this, Thread.currentThread());
 		this.scheduleUpdater = new Thread(scheduleUpdaterObject);
+		this.scheduleUpdater.start();
 		
 		try {
 			byte[] pb = new byte[sock.getReceiveBufferSize()];
