@@ -111,6 +111,7 @@ public class ChannelListener implements Runnable {
 			Npvrd.error("Error creating packet data buffer: " + e1.getMessage());
 		}
 		
+		Npvrd.log("Shuting down ChannelListener");
 		// runMode has to be STOP, we shut down operations
 		scheduleUpdater.interrupt();
 		try {

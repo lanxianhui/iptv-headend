@@ -14,9 +14,11 @@ public class ScheduleUpdater implements Runnable {
 	
 	private class ProgramRecordingSink {
 		public Recording recording;
+		@SuppressWarnings("unused")
 		public Program program;
 		public Sink sink;
 		
+		@SuppressWarnings("unused")
 		ProgramRecordingSink(Program program, Recording recording, Sink sink) {
 			this.program = program;
 			this.recording = recording;
@@ -71,7 +73,9 @@ public class ScheduleUpdater implements Runnable {
 		// Last added - useful to know what was last added to the ChannelListener Sink pool
 		Timestamp lastAdded = new Timestamp(System.currentTimeMillis());
 		
-		Npvrd.log(parentChannel.getTvChannel().getIpAdress() + "/SU: Creating a VLM manager.");
+		String logPrefix = parentChannel.getTvChannel().getIpAdress() + "/SU: ";
+		
+		Npvrd.log(logPrefix + "Creating a VLM manager.");
         VlmManager vlm = new VlmManager(Npvrd.config.vlm);
         String path = Npvrd.config.recordings;
         // Pre- and Post-roll in the database is given in seconds, convert to millis
@@ -82,9 +86,11 @@ public class ScheduleUpdater implements Runnable {
 		
         // We run this thread while our parent's RunMode is set tu Run
 		while (parentChannel.getRunMode().equals(ChannelListener.RunMode.RUN)) {
-			long nextRefreshAt = Long.MAX_VALUE;
+			long nextRefreshAt = System.currentTimeMillis() + 10 * 60 * 1000;
 			// We keep a now Timestamp as it's handy for comparisons
-			Timestamp now = new Timestamp(System.currentTimeMillis());
+			// Timestamp now = new Timestamp(System.currentTimeMillis());
+			
+			Npvrd.log(logPrefix + "Next loop.");
 	        
 			// First we check if there are new sinks to be added
 	        try {
@@ -97,6 +103,7 @@ public class ScheduleUpdater implements Runnable {
 					// Flag indicating we've found a recording scheduled, that's about to start
 					for (ProgramRecording cpr : topProgramSchedule) {
 						// We check if given PR is about to begin, if it is, we set smthUseful flag to true
+						// Npvrd.log("Program: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
 						long beginMillis = cpr.program.getBegin().getTime() - channelPreRollMillis;
 						if (beginMillis - waitTimeMillis < System.currentTimeMillis()) {
 							long endMillis = cpr.program.getEnd().getTime() + channelPostRollMillis;
@@ -107,6 +114,7 @@ public class ScheduleUpdater implements Runnable {
 								// We create and add a new sink to the temporary sink list
 								Sink tempSink = new FileSink(new BufferedOutputStream(new FileOutputStream(path + fileName)), beginMillis, endMillis);
 								tempSinks.add(tempSink);
+								Npvrd.log(logPrefix + "New sink: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
 								// We set the status of a given recording to Processing and we set the fileName
 								cpr.recording.setMode(Mode.PROCESSING);
 								cpr.recording.setFileName(fileName);
@@ -116,11 +124,12 @@ public class ScheduleUpdater implements Runnable {
 								prsStore.add(new ProgramRecordingSink(cpr, tempSink));
 								// Generally programs happen one after another, so it stands to reason to expect we should refresh around that time
 								if (nextRefreshAt > endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis) {
-									nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis;
+									nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis + 500;
+									Npvrd.log(logPrefix + (new Timestamp(nextRefreshAt)));
 								}
 							} catch (FileNotFoundException e) {
 								// We cannot add this sink
-								Npvrd.error("FileNotFoundException: " + e.getMessage());
+								Npvrd.error(logPrefix + "FileNotFoundException: " + e.getMessage());
 							}
 						}
 					}
@@ -133,10 +142,12 @@ public class ScheduleUpdater implements Runnable {
 						parentChannel.getSinks().addAll(tempSinks);
 						
 						parentChannel.getSinksLock().unlock();
+						
+						Npvrd.log(logPrefix + "Addeed new sinks");
 					}
 				}
 			} catch (DAOException e) {
-				Npvrd.error(parentChannel.getTvChannel().getIpAdress() + "/SU: Database error: " + e.getMessage());
+				Npvrd.error(logPrefix + "Database error: " + e.getMessage());
 			}
 			
 			// Now we clean timeouted sinks from the sink pool
@@ -144,15 +155,6 @@ public class ScheduleUpdater implements Runnable {
 			for (Sink cs : parentChannel.getSinks()) {
 				if (!cs.isActive()) {
 					tempSinks.add(cs);
-				} else {
-					try {
-						FileSink tfs = FileSink.class.cast(cs);
-						if (nextRefreshAt > tfs.getEnd() - channelPostRollMillis - waitTimeMillis - channelPreRollMillis) {
-							nextRefreshAt = tfs.getEnd() - channelPostRollMillis - waitTimeMillis - channelPreRollMillis;
-						}
-					} catch (ClassCastException cce) {
-						
-					}
 				}
 			}
 			
@@ -173,18 +175,20 @@ public class ScheduleUpdater implements Runnable {
 					
 					// If the sink was found in the store (it should - there is no way it's gone!)
 					if (cprs != null) {
+						Npvrd.log(logPrefix + "Finished sink: " + cprs.program.getTitle() + " at " + cprs.program.getBegin().toGMTString());
 						// If an error occured to the sink, we set it as unavailable
 						if (cs.isError()) {
 							cprs.recording.setMode(Mode.UNAVAILABLE);	
 						} else {
 							cprs.recording.setMode(Mode.AVAILABLE);
+							vlm.createNewVod(cprs.recording.getFileName(), Npvrd.config.recordings + cprs.recording.getFileName());
 						}
 						
 						try {
 							// We save the modified mode to the database
 							recordingDAO.save(cprs.recording);
 						} catch (DAOException e) {
-							Npvrd.error("Unable to set new mode for recording: " + e.getMessage());
+							Npvrd.error(logPrefix + "Unable to set new mode for recording: " + e.getMessage());
 						}
 						
 						// We remove the PRS from the store
@@ -195,10 +199,14 @@ public class ScheduleUpdater implements Runnable {
 
 			try {
 				// We sleep as long as it should take to the next update
+				Npvrd.log(logPrefix + "Next loop in " + ((nextRefreshAt - System.currentTimeMillis()) / 1000) + " seconds");
 				Thread.sleep(nextRefreshAt - System.currentTimeMillis());
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ie) {
 				// We've been interrupted - perhaps as a result of a changing RunMode
 				// Anyway, it's worth rechecking everything.
+			} catch (IllegalArgumentException iae) {
+				Npvrd.log(logPrefix + "Strange timeout value: " + (nextRefreshAt - System.currentTimeMillis()));
+				//System.exit(1);
 			}
 		}
 		
@@ -216,11 +224,11 @@ public class ScheduleUpdater implements Runnable {
 				// Save the new mode to database
 				recordingDAO.save(cprs.recording);
 			} catch (DAOException e) {
-				Npvrd.error("Unable to set new mode for recording: " + e.getMessage());
+				Npvrd.error(logPrefix + "Unable to set new mode for recording: " + e.getMessage());
 			}
 		}
 		
-		Npvrd.log(parentChannel.getTvChannel().getIpAdress() + "/SU: shutting down.");
+		Npvrd.log(logPrefix + "Shutting down.");
 	}
 
 }
