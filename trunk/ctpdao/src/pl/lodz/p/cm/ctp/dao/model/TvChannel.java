@@ -9,6 +9,8 @@ public class TvChannel {
 	private String unicastUrl;
 	private Integer lcn;
 	private String icon;
+	private Integer preRoll;
+	private Integer postRoll;
 	private Boolean enabled;
 	
 	public TvChannel() {
@@ -20,6 +22,8 @@ public class TvChannel {
 		this.name = name;
 		this.ipAdress = ipAdress;
 		this.port = port;
+		this.preRoll = 0;
+		this.postRoll = 0;
 	}
 	
 	public TvChannel(Long id, String name, String ipAdress, Integer port, String icon) {
@@ -36,6 +40,12 @@ public class TvChannel {
 	public TvChannel(Long id, String name, String ipAdress, Integer port, String unicastUrl, Integer lcn, String icon, Boolean enabled) {
 		this(id, name, ipAdress, port, lcn, icon, enabled);
 		this.unicastUrl = unicastUrl;
+	}
+	
+	public TvChannel(Long id, String name, String ipAdress, Integer port, String unicastUrl, Integer lcn, String icon, Integer preRoll, Integer postRoll, Boolean enabled) {
+		this(id, name, ipAdress, port, unicastUrl, lcn, icon, enabled);
+		this.preRoll = preRoll;
+		this.postRoll = postRoll;
 	}
 
 	public Long getId() {
@@ -102,6 +112,22 @@ public class TvChannel {
 		this.icon = icon;
 	}
 	
+	public Integer getPreRoll() {
+		return preRoll;
+	}
+
+	public void setPreRoll(Integer preRoll) {
+		this.preRoll = preRoll;
+	}
+
+	public Integer getPostRoll() {
+		return postRoll;
+	}
+
+	public void setPostRoll(Integer postRoll) {
+		this.postRoll = postRoll;
+	}
+
 	public boolean equals(Object other) {
 		return (other instanceof TvChannel) && (id != null) ? id.equals(((TvChannel) other).id) : (other == this);
 	}
