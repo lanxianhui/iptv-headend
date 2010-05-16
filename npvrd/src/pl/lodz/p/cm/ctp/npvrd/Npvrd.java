@@ -23,6 +23,8 @@ public class Npvrd {
 	
 	static Configuration config;
 	static ArrayList<ChannelListenerThread> channelListeners;
+	static Thread cleanerThread;
+	static Cleaner cleaner;
 	
 	public static boolean isAnyRecorderAlive() {
 		for(ChannelListenerThread threadListener : channelListeners) {
@@ -88,6 +90,10 @@ public class Npvrd {
 			System.exit(1);
 		}
 		
+		cleaner = new Cleaner();
+		cleanerThread = new Thread(cleaner);
+		cleanerThread.start();
+		
 		// Setup the shutdown hook
 		
 		Thread runtimeHookThread = new Thread() {
@@ -112,6 +118,8 @@ public class Npvrd {
 		log("Shutting down at user request.");
 		setRunModesRecorders(ChannelListener.RunMode.STOP);
 		wakeUpAllRecorders();
+		cleaner.setRunMode(Cleaner.RunMode.STOP);
+		cleanerThread.interrupt();
 	}
 	
 	static void error(String msg) {
