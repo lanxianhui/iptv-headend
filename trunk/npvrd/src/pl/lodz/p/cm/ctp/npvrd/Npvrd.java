@@ -11,40 +11,36 @@ import com.thoughtworks.xstream.*;
 
 public class Npvrd {
 	
-	static class ChannelRecorderThread {
+	static class ChannelListenerThread {
 		public Thread thread;
-		public ChannelRecorder channelRecorder;
+		public ChannelListener channelListener;
 		
-		public ChannelRecorderThread(Thread thread, ChannelRecorder channelRecorder) {
+		public ChannelListenerThread(Thread thread, ChannelListener channelListener) {
 			this.thread = thread;
-			this.channelRecorder = channelRecorder;
+			this.channelListener = channelListener;
 		}
 	}
 	
 	static Configuration config;
-	static ArrayList<ChannelRecorderThread> channelRecorders;
-	
-	public Npvrd() {
-		channelRecorders = new ArrayList<ChannelRecorderThread>();
-	}
+	static ArrayList<ChannelListenerThread> channelListeners;
 	
 	public static boolean isAnyRecorderAlive() {
-		for(ChannelRecorderThread threadRecorder : channelRecorders) {
-			if (threadRecorder.thread.isAlive())
+		for(ChannelListenerThread threadListener : channelListeners) {
+			if (threadListener.thread.isAlive())
 				return true;
 		}
 		return false;
 	}
 	
 	public static void wakeUpAllRecorders() {
-		for (ChannelRecorderThread threadRecorder : channelRecorders) {
-			threadRecorder.thread.interrupt();
+		for (ChannelListenerThread threadListener : channelListeners) {
+			threadListener.thread.interrupt();
 		}
 	}
 	
-	public static void setRunModesRecorders(ChannelRecorder.RunMode newMode) {
-		for (ChannelRecorderThread threadRecorder : channelRecorders) {
-			threadRecorder.channelRecorder.setRunMode(newMode);
+	public static void setRunModesRecorders(ChannelListener.RunMode newMode) {
+		for (ChannelListenerThread threadListener : channelListeners) {
+			threadListener.channelListener.setRunMode(newMode);
 		}
 	}
 
@@ -53,7 +49,7 @@ public class Npvrd {
 	 */
 	public static void main(String[] args) {
 		String configFile = "config.xml";
-		channelRecorders = new ArrayList<ChannelRecorderThread>();
+		channelListeners = new ArrayList<ChannelListenerThread>();
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-c")) {
@@ -78,12 +74,12 @@ public class Npvrd {
         
         try {
 			List<TvChannel> tvChannelList = tvChannelDAO.list();
-			log("Got " + tvChannelList.size() + " TV channels. Creating recorders for channels.");
+			log("Got " + tvChannelList.size() + " TV channels. Creating listeners for channels.");
 			
 			for (TvChannel tvChannel : tvChannelList) {
-				ChannelRecorder NewChannel = new ChannelRecorder(tvChannel.getId(), tvChannel.getIpAdress(), tvChannel.getPort());
+				ChannelListener NewChannel = new ChannelListener(tvChannel);
 				Thread RecordingThread = new Thread(NewChannel);
-				channelRecorders.add(new ChannelRecorderThread(RecordingThread, NewChannel));
+				channelListeners.add(new ChannelListenerThread(RecordingThread, NewChannel));
 				RecordingThread.start();
 			}
 		} catch (DAOException e1) {
@@ -114,7 +110,7 @@ public class Npvrd {
 	
 	public static void shutdownHook() {
 		log("Shutting down at user request.");
-		setRunModesRecorders(ChannelRecorder.RunMode.STOP);
+		setRunModesRecorders(ChannelListener.RunMode.STOP);
 		wakeUpAllRecorders();
 	}
 	
