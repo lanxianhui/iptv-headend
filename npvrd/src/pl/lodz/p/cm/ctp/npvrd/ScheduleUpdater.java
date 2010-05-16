@@ -14,7 +14,6 @@ public class ScheduleUpdater implements Runnable {
 	
 	private class ProgramRecordingSink {
 		public Recording recording;
-		@SuppressWarnings("unused")
 		public Program program;
 		public Sink sink;
 		
@@ -62,6 +61,7 @@ public class ScheduleUpdater implements Runnable {
 		return foundPrs;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
 		// We create a storage containing links to all Sinks and their respective recordings
