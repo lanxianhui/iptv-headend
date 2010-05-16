@@ -123,12 +123,14 @@ class TvChannelDao {
     function create(&$conn, &$valueObject) {
 
           $sql = "INSERT INTO TvChannel ( name, ipAdress, port, unicastUrl, lcn, ";
-          $sql = $sql."icon, enabled) VALUES ('".$valueObject->getName()."', ";
+          $sql = $sql."icon, preRoll, postRoll, enabled) VALUES ('".$valueObject->getName()."', ";
           $sql = $sql."'".$valueObject->getIpAdress()."', ";
           $sql = $sql."".$valueObject->getPort().", ";
           $sql = $sql."'".$valueObject->getUnicastUrl()."', "; 
           $sql = $sql."".$valueObject->getLCN().", ";
           $sql = $sql."'".$valueObject->getIcon()."', ";
+          $sql = $sql."".$valueObject->getPreRoll().", ";
+          $sql = $sql."".$valueObject->getPostRoll().", ";
           $sql = $sql."'".($valueObject->getEnabled()?"TRUE":"FALSE")."') ";
           $result = $this->databaseUpdate(&$conn, $sql);
 
@@ -173,6 +175,8 @@ class TvChannelDao {
           $sql = $sql."unicastUrl = '".$valueObject->getUnicastUrl()."', ";
           $sql = $sql."lcn = ".$valueObject->getLCN().", ";
           $sql = $sql."icon = '".$valueObject->getIcon()."' ";
+          $sql = $sql."preRoll = '".$valueObject->getPreRoll()."' ";
+          $sql = $sql."postRoll = '".$valueObject->getPostRoll()."' ";
           $sql = $sql."enabled = '".($valueObject->getEnabled()?"TRUE":"FALSE")."'";
           $sql = $sql." WHERE (id = ".$valueObject->getId().") ";
           $result = $this->databaseUpdate(&$conn, $sql);
@@ -312,6 +316,16 @@ class TvChannelDao {
               $sql = $sql."AND icon LIKE '".$valueObject->getIcon()."%' ";
           }
           
+    	  if ($valueObject->getPreRoll() !== null) {
+              if ($first) { $first = false; }
+              $sql = $sql."AND preRoll = ".$valueObject->getPreRoll()." ";
+          }
+          
+    	  if ($valueObject->getPostRoll() !== null) {
+              if ($first) { $first = false; }
+              $sql = $sql."AND postRoll = ".$valueObject->getPostRoll()." ";
+          }
+          
     	  if ($valueObject->getEnabled() != null) {
               if ($first) { $first = false; }
               $sql = $sql."AND enabled = '".($valueObject->getEnabled()?"TRUE":"FALSE")."' ";
@@ -380,7 +394,9 @@ class TvChannelDao {
                    $valueObject->setUnicastUrl($row[4]);
                    $valueObject->setLCN($row[5]);
                    $valueObject->setIcon($row[6]);
-                   $valueObject->setEnabled((($row[7]==="TRUE")?true:false));; 
+                   $valueObject->setPreRoll($row[7]);
+                   $valueObject->setPostRoll($row[8]);
+                   $valueObject->setEnabled((($row[9]==="TRUE")?true:false));; 
           } else {
                //print " Object Not Found!";
                return false;
@@ -412,7 +428,9 @@ class TvChannelDao {
                $temp->setUnicastUrl($row[4]);
                $temp->setLCN($row[5]);
                $temp->setIcon($row[6]);
-               $temp->setEnabled((($row[7]==="TRUE")?true:false)); 
+               $temp->setPreRoll($row[7]);
+               $temp->setPostRoll($row[8]);
+               $temp->setEnabled((($row[9]==="TRUE")?true:false)); 
                array_push($searchResults, $temp);
           }
 
