@@ -41,6 +41,8 @@ class TvChannel {
     var $unicastUrl;
     var $lcn;
     var $icon;
+    var $preRoll;
+    var $postRoll;
     var $enabled;
 
     var $programs;
@@ -126,6 +128,20 @@ class TvChannel {
     	  $this->enabled = $enabledIn;
     }
     
+    function getPreRoll() {
+    	return $this->preRoll;
+    }
+    function setPreRoll($preRollIn) {
+    	$this->preRoll = $preRollIn;
+    }
+    
+	function getPostRoll() {
+    	return $this->postRoll;
+    }
+    function setPostRoll($postRollIn) {
+    	$this->postRoll = $postRollIn;
+    }
+    
     function getPrograms() {
     	  return $this->programs;
     }
@@ -150,6 +166,8 @@ class TvChannel {
           $unicastUrlIn,
           $lcnIn,
           $iconIn,
+          $preRollIn,
+          $postRollIn,
           $enabledIn) {
           $this->id = $idIn;
           $this->name = $nameIn;
@@ -192,6 +210,12 @@ class TvChannel {
           if ($valueObject->getIcon() != $this->icon) {
                     return(false);
           }
+    	  if ($valueObject->getPreRoll() != $this->preRoll) {
+                    return(false);
+          }
+    	  if ($valueObject->getPostRoll() != $this->postRoll) {
+                    return(false);
+          }
     	  if ($valueObject->getEnabled() != $this->enabled) {
                     return(false);
           }
@@ -216,6 +240,8 @@ class TvChannel {
         $out = $out."port = ".$this->port."\n"; 
         $out = $out."lcn = ".$this->lcn."\n";
         $out = $out."icon = ".$this->icon."\n";
+        $out = $out."preRoll = ".$this->preRoll."\n";
+        $out = $out."postRoll = ".$this->postRoll."\n";
         $out = $out."enabled = ".$this->enabled."\n"; 
         return $out;
     }
@@ -235,6 +261,8 @@ class TvChannel {
         $cloned->setUnicastUrl($this->unicastUrl);  
         $cloned->setIcon($this->icon); 
         $cloned->setLCN($this->lcn);
+        $cloned->setPreRoll($this->preRoll);
+        $cloned->setPostRoll($this->postRoll);
         $cloned->setEnabled($this->enabled);
 
         return $cloned;

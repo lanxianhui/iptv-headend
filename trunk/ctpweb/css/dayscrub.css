@@ -29,14 +29,18 @@ body {
 	cursor: pointer;
 }
 
+.channelscrub .channelKnobRail {
+	position: absolute;
+	height: 5px;
+	margin-top: -10px;
+	z-index: 0;
+}
+
 .channelscrub .channelKnob {
 	position: absolute;
 	background-color: #CAD4E6;
-	height: 5px;
-	z-index: 0;
-	margin-top: -10px;
-	background-position: center center;
-	background-repeat: no-repeat;
+	height: inherit;
+	z-index: 1;
 	cursor: pointer;
 }
 

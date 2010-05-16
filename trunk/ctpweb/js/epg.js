@@ -21,11 +21,20 @@ function openMiniWindow(url, name, width, height) {
 	popupWindow.focus();
 }
 
+function playChannel(id) {
+	openMiniWindow('mediaplayer.php#channel,'+id, 'playerWindow', 640, 500);
+};
+
+function playProgram(id) {
+	openMiniWindow('mediaplayer.php#program,'+id, 'playerWindow', 640, 500);
+};
+
 function downloadData(url, callback){
     var jsonRequest = new Request.JSON({
         method: "get",
         url: url,
         onSuccess: loadGuide,
+        onFailure: cancelGuide,
         headers: {
             Accept: "application/json"
         }
@@ -110,10 +119,6 @@ function addProgram(schedule, program, channel){
 	var newActions = new Element('div', {
 		'class' : 'actions'
 	});
-	
-	var playProgram = function(id) {
-		openMiniWindow('mediaplayer.php#program,'+id, 'playerWindow', 640, 500);
-	};
 	
 	// TODO Make Star'ing programs, and all actions user-aware. We need logins.
 	
@@ -245,10 +250,6 @@ function addChannel(guide, channel){
 	newChannel.store("timefall", newTimefall);
 	newSchedule.adopt(newTimefall);
 	
-	var playChannel = function(id) {
-		openMiniWindow('mediaplayer.php#channel,'+id, 'playerWindow', 640, 500);
-	};
-	
 	newHeader.addEvent('click', function(event) {
 		playChannel(channel.id);
 	});
@@ -315,6 +316,20 @@ function changeChannelStart(newStart) {
 	startsForFit = newStart;
 	
 	movedChannelOffset();
+}
+
+function delayedNotificationHide(seconds) {
+	if (seconds) {
+		setTimeout(delayedNotificationHide, 1000 * seconds);
+	} else {
+		notificationHide();
+	}
+}
+
+function cancelGuide(xhr) {
+	notificationShow("Unable to refresh guide");
+	delayedNotificationHide(10);
+	epgUpdater = setTimeout(updateGuide, 1000 * epgPrecision);
 }
 
 function loadGuide(guide) {

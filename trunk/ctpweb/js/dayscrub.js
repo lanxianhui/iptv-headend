@@ -72,7 +72,7 @@ function Dayscrub(element, beginDate, span) {
 	
 	this.refreshCurrent = function() {
 		days.forEach(function(dayItem) {
-			elementDate = dayItem.retrieve('date')
+			elementDate = dayItem.retrieve('date');
 			if (compareDates(elementDate, currentDate)) {
 				if (!dayItem.hasClass('current')) {
 					dayItem.addClass('current');
@@ -166,6 +166,7 @@ function Channelscrub(element) {
 	
 	var channelKnobWidth = 0;
 	var channelKnobOffset = 0;
+	var allChannelsWidth = 0;
 	
 	// Even in JavaScript some double entandre is nice ;)
 	var knobExtended = false;
@@ -177,50 +178,79 @@ function Channelscrub(element) {
 	
 	var changeCallback = emptyFunction;
 	
-	var newChannelKnob = new Element('div', {
-		'class': 'channelKnob',
+	var newChannelKnobRail = new Element('div', {
+		'class': 'channelKnobRail',
 		'styles': {
-			'width': channelKnobWidth + 'px',
-			'margin-left': channelKnobOffset + 'px',
+			'width' : allChannelsWidth + 'px',
 			'height': '5px',
 			'margin-top': '-10px'
 		}
 	});
 	
+	newChannelKnobRail.addEvent('click', function(event) {
+		if (knobMoving == false) {
+			knobTempOffset = (event.page.x - getPageX(newChannelKnobRail)) - (channelKnobWidth/2);
+			
+			if (knobTempOffset > (39 * totalChannels - 5 - channelKnobWidth)) {
+				knobTempOffset = (39 * totalChannels - 5 - channelKnobWidth);
+			}
+			
+			if (knobTempOffset < 0) {
+				knobTempOffset = 0;
+			}
+			
+			var newFitsStarts = Math.round(knobTempOffset / 39);
+			if (lastFitsStarts != newFitsStarts) {
+				lastFitsStarts = newFitsStarts;
+				changeCallback(newFitsStarts);
+			}
+			
+			moveKnobToPixel(knobTempOffset);
+		}
+	});
+	
+	var newChannelKnob = new Element('div', {
+		'class': 'channelKnob',
+		'styles': {
+			'width': channelKnobWidth + 'px',
+			'margin-left': channelKnobOffset + 'px'
+		}
+	});
+	
 	var knobExtend = function() {
 		knobExtended = true;
-		var knobMarginTween = new Fx.Tween(newChannelKnob, {
+		var knobMarginTween = new Fx.Tween(newChannelKnobRail, {
 			'property': 'margin-top',
 			'unit': 'px',
 			'duration': 100,
 			'transition': 'sine:in:out'
 		});
-		var knobHeightTween = new Fx.Tween(newChannelKnob, {
+		var knobRailHeightTween = new Fx.Tween(newChannelKnobRail, {
 			'property': 'height',
 			'unit': 'px',
 			'duration': 100,
 			'transition': 'sine:in:out'
 		});
 		knobMarginTween.start(-16);
-		knobHeightTween.start(11);
+		knobRailHeightTween.start(11);
 	};
 	
 	var knobCollapse = function() {
 		knobExtended = false;
-		var knobMarginTween = new Fx.Tween(newChannelKnob, {
+		var knobMarginTween = new Fx.Tween(newChannelKnobRail, {
 			'property': 'margin-top',
 			'unit': 'px',
 			'duration': 100,
 			'transition': 'sine:in:out'
 		});
-		var knobHeightTween = new Fx.Tween(newChannelKnob, {
+		var knobRailHeightTween = new Fx.Tween(newChannelKnobRail, {
 			'property': 'height',
 			'unit': 'px',
 			'duration': 100,
 			'transition': 'sine:in:out'
 		});
 		knobMarginTween.start(-10);
-		knobHeightTween.start(5);
+		knobRailHeightTween.start(5);
 	};
 	
 	target.parentNode.addEvent('mouseenter', function(event) {
@@ -256,6 +286,27 @@ function Channelscrub(element) {
 		newChannelKnob.style.marginLeft = knobTempOffset + 'px';
 	};
 	
+	var moveKnobToPixel = function(newChannelKnobOffset) {
+		channelKnobModulo = newChannelKnobOffset % 39;
+		
+		var targetKnobOffset = newChannelKnobOffset;
+		if (channelKnobModulo < 19) {
+			targetKnobOffset = newChannelKnobOffset - channelKnobModulo;
+		} else if (channelKnobModulo >= 19) {
+			targetKnobOffset = newChannelKnobOffset + (39 - channelKnobModulo);
+		}
+		
+		var knobTween = new Fx.Tween(newChannelKnob, {
+			'property': 'margin-left',
+			'unit': 'px',
+			'duration': 'short',
+			'transition': 'sine:out'
+		});
+		knobTween.start(targetKnobOffset);
+		
+		channelKnobOffset = targetKnobOffset;
+	};
+	
 	var knobEnd = function(event) {
 		window.removeEvent('mousemove', knobMove);
 		window.removeEvent('mouseup', knobEnd);
@@ -264,37 +315,29 @@ function Channelscrub(element) {
 		channelKnobOffset = knobTempOffset;
 		
 		channelKnobModulo = channelKnobOffset % 39;
-		
 		if (channelKnobModulo != 0) {
-			var targetKnobOffset = channelKnobOffset;
-			if (channelKnobModulo < 19) {
-				targetKnobOffset = channelKnobOffset - channelKnobModulo;
-			} else if (channelKnobModulo >= 19) {
-				targetKnobOffset = channelKnobOffset + (39 - channelKnobModulo);
-			}
-			
-			var knobTween = new Fx.Tween(newChannelKnob, {
-				'property': 'margin-left',
-				'unit': 'px',
-				'duration': 'short',
-				'transition': 'sine:out'
-			});
-			knobTween.start(targetKnobOffset);
-			
-			channelKnobOffset = targetKnobOffset;
+			moveKnobToPixel(channelKnobOffset);
 		}
 		
 		if (knobExtended && (!knobMouseIn)) {
 			knobCollapse();
 		}
 		
-		var newFitsStarts = channelKnobOffset / 39;
-		
+		var newFitsStarts = Math.round(channelKnobOffset / 39);
 		if (lastFitsStarts != newFitsStarts) {
 			lastFitsStarts = newFitsStarts;
 			changeCallback(newFitsStarts);
 		}
+		
+		event.stop();
+		event.stopPropagation();
+		
+		return false;
 	};
+	
+	newChannelKnob.addEvent('click', function(event) {
+		event.stopPropagation();
+	});
 	
 	newChannelKnob.addEvent('mousedown', function(event) {
 		knobMoving = true;
@@ -341,13 +384,19 @@ function Channelscrub(element) {
 				'class': 'channelButton',
 				'html': '<img src="img/logos/' + channel.icon + '" width="30" height="30" alt="' + channel.name + '"/>'
 			}); 
+			newChannel.addEvent('click', function(event) {
+				playChannel(channel.id);
+			});
 			this.adopt(newChannel);
 		},
 		newChannelList);
 		
 		totalChannels = guide.length;
+		allChannelsWidth = (totalChannels * 39) - 5;
+		newChannelKnobRail.style.width = allChannelsWidth + 'px';
 	};
 	
 	target.adopt(newChannelList);
-	target.adopt(newChannelKnob);
+	target.adopt(newChannelKnobRail);
+	newChannelKnobRail.adopt(newChannelKnob);
 }
