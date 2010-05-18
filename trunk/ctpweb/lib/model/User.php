@@ -74,7 +74,7 @@ class User {
           return $this->id;
     }
     function setId($idIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
     }
 
     function getUserName() {
@@ -102,7 +102,7 @@ class User {
           return $this->quota;
     }
     function setQuota($quotaIn) {
-          $this->quota = $quotaIn;
+          $this->quota = (int)$quotaIn;
     }
 
     function getEnabled() {
@@ -152,11 +152,11 @@ class User {
           $fullNameIn,
           $createdOnIn,
           $lastLoginIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
           $this->userName = $userNameIn;
           $this->password = $passwordIn;
           $this->authToken = $authTokenIn;
-          $this->quota = $quotaIn;
+          $this->quota = (int)$quotaIn;
           $this->enabled = $enabledIn;
           $this->fullName = $fullNameIn;
           $this->createdOn = $createdOnIn;

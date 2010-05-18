@@ -76,7 +76,7 @@ class TvChannel {
           return $this->id;
     }
     function setId($idIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
     }
 
     function getName() {
@@ -97,7 +97,7 @@ class TvChannel {
           return $this->port;
     }
     function setPort($portIn) {
-          $this->port = $portIn;
+          $this->port = (int)$portIn;
     }
     
 	function getUnicastUrl() {
@@ -118,7 +118,7 @@ class TvChannel {
     	  return $this->lcn;
     }
     function setLCN($lcnIn) {
-    	  $this->lcn = $lcnIn;
+    	  $this->lcn = (int)$lcnIn;
     }
     
     function getEnabled() {
@@ -132,14 +132,14 @@ class TvChannel {
     	return $this->preRoll;
     }
     function setPreRoll($preRollIn) {
-    	$this->preRoll = $preRollIn;
+    	$this->preRoll = (int)$preRollIn;
     }
     
 	function getPostRoll() {
     	return $this->postRoll;
     }
     function setPostRoll($postRollIn) {
-    	$this->postRoll = $postRollIn;
+    	$this->postRoll = (int)$postRollIn;
     }
     
     function getPrograms() {
@@ -169,12 +169,14 @@ class TvChannel {
           $preRollIn,
           $postRollIn,
           $enabledIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
           $this->name = $nameIn;
           $this->ipAdress = $ipAdressIn;
-          $this->port = $portIn;
+          $this->port = (int)$portIn;
           $this->unicastUrl = $unicastUrlIn;
-          $this->lcn = $lcnIn;
+          $this->lcn = (int)$lcnIn;
+          $this->preRoll = (int)$preRollIn;
+          $this->postRoll = (int)$postRollIn;
           $this->icon = $iconIn;
           $this->enabled = $enabledIn;
     }

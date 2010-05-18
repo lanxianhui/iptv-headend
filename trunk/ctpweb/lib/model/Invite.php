@@ -68,7 +68,7 @@ class Invite {
           return $this->id;
     }
     function setId($idIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
     }
 
     function getCode() {
@@ -89,7 +89,7 @@ class Invite {
           return $this->userId;
     }
     function setUserId($userIdIn) {
-          $this->userId = $userIdIn;
+          $this->userId = (int)$userIdIn;
     }
 
 
@@ -106,10 +106,10 @@ class Invite {
           $codeIn,
           $createdOnIn,
           $userIdIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
           $this->code = $codeIn;
           $this->createdOn = $createdOnIn;
-          $this->userId = $userIdIn;
+          $this->userId = (int)$userIdIn;
     }
 
 
