@@ -15,14 +15,28 @@ function loadProgram(program) {
 	isLive = false;
 	localProgram = program;
 	document.title = program.title;
-	var totalTime = (program.end - program.begin) * 1000;
+	
+	if (localChannels == null) {
+		setTimeout(loadProgram, 300, program);
+		return;
+	}
+	
+	programChannelPointer = findChannel(program.tvChannelId, localChannels);
+	if (programChannelPointer != -1) {
+		preRoll = localChannels[programChannelPointer].preRoll;
+		postRoll = localChannels[programChannelPointer].postRoll;
+	}
+	
+	begin = program.begin - preRoll;
+	end = program.end + postRoll;
+	var totalTime = (end - begin) * 1000;
 	
 	var mediabar = mediaplayer.getMediabar();
 	mediabar.reset();
 	mediabar.setTotalTime(totalTime);
 	if (program.recording.mode == "PROCESSING") {
 		var currentDate = new Date().getTime();
-		var primaryTime = currentDate - (program.begin * 1000);
+		var primaryTime = currentDate - (begin * 1000);
 		mediabar.setPrimaryTime(primaryTime);
 		mediabar.setTrickplay(true);
 	} else {
@@ -39,23 +53,33 @@ function loadProgram(program) {
 }
 
 function findChannel(id, channels) {
-	for (var i=0; i<channels.length; i++) {
-		if (channels[i].id == id) {
-			return i;
+	if (channels != null) {
+		for (var i=0; i<channels.length; i++) {
+			if (channels[i].id == id) {
+				return i;
+			}
 		}
 	}
 	return -1;
 }
 
-function loadChannels(channels) {
-	isLive = true;
+function storeChannels(channels) {
 	localChannels = channels;
+}
+
+function playChannels() {
+	isLive = true;
+	if (localChannels == null) {
+		setTimeout(playChannels, 300);
+		return;
+	}
+	
 	channelPointer = findChannel(channelId, localChannels);
 	
 	if (channelPointer == -1)
 		channelPointer = 0;
 	
-	document.title = channels[channelPointer].name;
+	document.title = localChannels[channelPointer].name;
 	
 	var mediabar = mediaplayer.getMediabar();
 	mediabar.reset();
@@ -77,7 +101,7 @@ function loadResult(result) {
 	if (result.recording != null) {
 		loadProgram(result);
 	} else if (result[0].lcn) {
-		loadChannels(result);
+		storeChannels(result);
 	}
 }
 
@@ -102,12 +126,7 @@ function beginPlaybackFromUrl() {
 		downloadData("mediaplayer.php?id=" + id + "&type=" + type);
 	} else if (type == "channel") {
 		channelId = id;
-		if (localChannels == null) {
-			downloadData("mediaplayer.php?type=channels");
-		} else {
-			// We skip downloading the channel list - we use the list that already has been downloaded
-			loadChannels(localChannels);
-		}
+		playChannels();
 	}
 }
 
@@ -123,8 +142,8 @@ function hasUrlChanged() {
 }
 
 function loadSettings() {
-	while (typeof mediaplayer.getPlayer() == "undefined") {
-		
+	if (typeof mediaplayer.getPlayer() == "undefined") {
+		setTimeout(loadSettings, 300);
 	}
 	
 	var settingsCookie = Cookie.read('settings');
@@ -229,6 +248,9 @@ function soundMinus() {
 }
 
 function bootscripts() {
+	// Bootstrap our list of channels
+	downloadData("mediaplayer.php?type=channels");
+	
 	mediaplayer = new Media($('media'), "");
 	
 	var mediabar = mediaplayer.getMediabar();
@@ -243,7 +265,6 @@ function bootscripts() {
 		channelMinus();
 	});
 	window.addEvent('keyup', function(event) {
-		//console.log(event);
 		if ((event.code == 33) | (event.code == 176)) {
 			channelPlus();
 		} else if ((event.code == 34) | (event.code == 177)) {

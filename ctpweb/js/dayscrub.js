@@ -380,9 +380,10 @@ function Channelscrub(element) {
 		newChannelList.empty();
 		
 		$each(guide, function(channel) {
+			channelIcon = iconSize(channel.icon, 'pico');
 			var newChannel = new Element('div', {
 				'class': 'channelButton',
-				'html': '<img src="img/logos/' + channel.icon + '" width="30" height="30" alt="' + channel.name + '"/>'
+				'html': '<img src="img/logos/' + channelIcon + '" width="30" height="30" alt="' + channel.name + '"/>'
 			}); 
 			newChannel.addEvent('click', function(event) {
 				playChannel(channel.id);

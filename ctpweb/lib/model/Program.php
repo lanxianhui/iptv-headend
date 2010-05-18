@@ -72,14 +72,14 @@ class Program {
           return $this->id;
     }
     function setId($idIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
     }
 
     function getTvChannelId() {
           return $this->tvChannelId;
     }
     function setTvChannelId($tvChannelIdIn) {
-          $this->tvChannelId = $tvChannelIdIn;
+          $this->tvChannelId = (int)$tvChannelIdIn;
     }
 
     function getTitle() {
@@ -100,14 +100,14 @@ class Program {
           return $this->begin;
     }
     function setBegin($beginIn) {
-          $this->begin = $beginIn;
+          $this->begin = (int)$beginIn;
     }
 
     function getEnd() {
           return $this->end;
     }
     function setEnd($endIn) {
-          $this->end = $endIn;
+          $this->end = (int)$endIn;
     }
 
     function setRecording($recordingIn) {
@@ -133,12 +133,12 @@ class Program {
           $beginIn,
           $endIn,
           $recordingIn = null) {
-          $this->id = $idIn;
-          $this->tvChannelId = $tvChannelIdIn;
+          $this->id = (int)$idIn;
+          $this->tvChannelId = (int)$tvChannelIdIn;
           $this->title = $titleIn;
           $this->description = $descriptionIn;
-          $this->begin = $beginIn;
-          $this->end = $endIn;
+          $this->begin = (int)$beginIn;
+          $this->end = (int)$endIn;
           $this->recording = $recordingIn;
     }
 

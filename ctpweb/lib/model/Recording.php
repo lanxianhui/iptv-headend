@@ -70,14 +70,14 @@ class Recording {
           return $this->id;
     }
     function setId($idIn) {
-          $this->id = $idIn;
+          $this->id = (int)$idIn;
     }
 
     function getProgramId() {
           return $this->programId;
     }
     function setProgramId($programIdIn) {
-          $this->programId = $programIdIn;
+          $this->programId = (int)$programIdIn;
     }
 
     function getMode() {
@@ -108,8 +108,8 @@ class Recording {
           $programIdIn,
           $modeIn,
           $fileNameIn) {
-          $this->id = $idIn;
-          $this->programId = $programIdIn;
+          $this->id = (int)$idIn;
+          $this->programId = (int)$programIdIn;
           $this->mode = $modeIn;
           $this->fileName = $fileNameIn;
     }

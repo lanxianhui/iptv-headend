@@ -71,14 +71,14 @@ class UserRecording {
           return $this->recordingId;
     }
     function setRecordingId($recordingIdIn) {
-          $this->recordingId = $recordingIdIn;
+          $this->recordingId = (int)$recordingIdIn;
     }
 
     function getUserId() {
           return $this->userId;
     }
     function setUserId($userIdIn) {
-          $this->userId = $userIdIn;
+          $this->userId = (int)$userIdIn;
     }
     
     function getUser() {
@@ -113,8 +113,8 @@ class UserRecording {
 
     function setAll($recordingIdIn,
           $userIdIn) {
-          $this->recordingId = $recordingIdIn;
-          $this->userId = $userIdIn;
+          $this->recordingId = (int)$recordingIdIn;
+          $this->userId = (int)$userIdIn;
     }
 
 

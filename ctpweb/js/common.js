@@ -153,3 +153,9 @@ function createButton(element, classList, caption){
 	element.adopt(newButton);
 	return newButton;
 }
+
+function iconSize(url, size) {
+	var extension = url.slice(-4);
+	var mainPart = url.slice(0,url.length - 4);
+	return mainPart + "_" + size + extension;
+}
