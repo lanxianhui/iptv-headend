@@ -83,16 +83,15 @@ public class ScheduleUpdater implements Runnable {
         int channelPostRollMillis = parentChannel.getTvChannel().getPostRoll() * 1000;
         // The window of opportunity is 2 seconds
         int waitTimeMillis = Npvrd.config.prepTime * 1000;
-        
-        // Default nextRefreshAt (set 10 minutes in the future)
-        long nextRefreshAt = System.currentTimeMillis() + 10 * 60 * 1000;
 		
         // We run this thread while our parent's RunMode is set tu Run
 		while (parentChannel.getRunMode().equals(ChannelListener.RunMode.RUN)) {
+	        // Default nextRefreshAt (set 10 minutes in the future)
+	        long nextRefreshAt = System.currentTimeMillis() + 10 * 60 * 1000;
 			// We keep a now Timestamp as it's handy for comparisons
 			// Timestamp now = new Timestamp(System.currentTimeMillis());
 			
-			Npvrd.log(logPrefix + "Next loop.");
+			//Npvrd.log(logPrefix + "Next loop.");
 	        
 			// First we check if there are new sinks to be added
 	        try {
@@ -102,13 +101,12 @@ public class ScheduleUpdater implements Runnable {
 				
 				// If any where found
 				if (topProgramSchedule.size() > 0) {
-					// Flag indicating we've found a recording scheduled, that's about to start
 					for (ProgramRecording cpr : topProgramSchedule) {
 						// We check if given PR is about to begin, if it is, we set smthUseful flag to true
 						// Npvrd.log("Program: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
 						long beginMillis = cpr.program.getBegin().getTime() - channelPreRollMillis;
+						long endMillis = cpr.program.getEnd().getTime() + channelPostRollMillis;
 						if (beginMillis - waitTimeMillis - 100 < System.currentTimeMillis()) {
-							long endMillis = cpr.program.getEnd().getTime() + channelPostRollMillis;
 							String fileName = generateFileName(cpr);
 							lastAdded = cpr.program.getEnd();
 							
@@ -124,15 +122,23 @@ public class ScheduleUpdater implements Runnable {
 								recordingDAO.save(cpr.recording);
 								// We store the sink in the store to know which recording to update
 								prsStore.add(new ProgramRecordingSink(cpr, tempSink));
-								// Generally programs happen one after another, so it stands to reason to expect we should refresh around that time
-								Npvrd.log(logPrefix + "Compare: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
-								if (nextRefreshAt > endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis) {
-									nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis - 100;
-									Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
-								}
 							} catch (FileNotFoundException e) {
 								// We cannot add this sink
 								Npvrd.error(logPrefix + "FileNotFoundException: " + e.getMessage());
+							}
+							
+							// Generally programs happen one after another, so it stands to reason to expect we should refresh around that time
+							//Npvrd.log(logPrefix + "Compare End: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
+							if (nextRefreshAt > endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis) {
+								nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis - 100;
+								//Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
+							}
+						} else {
+							// We should also check if a program following this one may start sooner than current nextRefreshAt
+							//Npvrd.log(logPrefix + "Compare Begin: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
+							if (nextRefreshAt > beginMillis) {
+								nextRefreshAt = beginMillis - 100;
+								//Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
 							}
 						}
 					}
@@ -202,7 +208,7 @@ public class ScheduleUpdater implements Runnable {
 
 			try {
 				// We sleep as long as it should take to the next update
-				Npvrd.log(logPrefix + "Next loop in " + ((nextRefreshAt - System.currentTimeMillis()) / 1000) + " seconds");
+				//Npvrd.log(logPrefix + "Next loop in " + ((nextRefreshAt - System.currentTimeMillis()) / 1000) + " seconds");
 				Thread.sleep(nextRefreshAt - System.currentTimeMillis());
 			} catch (InterruptedException ie) {
 				// We've been interrupted - perhaps as a result of a changing RunMode
