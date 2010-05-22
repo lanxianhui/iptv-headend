@@ -18,6 +18,8 @@ public class ChannelListener implements Runnable {
 	private MulticastSocket sock;
 	private InetAddress group;
 	
+	private String logPrefix;
+	
 	/**
 	 * Creates a new channel recorder listening on a given multicast IP address and port.
 	 * @param groupIp Multicast group IP to listen to.
@@ -29,6 +31,8 @@ public class ChannelListener implements Runnable {
 		this.sinks = new LinkedList<Sink>();
 		this.runMode = RunMode.RUN;
 		
+		this.logPrefix = tvChannel.getIpAdress() + ": ";
+		
 		// Synchronous socket setup to solve crosstalk issues
 		Npvrd.log(tvChannel.getIpAdress() + ": Setting up socket.");
 		try {
@@ -38,9 +42,9 @@ public class ChannelListener implements Runnable {
 			this.sock.setSoTimeout(10000);
 			this.sock.joinGroup(group);
 		} catch (UnknownHostException e) {
-			Npvrd.error(tvChannel.getIpAdress() + ": Group IP address invalid: " + e.getMessage());
+			Npvrd.error(logPrefix + "Group IP address invalid: " + e.getMessage());
 		} catch (IOException e) {
-			Npvrd.error(tvChannel.getIpAdress() + ": Error while trying to set-up socket: " + e.getMessage());
+			Npvrd.error(logPrefix + "Error while trying to set-up socket: " + e.getMessage());
 		}
 	}
 	
@@ -93,7 +97,7 @@ public class ChannelListener implements Runnable {
 					// We unlock the sinks list
 					this.sinksLock.unlock();
 				} catch (IOException ioe) {
-					Npvrd.error("Error reading from network: " + ioe.getMessage());
+					Npvrd.error(logPrefix + "Error reading from network: " + ioe.getMessage());
 					
 					// We lock the sinks list, so that it's not modified while we iterate through it
 					this.sinksLock.lock();
@@ -108,16 +112,16 @@ public class ChannelListener implements Runnable {
 				}
 			}
 		} catch (SocketException e1) {
-			Npvrd.error("Error creating packet data buffer: " + e1.getMessage());
+			Npvrd.error(logPrefix + "Error creating packet data buffer: " + e1.getMessage());
 		}
 		
-		Npvrd.log("Shuting down ChannelListener");
+		Npvrd.log(logPrefix + "Shuting down ChannelListener");
 		// runMode has to be STOP, we shut down operations
 		scheduleUpdater.interrupt();
 		try {
 			this.sock.leaveGroup(group);
 		} catch (IOException e) {
-			Npvrd.error("Error leaving group: " + e.getMessage());
+			Npvrd.error(logPrefix + "Error leaving group: " + e.getMessage());
 		}
 		this.sock.close();
 	}
