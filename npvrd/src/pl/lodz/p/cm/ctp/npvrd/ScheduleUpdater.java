@@ -83,10 +83,12 @@ public class ScheduleUpdater implements Runnable {
         int channelPostRollMillis = parentChannel.getTvChannel().getPostRoll() * 1000;
         // The window of opportunity is 2 seconds
         int waitTimeMillis = Npvrd.config.prepTime * 1000;
+        
+        // Default nextRefreshAt (set 10 minutes in the future)
+        long nextRefreshAt = System.currentTimeMillis() + 10 * 60 * 1000;
 		
         // We run this thread while our parent's RunMode is set tu Run
 		while (parentChannel.getRunMode().equals(ChannelListener.RunMode.RUN)) {
-			long nextRefreshAt = System.currentTimeMillis() + 10 * 60 * 1000;
 			// We keep a now Timestamp as it's handy for comparisons
 			// Timestamp now = new Timestamp(System.currentTimeMillis());
 			
@@ -105,7 +107,7 @@ public class ScheduleUpdater implements Runnable {
 						// We check if given PR is about to begin, if it is, we set smthUseful flag to true
 						// Npvrd.log("Program: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
 						long beginMillis = cpr.program.getBegin().getTime() - channelPreRollMillis;
-						if (beginMillis - waitTimeMillis < System.currentTimeMillis()) {
+						if (beginMillis - waitTimeMillis - 100 < System.currentTimeMillis()) {
 							long endMillis = cpr.program.getEnd().getTime() + channelPostRollMillis;
 							String fileName = generateFileName(cpr);
 							lastAdded = cpr.program.getEnd();
@@ -114,7 +116,7 @@ public class ScheduleUpdater implements Runnable {
 								// We create and add a new sink to the temporary sink list
 								Sink tempSink = new FileSink(new BufferedOutputStream(new FileOutputStream(path + fileName)), beginMillis, endMillis);
 								tempSinks.add(tempSink);
-								Npvrd.log(logPrefix + "New sink: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
+								Npvrd.log(logPrefix + "New sink: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString() + " (" + (new Timestamp(beginMillis)).toGMTString() + ")");
 								// We set the status of a given recording to Processing and we set the fileName
 								cpr.recording.setMode(Mode.PROCESSING);
 								cpr.recording.setFileName(fileName);
@@ -123,9 +125,10 @@ public class ScheduleUpdater implements Runnable {
 								// We store the sink in the store to know which recording to update
 								prsStore.add(new ProgramRecordingSink(cpr, tempSink));
 								// Generally programs happen one after another, so it stands to reason to expect we should refresh around that time
+								Npvrd.log(logPrefix + "Compare: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
 								if (nextRefreshAt > endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis) {
-									nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis + 500;
-									Npvrd.log(logPrefix + (new Timestamp(nextRefreshAt)));
+									nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis - 100;
+									Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
 								}
 							} catch (FileNotFoundException e) {
 								// We cannot add this sink
