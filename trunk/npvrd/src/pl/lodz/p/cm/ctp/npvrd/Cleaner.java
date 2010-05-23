@@ -49,8 +49,8 @@ public class Cleaner implements Runnable {
 					} catch (DAOException e) {
 						Npvrd.error(logPrefix + "Problem working with the database in Cleaner");
 					}	
-					Npvrd.log(logPrefix + "Deleted " + counter + " recordings.");
 				}
+				Npvrd.log(logPrefix + "Deleted " + counter + " recordings.");
 				
 				try {
 					Thread.sleep(Npvrd.config.cleanerResolution * 60 * 60 * 1000);
