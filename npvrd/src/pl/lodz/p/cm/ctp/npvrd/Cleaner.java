@@ -11,6 +11,12 @@ public class Cleaner implements Runnable {
 	
 	private RunMode runMode = RunMode.RUN;
 	
+	private String logPrefix = "Cleaner: ";
+	
+	public Cleaner() {
+		Npvrd.log(logPrefix + "Starting up");
+	}
+	
 	public RunMode getRunMode() {
 		return this.runMode;
 	}
@@ -30,6 +36,7 @@ public class Cleaner implements Runnable {
 			tvChannels = tvChannelDAO.list();
 			
 			while (runMode.equals(RunMode.RUN)) {
+				int counter = 0;
 				for (TvChannel tc : tvChannels) {
 					try {
 						List<ProgramRecording> forDeletion = programDvrScheduleDAO.listOlderThanHours(tc.getId(), Npvrd.config.cleanerTolerance);
@@ -37,10 +44,12 @@ public class Cleaner implements Runnable {
 							File fileForDeletion = new File(Npvrd.config.recordings + cpr.recording.getFileName());
 							recordingDAO.delete(cpr.recording);
 							fileForDeletion.delete();
+							counter++;
 						}
 					} catch (DAOException e) {
-						Npvrd.error("Problem working with the database in Cleaner");
+						Npvrd.error(logPrefix + "Problem working with the database in Cleaner");
 					}	
+					Npvrd.log(logPrefix + "Deleted " + counter + " recordings.");
 				}
 				
 				try {
@@ -51,7 +60,7 @@ public class Cleaner implements Runnable {
 				}
 			}
 		} catch (DAOException e1) {
-			Npvrd.error("Unable to get TvChannels! Cleaner.");
+			Npvrd.error(logPrefix + "Unable to get TvChannels!");
 		}
 	}
 
