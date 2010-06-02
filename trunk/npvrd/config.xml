@@ -8,8 +8,8 @@
 	</database>
 	<recordings>/var/ctp/pvr/</recordings> <!-- Where to write all recorded programs (should be writable by the npvrd -->
 	<prepTime>2</prepTime> <!-- How much time before a task begins should it be added to the queue (in seconds) -->
-	<cleanerResolution>120</cleanerResolution> <!-- How often to run the cleaner (in minutes) -->
-	<cleanerTolerance></cleanerTolerance> <!-- How long to wait before removing a recording from the system -->
+	<cleanerSchedule>30 * * * *</cleanerSchedule> <!-- When to run the cleaner -->
+	<cleanerTolerance>90</cleanerTolerance> <!-- How long to wait before removing a recording from the system -->
 	<vlm>
 		<host>localhost</host>
 		<port>4212</port>
