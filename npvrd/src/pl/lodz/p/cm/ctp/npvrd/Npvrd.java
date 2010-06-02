@@ -3,7 +3,7 @@ package pl.lodz.p.cm.ctp.npvrd;
 import java.io.*;
 import pl.lodz.p.cm.ctp.dao.*;
 import pl.lodz.p.cm.ctp.dao.model.*;
-
+import it.sauronsoftware.cron4j.Scheduler;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class Npvrd {
 	static Configuration config;
 	static ArrayList<ChannelListenerThread> channelListeners;
 	static Thread cleanerThread;
-	static Cleaner cleaner;
+	static Scheduler cleanerScheduler;
 	
 	public static boolean isAnyRecorderAlive() {
 		for(ChannelListenerThread threadListener : channelListeners) {
@@ -83,6 +83,13 @@ public class Npvrd {
 				Thread RecordingThread = new Thread(NewChannel);
 				channelListeners.add(new ChannelListenerThread(RecordingThread, NewChannel));
 				RecordingThread.start();
+				// Sleeping in order to conserve amount of concurrent database connections when
+				// Schedule updater starts
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+
+				}
 			}
 		} catch (DAOException e1) {
 			error("Database error: " + e1.getMessage());
@@ -90,9 +97,12 @@ public class Npvrd {
 			System.exit(1);
 		}
 		
-		cleaner = new Cleaner();
-		cleanerThread = new Thread(cleaner);
-		cleanerThread.start();
+		cleanerScheduler = new Scheduler();
+		
+		cleanerThread = new Thread(new Cleaner());
+		
+		cleanerScheduler.schedule(Npvrd.config.cleanerSchedule, cleanerThread);
+		cleanerScheduler.start();
 		
 		// Setup the shutdown hook
 		
@@ -118,8 +128,7 @@ public class Npvrd {
 		log("Shutting down at user request.");
 		setRunModesRecorders(ChannelListener.RunMode.STOP);
 		wakeUpAllRecorders();
-		cleaner.setRunMode(Cleaner.RunMode.STOP);
-		cleanerThread.interrupt();
+		cleanerScheduler.stop();
 	}
 	
 	static void error(String msg) {

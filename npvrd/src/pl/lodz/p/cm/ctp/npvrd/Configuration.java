@@ -10,7 +10,7 @@ public class Configuration implements Serializable {
 	public DatabaseConfiguration database;
 	public String recordings;
 	public Integer prepTime;
-	public Integer cleanerResolution;
+	public String cleanerSchedule;
 	public Integer cleanerTolerance;
 	public VlmConfig vlm;
 
