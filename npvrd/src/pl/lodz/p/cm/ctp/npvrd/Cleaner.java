@@ -36,7 +36,10 @@ public class Cleaner implements Runnable {
 				for (ProgramRecording cpr : forDeletion) {
 					File fileForDeletion = new File(Npvrd.config.recordings + cpr.recording.getFileName());
 					recordingDAO.delete(cpr.recording);
-					fileForDeletion.delete();
+					boolean result = fileForDeletion.delete();
+					if (!result) {
+						Npvrd.error(logPrefix + "Could not delete file " + cpr.recording.getFileName() + ". Dropped nonetheless.");
+					}
 					counter++;
 				}
 			} catch (DAOException e) {
