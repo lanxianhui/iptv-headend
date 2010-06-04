@@ -38,7 +38,7 @@ public final class ProgramRecordingDAO {
         "SELECT Program.id, Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end, " + 
         "Recording.id, Recording.mode, Recording.fileName FROM Program, Recording " +
         "WHERE Program.id = Recording.programId AND Program.tvChannelId = ? " +
-        "AND TIMESTAMPDIFF(HOUR, Program.end, NOW()) > ? AND Recording.mode = 'WAITING' " +
+        "AND TIMESTAMPDIFF(HOUR, Program.end, NOW()) >= ? AND Recording.mode = 'AVAILABLE' " +
         "ORDER BY Program.begin ASC";
 	
 	private DAOFactory daoFactory;
