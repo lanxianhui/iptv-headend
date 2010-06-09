@@ -53,14 +53,14 @@ class AccountLogic {
 		$userToBeFound = new User();
 		$userToBeFound->setUserName($userName);
 		$userToBeFound->setPassword($passwordMD5);
-		$userList = $userDAO->searchMatching(&$conn, $userToBeFound);
+		$userList = $userDAO->searchMatching(&$conn, &$userToBeFound);
 		
 		if (count($userList) == 1) {
 			$selectedUser = $userList[0];
 			if ($selectedUser->getEnabled() == true) {
 				if ($usedPersistent) {
 					$selectedUser->setLastLogin(date("c"));
-					$userDAO->save($selectedUser); 
+					$userDAO->save(&$conn, &$selectedUser); 
 				}
 				
 				$_SESSION["userObject"] = $userList[0];
@@ -100,13 +100,13 @@ class AccountLogic {
 		$userToBeFound = new User();
 		$userToBeFound->setUserName($userName);
 		$userToBeFound->setPassword($passwordMD5);
-		$userList = $userDAO->searchMatching(&$conn, $userToBeFound);
+		$userList = $userDAO->searchMatching(&$conn, &$userToBeFound);
 		
 		if (count($userList) == 1) {
 			$selectedUser = $userList[0];
 			if ($selectedUser->getEnabled() == true) {
 				$selectedUser->setLastLogin(date("c"));
-				$userDAO->save($selectedUser);
+				$userDAO->save(&$conn, &$selectedUser);
 				
 				$_SESSION["userObject"] = $userList[0];
 				$_SESSION["userName"] = $userName;
