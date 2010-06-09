@@ -198,7 +198,7 @@ function playbackPlayPause() {
 
 function fullScreen() {
 	var vlc = mediaplayer.getPlayer();
-	vlc.video.toggleFullscreen();
+	vlc.video.fullscreen = true;
 }
 
 function soundPlus() {

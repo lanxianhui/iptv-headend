@@ -173,6 +173,9 @@ function Channelscrub(element) {
 	var knobMouseIn = false;
 	
 	var totalChannels = 0;
+	var channelKnobLocking = 0;
+	var totalChannelWidth = 0;
+	var listWidth = 0;
 	
 	var emptyFunction = function() { return; };
 	
@@ -181,7 +184,7 @@ function Channelscrub(element) {
 	var newChannelKnobRail = new Element('div', {
 		'class': 'channelKnobRail',
 		'styles': {
-			'width' : allChannelsWidth + 'px',
+			// 'width' : allChannelsWidth + 'px',
 			'height': '5px',
 			'margin-top': '-10px'
 		}
@@ -269,31 +272,39 @@ function Channelscrub(element) {
 	var knobMove = function(event) {
 		knobTempOffset = (knobBaseOffset + event.page.x - oldMouseX);
 		
-		if (knobTempOffset > (39 * totalChannels - 5 - channelKnobWidth)) {
+		/* if (knobTempOffset > (39 * totalChannels - 5 - channelKnobWidth)) {
 			knobTempOffset = (39 * totalChannels - 5 - channelKnobWidth);
+		} */
+		
+		if (knobTempOffset > (listWidth - channelKnobWidth - 5)) {
+			knobTempOffset = listWidth - channelKnobWidth - 5;
 		}
 		
 		if (knobTempOffset < 0) {
 			knobTempOffset = 0;
 		}
 		
-		var newFitsStarts = Math.round(knobTempOffset / 39);
+		var newFitsStarts = Math.round(knobTempOffset / channelKnobLocking);
 		if (lastFitsStarts != newFitsStarts) {
 			lastFitsStarts = newFitsStarts;
 			changeCallback(newFitsStarts);
 		}
 		
 		newChannelKnob.style.marginLeft = knobTempOffset + 'px';
+		
+		proportionOffset = (knobTempOffset / (listWidth - 5 - channelKnobWidth)) * (totalButtonsWidth - listWidth - 5);
+		
+		newChannelList.style.left = -(proportionOffset) + 'px';
 	};
 	
 	var moveKnobToPixel = function(newChannelKnobOffset) {
-		channelKnobModulo = newChannelKnobOffset % 39;
+		channelKnobModulo = newChannelKnobOffset % channelKnobLocking;
 		
 		var targetKnobOffset = newChannelKnobOffset;
 		if (channelKnobModulo < 19) {
 			targetKnobOffset = newChannelKnobOffset - channelKnobModulo;
 		} else if (channelKnobModulo >= 19) {
-			targetKnobOffset = newChannelKnobOffset + (39 - channelKnobModulo);
+			targetKnobOffset = newChannelKnobOffset + (channelKnobLocking - channelKnobModulo);
 		}
 		
 		var knobTween = new Fx.Tween(newChannelKnob, {
@@ -314,7 +325,7 @@ function Channelscrub(element) {
 		
 		channelKnobOffset = knobTempOffset;
 		
-		channelKnobModulo = channelKnobOffset % 39;
+		channelKnobModulo = channelKnobOffset % channelKnobLocking;
 		if (channelKnobModulo != 0) {
 			moveKnobToPixel(channelKnobOffset);
 		}
@@ -323,7 +334,7 @@ function Channelscrub(element) {
 			knobCollapse();
 		}
 		
-		var newFitsStarts = Math.round(channelKnobOffset / 39);
+		var newFitsStarts = Math.round(channelKnobOffset / channelKnobLocking);
 		if (lastFitsStarts != newFitsStarts) {
 			lastFitsStarts = newFitsStarts;
 			changeCallback(newFitsStarts);
@@ -346,7 +357,7 @@ function Channelscrub(element) {
 		
 		knobBaseOffset = channelKnobOffset;
 		
-		lastFitsStarts = channelKnobOffset / 39;
+		lastFitsStarts = channelKnobOffset / channelKnobLocking;
 		
 		window.addEvent('mousemove', knobMove);
 		window.addEvent('mouseup', knobEnd);
@@ -357,12 +368,17 @@ function Channelscrub(element) {
 	});
 	
 	var newChannelList = new Element('div', {
-		'class': 'channelButtons'
+		'class': 'channelButtons',
+		'styles': {
+			'left': '0px'
+		}
 	});
 	
 	this.refreshKnobPosition =  function(fits, startsForFit) {
+		listWidth = target.clientWidth;
 		channelKnobWidth = 39 * fits - 5;
-		channelKnobOffset = 39 * startsForFit;
+		channelKnobLocking = (listWidth - channelKnobWidth) / (totalChannels - fits);
+		channelKnobOffset = channelKnobLocking * startsForFit;
 		
 		newChannelKnob.style.width = channelKnobWidth + 'px';
 		newChannelKnob.style.marginLeft = channelKnobOffset + 'px';
@@ -393,8 +409,13 @@ function Channelscrub(element) {
 		newChannelList);
 		
 		totalChannels = guide.length;
-		allChannelsWidth = (totalChannels * 39) - 5;
-		newChannelKnobRail.style.width = allChannelsWidth + 'px';
+		
+		totalButtonsWidth = (39 * totalChannels - 5);
+		listWidth = target.clientWidth;
+		channelKnobLocking = (listWidth - channelKnobWidth) / (totalChannels - fits);
+		
+		/* allChannelsWidth = (totalChannels * 39) - 5;
+		newChannelKnobRail.style.width = allChannelsWidth + 'px'; */
 	};
 	
 	target.adopt(newChannelList);

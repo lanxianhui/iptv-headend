@@ -16,7 +16,15 @@ body {
 
 .channelscrub {
 	float: right;
-	margin: 21px 0 5px 0;
+	margin: 21px 5px 5px 0;
+	overflow: hidden;
+	height: 35px;
+	width: 40%;
+}
+
+.channelscrub .channelButtons {
+	position: relative;
+	width: 10000px;
 }
 
 .channelscrub .channelButton {
@@ -34,6 +42,7 @@ body {
 	height: 5px;
 	margin-top: -10px;
 	z-index: 0;
+	width: inherit;
 }
 
 .channelscrub .channelKnob {

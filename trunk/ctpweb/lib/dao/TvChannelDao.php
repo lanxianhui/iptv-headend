@@ -50,7 +50,7 @@ class TvChannelDao {
      * valueObject will be created using the createValueObject() method.
      */
     function getObject(&$conn, $id) {
-
+    	
           $valueObject = $this->createValueObject();
           $valueObject->setId($id);
           $this->load(&$conn, &$valueObject);
@@ -84,7 +84,16 @@ class TvChannelDao {
           else
                return false;
     }
+    
+    function loadAllByLCN(&$conn) {
 
+
+          $sql = "SELECT * FROM TvChannel ORDER BY lcn ASC ";
+
+          $searchResults = $this->listQuery(&$conn, $sql);
+
+          return $searchResults;
+    }
 
     /**
      * LoadAll-method. This will read all contents from database table and
