@@ -14,7 +14,7 @@ class EpgLogic {
 	public function getChannels(&$conn, $start = null, $number = null) {
 		$channelDAO = new TvChannelDAO();
 		if (($start === null) && ($number === null))
-			return $channelDAO->loadAll(&$conn);
+			return $channelDAO->loadAllByLCN(&$conn);
 		else
 			return false;
 	}

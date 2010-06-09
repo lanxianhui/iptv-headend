@@ -59,7 +59,8 @@ class AccountLogic {
 			$selectedUser = $userList[0];
 			if ($selectedUser->getEnabled() == true) {
 				if ($usedPersistent) {
-					// TODO Make the system save a last login information if the session has been created from the persistent login cookie 
+					$selectedUser->setLastLogin(date("c"));
+					$userDAO->save($selectedUser); 
 				}
 				
 				$_SESSION["userObject"] = $userList[0];
@@ -102,23 +103,26 @@ class AccountLogic {
 		$userList = $userDAO->searchMatching(&$conn, $userToBeFound);
 		
 		if (count($userList) == 1) {
-			// TODO The user has just been logged in, we should save the lastLogin information in the database
-			
-			$_SESSION["userObject"] = $userList[0];
-			$_SESSION["userName"] = $userName;
-			$_SESSION["password"] = $passwordMD5;
-			
-			if ($keepLoggedIn) {
-				$persistentLoginData["userName"] = $userName;
-				$persistentLoginData["password"] = $passwordMD5;
-				setcookie("CTP_freezeDriedUser", base64_encode(json_encode($persistentLoginData)), time()+60*60*24*365, '/');
+			$selectedUser = $userList[0];
+			if ($selectedUser->getEnabled() == true) {
+				$selectedUser->setLastLogin(date("c"));
+				$userDAO->save($selectedUser);
+				
+				$_SESSION["userObject"] = $userList[0];
+				$_SESSION["userName"] = $userName;
+				$_SESSION["password"] = $passwordMD5;
+				
+				if ($keepLoggedIn) {
+					$persistentLoginData["userName"] = $userName;
+					$persistentLoginData["password"] = $passwordMD5;
+					setcookie("CTP_freezeDriedUser", base64_encode(json_encode($persistentLoginData)), time()+60*60*24*365, '/');
+				}
+				return true;
 			}
-			
-			return true;
-		} else {
-			$_SESSION = array();
-			return false;
 		}
+		
+		$_SESSION = array();
+		return false;
 	}
 	
 	/**
@@ -128,11 +132,11 @@ class AccountLogic {
 	 * @param $conn The Datasource object containing the database connection
 	 */
 	public function logoutUser() {
-		$currentUser = AccountLogic::GetCurrentUser();
+		$currentUser = self::getCurrentUser();
 		self::$lastUserName = $currentUser->getUserName();
-		// We store the last user name for 6 hours. If the user doesn't
+		// We store the last user name for 2 hours. If the user doesn't
 		// return by then, the login will be blank - useful for internet cafes
-		setcookie("CTP_lastUser", self::$lastUserName, time() + (6 * 3600), '/');
+		setcookie("CTP_lastUser", self::$lastUserName, time() + (2 * 3600), '/');
 		
 		$_SESSION = array();
 		session_destroy();
