@@ -12,6 +12,7 @@ public class Configuration implements Serializable {
 	public DatabaseConfiguration database;
 	public ArrayList<XmlTvGrabberConfig> xmlTvGrabbers;
 	public boolean recordAllPrograms;
+	public String runInfoDir = "/var/run/epgd/";
 	public CleanerConfig cleaner;
 	
 }
