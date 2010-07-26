@@ -7,7 +7,7 @@ function padZeros(number) {
 		return number;
 }
 
-function toRomanNumerals(number) {
+function toMonthShort(number) {
 	switch (number) {
 		case 1:
 			return "I";
@@ -125,7 +125,7 @@ function Dayscrub(element, beginDate, span) {
 		var newMonthDesc = new Element('div', {
 			'class': 'desc'
 		});
-		newMonthDesc.innerHTML = toRomanNumerals(date.get('Month') + 1);
+		newMonthDesc.innerHTML = toMonthShort(date.get('Month') + 1);
 		newMonth.adopt(newMonthDesc);
 		return newMonth;
 	};
@@ -191,7 +191,7 @@ function Channelscrub(element) {
 	});
 	
 	newChannelKnobRail.addEvent('click', function(event) {
-		if (knobMoving == false) {
+		/* if (knobMoving == false) {
 			knobTempOffset = (event.page.x - getPageX(newChannelKnobRail)) - (channelKnobWidth/2);
 			
 			if (knobTempOffset > (39 * totalChannels - 5 - channelKnobWidth)) {
@@ -209,7 +209,7 @@ function Channelscrub(element) {
 			}
 			
 			moveKnobToPixel(knobTempOffset);
-		}
+		} */
 	});
 	
 	var newChannelKnob = new Element('div', {
@@ -272,12 +272,8 @@ function Channelscrub(element) {
 	var knobMove = function(event) {
 		knobTempOffset = (knobBaseOffset + event.page.x - oldMouseX);
 		
-		/* if (knobTempOffset > (39 * totalChannels - 5 - channelKnobWidth)) {
-			knobTempOffset = (39 * totalChannels - 5 - channelKnobWidth);
-		} */
-		
-		if (knobTempOffset > (listWidth - channelKnobWidth - 5)) {
-			knobTempOffset = listWidth - channelKnobWidth - 5;
+		if (knobTempOffset > (listWidth - channelKnobWidth - 1)) {
+			knobTempOffset = listWidth - channelKnobWidth - 1;
 		}
 		
 		if (knobTempOffset < 0) {
@@ -297,14 +293,17 @@ function Channelscrub(element) {
 		newChannelList.style.left = -(proportionOffset) + 'px';
 	};
 	
-	var moveKnobToPixel = function(newChannelKnobOffset) {
-		channelKnobModulo = newChannelKnobOffset % channelKnobLocking;
+	var knobSyncChannels = function(newChannelKnobOffset) {
+		channelKnobModulo = Math.round(newChannelKnobOffset / channelKnobLocking);
 		
-		var targetKnobOffset = newChannelKnobOffset;
-		if (channelKnobModulo < 19) {
-			targetKnobOffset = newChannelKnobOffset - channelKnobModulo;
-		} else if (channelKnobModulo >= 19) {
-			targetKnobOffset = newChannelKnobOffset + (channelKnobLocking - channelKnobModulo);
+		var targetKnobOffset = channelKnobLocking * channelKnobModulo;
+		
+		if (targetKnobOffset > (listWidth - channelKnobWidth - 1)) {
+			targetKnobOffset = listWidth - channelKnobWidth - 1;
+		}
+		
+		if (targetKnobOffset < 0) {
+			targetKnobOffset = 0;
 		}
 		
 		var knobTween = new Fx.Tween(newChannelKnob, {
@@ -313,9 +312,18 @@ function Channelscrub(element) {
 			'duration': 'short',
 			'transition': 'sine:out'
 		});
-		knobTween.start(targetKnobOffset);
-		
 		channelKnobOffset = targetKnobOffset;
+		
+		var railTween = new Fx.Tween(newChannelList, {
+			'property': 'left',
+			'unit': 'px',
+			'duration': 'short',
+			'transition': 'sine:out'
+		});
+		proportionOffset = (targetKnobOffset / (listWidth - 5 - channelKnobWidth)) * (totalButtonsWidth - listWidth - 5);
+		
+		knobTween.start(channelKnobOffset);		
+		railTween.start(-proportionOffset);
 	};
 	
 	var knobEnd = function(event) {
@@ -325,7 +333,9 @@ function Channelscrub(element) {
 		
 		channelKnobOffset = knobTempOffset;
 		
-		channelKnobModulo = channelKnobOffset % channelKnobLocking;
+		knobSyncChannels(knobTempOffset);
+		
+		/* channelKnobModulo = channelKnobOffset % channelKnobLocking;
 		if (channelKnobModulo != 0) {
 			moveKnobToPixel(channelKnobOffset);
 		}
@@ -338,7 +348,7 @@ function Channelscrub(element) {
 		if (lastFitsStarts != newFitsStarts) {
 			lastFitsStarts = newFitsStarts;
 			changeCallback(newFitsStarts);
-		}
+		} */
 		
 		event.stop();
 		event.stopPropagation();
@@ -350,7 +360,7 @@ function Channelscrub(element) {
 		event.stopPropagation();
 	});
 	
-	newChannelKnob.addEvent('mousedown', function(event) {
+	var knobBegin = function(event) {
 		knobMoving = true;
 		oldMouseX = event.page.x;
 		oldMouseY = event.page.y;
@@ -365,7 +375,9 @@ function Channelscrub(element) {
 		event.stop();
 		
 		return false;
-	});
+	};
+	
+	newChannelKnob.addEvent('mousedown', knobBegin);
 	
 	var newChannelList = new Element('div', {
 		'class': 'channelButtons',
