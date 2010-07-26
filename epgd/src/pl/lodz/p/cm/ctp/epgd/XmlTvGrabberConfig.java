@@ -9,6 +9,7 @@ public class XmlTvGrabberConfig implements Serializable {
 	public String commandLine;
 	public String resultFile;
 	public String mapFile;
+	public int aheadDays;
 	
 	public String toString() {
 		return commandLine + " , " + resultFile;

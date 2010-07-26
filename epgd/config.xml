@@ -8,12 +8,14 @@
 	</database>
 	<xmlTvGrabbers>
 		<xmlTvGrabber>
-			<commandLine>/home/jstar/epguide-1.3/src/epguide_run -p teleman -w -c 1,2 -f xmltv -o thisWeek.xml</commandLine>
+			<commandLine>/home/jstar/epguide-1.3/src/epguide_run -p teleman -d %tF -c 1,2 -f xmltv -o thisWeek.xml</commandLine>
 			<resultFile>thisWeek.xml</resultFile>
 			<mapFile>mapping.xml</mapFile>
 			<schedule>0 3 * * Mon</schedule> <!-- this is crontab-like syntax, for more lookup cron4j -->
+			<aheadDays>5</aheadDays>
 		</xmlTvGrabber>
 	</xmlTvGrabbers>
+	<runInfoDir>/var/run/epgd/</runInfoDir>
 	<recordAllPrograms>true</recordAllPrograms>
 	<cleaner>
 		<schedule>5 3 * * Mon</schedule>

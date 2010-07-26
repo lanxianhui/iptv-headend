@@ -2,6 +2,7 @@ package pl.lodz.p.cm.ctp.epgd;
 
 import java.io.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Hashtable;
 
 import pl.lodz.p.cm.ctp.dao.*;
@@ -15,6 +16,8 @@ public class ProgramUpdater implements Runnable {
 	private XmlTvGrabberConfig myConfig;
 	private Hashtable<String, Long> channelMap;
 	private Hashtable<Long, String> timeCorrectionMap;
+	
+	volatile boolean running = false;
 	
 	public ProgramUpdater(XmlTvGrabberConfig config) {
 		this.myConfig = config;
@@ -59,9 +62,22 @@ public class ProgramUpdater implements Runnable {
 
 	@Override
 	public void run() {
+		Epgd.log("Starting XMLTV grabber");
+		
+		if (!running) {
+			running = true;
+		} else {
+			Epgd.log("Grabber already running, terminating this instance.");
+			return;
+		}
+		
 		try {
-			Epgd.log("Starting XMLTV grabber");
-			String[] cmd = myConfig.commandLine.split(" ");
+			Date downloadDate = new Date();
+			
+			String tempCmd = String.format(myConfig.commandLine, downloadDate);
+			Epgd.log("Using command line: " + tempCmd);
+			
+			String[] cmd = tempCmd.split(" ");
 			
 			try {
 				Process p = Runtime.getRuntime().exec(cmd);
@@ -70,7 +86,7 @@ public class ProgramUpdater implements Runnable {
 				Epgd.error("Woken up?");
 				e1.printStackTrace();
 			} catch (IOException io) {
-				Epgd.error("Unable to start xmltv grabber." + io.getMessage());
+				Epgd.error("Unable to start xmltv grabber. " + io.getMessage());
 				return;
 			}
 			
@@ -146,6 +162,8 @@ public class ProgramUpdater implements Runnable {
 		} catch (IOException e) {
 			Epgd.error("There is a problem with the XMLTV file: " + e.getMessage());
 		}		
+		
+		running = false;
 	}
 	
 }
