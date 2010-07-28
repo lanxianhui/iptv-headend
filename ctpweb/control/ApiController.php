@@ -27,11 +27,13 @@ class ApiController {
 				$channel->setPrograms($programs);
 			}
 		} else {
-		foreach ($channels as &$channel) {
+			foreach ($channels as &$channel) {
 				$programs = EpgLogic::getPrograms(&$conn, &$channel, $date);
 				$channel->setPrograms($programs);
 			}
 		}
+		
+		return $channels;
 	}
 	
 	private function guideOperations(&$conn, $method, $args) {
@@ -49,7 +51,7 @@ class ApiController {
 							break;
 					}
 				}
-				return getGuide(&$conn, null, $date, $withRecordings);
+				return $this->getGuide(&$conn, null, $date, $withRecordings);
 				break;
 			default:
 				header('HTTP/1.1 405 Method Not Allowed');
@@ -73,9 +75,9 @@ class ApiController {
 		switch ($method) {
 			case 'GET':
 				if (count($args) == 0) {
-					return listChannels(&$conn);
+					return $this->listChannels(&$conn);
 				} else if (count($args) == 1) {
-					return getChannelById(&$conn, (int)$args[0]);
+					return $this->getChannelById(&$conn, (int)$args[0]);
 				} else if ((count($args) >= 2) && ($args[1] == "guide")) {
 					$id = (int)$args[0];
 					$withRecordings = false;
@@ -90,7 +92,7 @@ class ApiController {
 								break;
 						}
 					}
-					return getGuide(&$conn, $id, $date, $withRecordings);
+					return $this->getGuide(&$conn, $id, $date, $withRecordings);
 				}
 				break;
 			default:
@@ -103,15 +105,23 @@ class ApiController {
 	
 	// ---------- PROGRAM OPERATIONS -------------
 	
+	private function getProgramById(&$conn, $id) {
+		return EpgLogic::getProgramById(&$conn, $id);
+	}
+	
+	private function getProgramRecordingByProgramId(&$conn, $id) {
+		return EpgLogic::getProgramRecordingByProgramId(&$conn, $id);
+	}
+	
 	private function programOperations(&$conn, $method, $args) {
 		switch ($method) {
 			case 'GET':
 				if (count($args) == 1) {
 					$id = (int)$args[0];
-					return EpgLogic::getProgramById(&$conn, $id);
+					return $this->getProgramById(&$conn, $id);
 				} else if ((count($args) == 2) && ($args[1] == 'withRecordings')) {
 					$id = (int)$args[0];
-					return EpgLogic::getProgramRecordingByProgramId(&$conn, $id);
+					return $this->getProgramRecordingByProgramId(&$conn, $id);
 				}
 				break;
 			default:
@@ -160,16 +170,16 @@ class ApiController {
 			
 			switch ($object) {
 				case "guide":
-					$result = guideOperations(&$conn, $method, $args);
+					$result = $this->guideOperations(&$conn, $method, $args);
 					break;
 				case "channels":
-					$result = channelOperations(&$conn, $method, $args);
+					$result = $this->channelOperations(&$conn, $method, $args);
 					break;
 				case "program":
-					$result = programOperations(&$conn, $method, $args);
+					$result = $this->programOperations(&$conn, $method, $args);
 					break;
 				case "favProgs":
-					$result = favProgsOperations(&$conn, $method, $args);
+					$result = $this->favProgsOperations(&$conn, $method, $args);
 					break;
 			}
 			
