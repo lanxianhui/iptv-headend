@@ -36,7 +36,8 @@ function downloadData(url, callback){
         onSuccess: loadGuide,
         onFailure: cancelGuide,
         headers: {
-            Accept: "application/json"
+            Accept: "application/json",
+            'X-CTP-Api': "0.01"
         }
     });
     jsonRequest.send();
@@ -385,9 +386,9 @@ function updateGuide(){
 	var dayForS = padZeros(currentDate.get('Date', day));
 	
 	var date = yearForS + "-" + monthForS + "-" + dayForS; 
-	extUrl = "?day=" + date;
+	extUrl = "/guide/day/" + date + "/withRecordings";
 	
-    downloadData("epg.php" + extUrl, loadGuide);
+    downloadData("api.php" + extUrl, loadGuide);
 }
 
 function hasUrlChanged() {

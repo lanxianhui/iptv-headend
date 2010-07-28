@@ -111,7 +111,8 @@ function downloadData(url) {
         url: url,
         onSuccess: loadResult,
         headers: {
-            Accept: "application/json"
+            Accept: "application/json",
+            'X-CTP-Api': '0.01'
         }
     });
     jsonRequest.send();
@@ -123,7 +124,7 @@ function beginPlaybackFromUrl() {
 	var type = urlParams[0]; 
 	var id = urlParams[1];
 	if (type == "program") {
-		downloadData("mediaplayer.php?id=" + id + "&type=" + type);
+		downloadData("api.php/program/" + id + "/withRecordings");
 	} else if (type == "channel") {
 		channelId = id;
 		playChannels();
@@ -249,7 +250,7 @@ function soundMinus() {
 
 function bootscripts() {
 	// Bootstrap our list of channels
-	downloadData("mediaplayer.php?type=channels");
+	downloadData("api.php/channels");
 	
 	mediaplayer = new Media($('media'), "");
 	

@@ -138,6 +138,7 @@ class ApiController {
 	
 	public function ApiController($config) {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
+		// TODO Reenable CTP API testing
 		//$isCTPApiSet = ($_SERVER['HTTP_X_CTP_API'] == "0.01");
 		$isCTPApiSet = true;
 	
