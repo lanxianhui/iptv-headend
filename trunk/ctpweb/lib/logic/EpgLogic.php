@@ -20,6 +20,20 @@ class EpgLogic {
 	}
 	
 	/**
+	 * Gets a channel with a given id
+	 * @param $conn The Datasource connection to be used
+	 * @param $id The id of the channel to be downloaded
+	 * @return A TvChannel object
+	 */
+	public function getChannel(&$conn, $id) {
+		$channelDAO = new TvChannelDAO();
+		if ($id != null)
+			return $channelDAO->getObject(&$conn, $id);
+		else
+			return false;
+	}
+	
+	/**
 	 * Gets the number of all the channels within the system
 	 * @param $conn The Datasource connection to be used
 	 * @return A number of all the channels
