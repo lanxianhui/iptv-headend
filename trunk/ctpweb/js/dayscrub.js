@@ -9,7 +9,7 @@ function padZeros(number) {
 
 function toMonthShort(number) {
 	switch (number) {
-		case 1:
+		/* case 1:
 			return "I";
 		case 2:
 			return "II";
@@ -32,7 +32,31 @@ function toMonthShort(number) {
 		case 11:
 			return "XI";
 		case 12:
-			return "XII";
+			return "XII"; */
+		case 1:
+			return "Jan";
+		case 2:
+			return "Feb";
+		case 3:
+			return "Mar";
+		case 4:
+			return "Apr";
+		case 5:
+			return "May";
+		case 6:
+			return "Jun";
+		case 7:
+			return "Jul";
+		case 8:
+			return "Aug";
+		case 9:
+			return "Sept";
+		case 10:
+			return "Oct";
+		case 11:
+			return "Nov";
+		case 12:
+			return "Dec";
 	}
 }
 
