@@ -258,6 +258,13 @@ function soundMinus() {
 	vlc.audio.volume = volume * 100;
 }
 
+function goLive() {
+	if (!isLive) {
+		var urlParams = location.href.split("#");
+		location.href = urlParams[0] + "#" + 'channel' + ',' + localProgram.tvChannelId;
+	}
+}
+
 function bootscripts() {
 	// Bootstrap our list of channels
 	downloadData("api.php/channels");
@@ -266,8 +273,7 @@ function bootscripts() {
 	
 	var mediabar = mediaplayer.getMediabar();
 	mediabar.addEvent('liveclick', function(event) {
-		var urlParams = location.href.split("#");
-		location.href = urlParams[0] + "#" + 'channel' + ',' + localProgram.tvChannelId;
+		goLive();
 	});
 	mediabar.addEvent('chplusclick', function(event) {
 		channelPlus();
@@ -282,6 +288,8 @@ function bootscripts() {
 			channelMinus();
 		} else if ((event.code == 32) | (event.code == 179)) {
 			playbackPlayPause();
+		} else if ((event.code == 178)) {
+			goLive();
 		} else if (event.code == 38) {
 			soundPlus();
 		} else if (event.code == 40) {
