@@ -50,6 +50,8 @@ function loadProgram(program) {
 	vlc.playlist.playItem(id);
 	
 	vlc.audio.volume = mediabar.getVolume() * 100;
+	
+	setTimeout(enableDeinterlace, 500);
 }
 
 function findChannel(id, channels) {
@@ -95,6 +97,8 @@ function playChannels() {
 	vlc.playlist.playItem(id);
 	
 	vlc.audio.volume = mediabar.getVolume() * 100;
+	
+	setTimeout(enableDeinterlace, 500);
 }
 
 function loadResult(result) {
@@ -160,6 +164,12 @@ function loadSettings() {
 		var vlc = mediaplayer.getPlayer();
 		vlc.audio.volume = settingsObject.volume * 100;
 	} 
+}
+
+function enableDeinterlace() {
+	var vlc = mediaplayer.getPlayer();
+	
+	vlc.video.deinterlace.enable("x");
 }
 
 function channelPlus() {

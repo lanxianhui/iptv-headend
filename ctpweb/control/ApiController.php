@@ -7,6 +7,62 @@ require_once('lib/logic/AccountLogic.php');
 
 class ApiController {
 	
+	// ---------- HELPER FUNCTIONS -------------
+	
+	private function sendStatusCode($code, $message, $headers = null) {
+		$codeDesc = array(// Successful action
+			  201 => "Created",
+			  202 => "Accepted",
+			  203 => "Non-Authoritative Information",
+			  204 => "No Content",
+			  205 => "Reset Content",
+			  206 => "Partial Content",
+			  // Redirection
+			  300 => "Multiple Choices",
+			  301 => "Moved Permanently",
+			  302 => "Found",
+			  303 => "See Other",
+			  304 => "Not Modified",
+			  305 => "Use Proxy",
+			  307 => "Temporary Redirect",
+			  // Client Error
+			  400 => "Bad Request",
+			  401 => "Unauthorized",
+			  402 => "Payment Required",
+			  403 => "Forbidden",
+			  404 => "Not Found",
+			  405 => "Method Not Allowed",
+			  406 => "Not Acceptable",
+			  407 => "Proxy Authentication Required",
+			  408 => "Request Timeout",
+			  409 => "Conflict",
+			  410 => "Gone",
+			  411 => "Length Required",
+			  412 => "Precondition Failed",
+			  413 => "Request Entity Too Large",
+			  414 => "Request-URI Too Long",
+			  415 => "Unsupported Media Type",
+			  416 => "Requested Range Not Satisfiable",
+			  417 => "Expectation Failed",
+			  // Server Error
+			  500 => "Internal Server Error",
+			  501 => "Not Implemented",
+			  502 => "Bad Gateway",
+			  503 => "Service Unavailable",
+			  504 => "Gateway Timeout"
+		);
+		header('HTTP/1.1 ' + $code + ' ' + $codeDesc[$code]);
+		if (count($headers) > 0) {
+			foreach ($headers as &$header) {
+				header($header);
+			}
+		}
+		$errorObj = array('code' => $code,
+						  'description' => $codeDesc[$code],
+						  'message' => $message);
+		return $errorObj;
+	}
+	
 	// ---------- GUIDE OPERATIONS -------------
 	
 	private function getGuide(&$conn, $id = null, $date = null, $withRecordings = false) {
@@ -54,9 +110,7 @@ class ApiController {
 				return $this->getGuide(&$conn, null, $date, $withRecordings);
 				break;
 			default:
-				header('HTTP/1.1 405 Method Not Allowed');
-				header('Allow: GET');
-				return("This method is not allowed for this resource");
+				return sendStatusCode(405, "Guide supports only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
@@ -96,9 +150,7 @@ class ApiController {
 				}
 				break;
 			default:
-				header('HTTP/1.1 405 Method Not Allowed');
-				header('Allow: GET');
-				return("This method is not allowed for this resource");
+				return sendStatusCode(405, "Channels support only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
@@ -125,9 +177,7 @@ class ApiController {
 				}
 				break;
 			default:
-				header('HTTP/1.1 405 Method Not Allowed');
-				header('Allow: GET');
-				return("This method is not allowed for this resource");
+				return sendStatusCode(405, "Programs supports only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
@@ -139,9 +189,7 @@ class ApiController {
 			/* case 'GET':
 				break; */
 			default:
-				header('HTTP/1.1 405 Method Not Allowed');
-				header('Allow: GET');
-				return("This method is not allowed for this resource");
+				return sendStatusCode(405, "FavProgs supports only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
@@ -149,8 +197,8 @@ class ApiController {
 	public function ApiController($config) {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
 		// TODO Reenable CTP API testing
-		//$isCTPApiSet = ($_SERVER['HTTP_X_CTP_API'] == "0.01");
-		$isCTPApiSet = true;
+		$isCTPApiSet = ($_SERVER['HTTP_X_CTP_API'] == "0.01");
+		//$isCTPApiSet = true;
 	
 		if (AccountLogic::isAuthorised(&$conn) && $isCTPApiSet) {
 			
@@ -188,15 +236,13 @@ class ApiController {
 				print(json_encode($result));
 				exit;
 			} else {
-				header('HTTP/1.1 406 Not Acceptable');
 				header('Content-type: application/json');
-				print(json_encode("JSON is currently the only supported format for API interaction."));
+				print(sendStatusCode(406, "JSON is currently the only supported format for API interaction."));
 				exit;
 			}
 		} else {
-			header('HTTP/1.1 401 Unauthorized');
-			header('Location: login.php');
-			print(json_encode("You need to authorise yourself properly for the interaction with the API."));
+			header('Content-type: application/json');
+			print(sendStatusCode(401, "You need to authorise yourself."));
 			exit;
 		}
 	}
