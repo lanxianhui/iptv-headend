@@ -2,6 +2,8 @@
 
 class AccountLogic {
 	
+	private static $salt = "gsdfha7f348fajhsvzyd8d7dj4i8gd84jdg";
+	
 	public function AccountLogic() {
 		
 	}
@@ -44,7 +46,7 @@ class AccountLogic {
 			$usedPersistent = true;
 		} else if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 			$userName = $_SERVER['PHP_AUTH_USER'];
-			$passwordMD5 = md5($_SERVER['PHP_AUTH_PW']);
+			$passwordMD5 = md5($_SERVER['PHP_AUTH_PW'] . AccountLogic::salt);
 		} else {
 			return false;
 		}
@@ -92,7 +94,7 @@ class AccountLogic {
 	 */
 	function loginUser(&$conn, $userName, $password, $keepLoggedIn, $plainText = false) {
 		if ($plainText) {
-			$passwordMD5 = md5($password);
+			$passwordMD5 = md5($password . AccountLogic::salt);
 		} else {
 			$passwordMD5 = $password;
 		}
