@@ -275,6 +275,46 @@ a {
     font-size: 0.85em;
 }
 
+.channelGuide .channel {
+	background: #e0ecff;
+	float: left;
+	height: 125px;
+	margin: 5px;
+	position: relative;
+	padding: 10px 10px;
+	width: 80px;
+	cursor: pointer;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.channelGuide .channel img {
+	z-index: 2;
+}
+
+.channelGuide .channel h2 {
+	text-align: center;
+	position: relative;
+	z-index: 2;
+	margin-top: 10px;
+}
+
+.channelGuide .channel a {
+	color: #000;
+	text-decoration: none;
+}
+
+.channelGuide .channel .lcn {
+	color: #f7faff;
+	font-size: 4em;
+	font-weight: bold;
+	left: 0px;
+	position: absolute;
+	top: 96px;
+	z-index: 1;
+}
+
 div.hidden {
     display: none;
 }

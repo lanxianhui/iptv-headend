@@ -10,6 +10,10 @@ class AccountLogic {
 	
 	private static $lastUserName;
 	
+	/**
+	 * Fetch the last user name that was logged in
+	 * @return The name of the last logged-in user
+	 */
 	public function getLastUser() {
 		if (!isset($_COOKIE["CTP_lastUser"])) {
 			return self::$lastUserName;
@@ -18,6 +22,10 @@ class AccountLogic {
 		}
 	}
 	
+	/**
+	 * Get the current user object
+	 * @return Current logged-in user object of User class
+	 */
 	public function getCurrentUser() {
 		return $_SESSION["userObject"];
 	}
@@ -91,10 +99,11 @@ class AccountLogic {
 	 * @param $password User's password (plaintext)
 	 * @param $keepLoggedIn Should the system keep the user logged in for an indefinite amount of time.
 	 * @param $plainText If the password is provided in plain text, should be set to true, otherwise optional
+	 * @return true if the login was succesful, false otherwise
 	 */
 	function loginUser(&$conn, $userName, $password, $keepLoggedIn, $plainText = false) {
 		if ($plainText) {
-			$passwordMD5 = md5($password . AccountLogic::salt);
+			$passwordMD5 = md5($password . AccountLogic::$salt);
 		} else {
 			$passwordMD5 = $password;
 		}
