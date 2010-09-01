@@ -16,19 +16,6 @@ var notification;
 var fits = 4;
 var startsForFit = 0;
 
-function openMiniWindow(url, name, width, height) {
-	var popupWindow = window.open(url, name, "width=" + width + ",height=" + height + ",menubar=no,location=no,resizable=yes,scrollbars=no,status=no,centerscreen=yes,directories=no");
-	popupWindow.focus();
-}
-
-function playChannel(id) {
-	openMiniWindow('mediaplayer.php#channel,'+id, 'playerWindow', 640, 500);
-};
-
-function playProgram(id) {
-	openMiniWindow('mediaplayer.php#program,'+id, 'playerWindow', 640, 500);
-};
-
 function downloadData(url, callback){
     var jsonRequest = new Request.JSON({
         method: "get",
