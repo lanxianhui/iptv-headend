@@ -1,8 +1,11 @@
 <?php
 
+require_once($_LIBDIR."/salt.inc.php");
+
 class AccountLogic {
 	
-	private static $salt = "gsdfha7f348fajhsvzyd8d7dj4i8gd84jdg";
+	// TODO Move the salt to an external file
+	private static $salt = SALT;
 	
 	public function AccountLogic() {
 		
