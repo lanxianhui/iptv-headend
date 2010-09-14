@@ -1,0 +1,19 @@
+@CHARSET "UTF-8";
+body {
+	background: #000;
+	color: #eee;
+	margin: 0;
+}
+h1 {
+	text-align: center;
+}
+p {
+	font-size: 1.5em;
+}
+.message {
+	margin: 5em 0;
+	text-align: center;
+}
+#canvas {
+	margin: 10em 10em;
+}
