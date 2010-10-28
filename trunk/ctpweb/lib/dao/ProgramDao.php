@@ -57,11 +57,11 @@ class ProgramDao {
           return $valueObject;
     }
     
-	function getObjectWithRecording(&$conn, $id) {
+	function getObjectWithRecording(&$conn, $id, $user) {
 
           $valueObject = $this->createValueObject();
           $valueObject->setId($id);
-          $this->loadWithRecording(&$conn, &$valueObject);
+          $this->loadWithRecording(&$conn, &$valueObject, &$user);
           return $valueObject;
     }
 
@@ -93,14 +93,22 @@ class ProgramDao {
                return false;
     }
     
-    function loadWithRecording(&$conn, &$valueObject) {
+    function loadWithRecording(&$conn, &$valueObject, $user = null) {
     	
     	if (!$valueObject->getId()) {
                //print "Can not select without Primary-Key!";
                return false;
           }
 
-          $sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId WHERE (Program.id = ".$valueObject->getId().") "; 
+          $sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId";
+          if ($user !== null) {
+          	$sql = $sql." LEFT JOIN UserRecording ON Recording.id = UserRecording.recordingId";
+          }
+          $sql = $sql." WHERE (Program.id = ".$valueObject->getId();
+          if ($user !== null) {
+          	$sql = $sql." AND (UserRecording.userId = ".$user->getId()." OR UserRecording.userId IS NULL)";
+          }
+          $sql = $sql.") "; 
 
           if ($this->singleQueryRecording(&$conn, $sql, &$valueObject))
                return true;
@@ -124,12 +132,20 @@ class ProgramDao {
     	
     }
     
-    function loadDayWithRecordings(&$conn, &$channel, $date) {
+    function loadDayWithRecordings(&$conn, &$channel, $date, $user = null) {
     	if (!$channel->getId()) {
                return false;
        	}
     	
-    	$sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId WHERE ( Program.tvChannelId = ".$channel->getId()." AND DATE(Program.begin) = DATE(FROM_UNIXTIME(".$date.")) ) ORDER BY begin ASC";
+    	$sql = "SELECT * FROM Program LEFT JOIN Recording ON Program.id = Recording.programId";
+    	if ($user !== null) {
+          	$sql = $sql." LEFT JOIN UserRecording ON Recording.id = UserRecording.recordingId";
+        }
+    	$sql = $sql." WHERE ( Program.tvChannelId = ".$channel->getId()." AND DATE(Program.begin) = DATE(FROM_UNIXTIME(".$date.")) ";
+    	if ($user !== null) {
+    		$sql = $sql." AND (UserRecording.userId = ".$user->getId()." OR UserRecording.userId IS NULL)";
+    	}
+    	$sql = $sql.") ORDER BY Program.begin ASC";
     	
     	$searchResults = $this->listQueryRecordings(&$conn, &$sql);
     	
@@ -441,13 +457,16 @@ class ProgramDao {
                    $valueObject->setBegin(strtotime($row[4])); 
                    $valueObject->setEnd(strtotime($row[5]));
 
-		           if ($row[6] != null) {
+		           if ($row[6] !== null) {
 			               $recordingDao = new RecordingDao();
 			               $tempRecording = $recordingDao->createValueObject();
 			               $tempRecording->setId($row[6]);
 			               $tempRecording->setProgramId($row[7]);
 			               $tempRecording->setMode($row[8]);
 			               $tempRecording->setFileName($row[9]);
+			               if ($row[10] !== null) {
+			               		$tempRecording->setGrabbed(true);
+			               }
 			               $valueObject->setRecording($tempRecording);
 		           }
           } else {
@@ -501,13 +520,16 @@ class ProgramDao {
                $temp->setBegin(strtotime($row[4])); 
                $temp->setEnd(strtotime($row[5])); 
                
-               if ($row[6] != null) {
+               if ($row[6] !== null) {
 	               $recordingDao = new RecordingDao();
 	               $tempRecording = $recordingDao->createValueObject();
 	               $tempRecording->setId($row[6]);
 	               $tempRecording->setProgramId($row[7]);
 	               $tempRecording->setMode($row[8]);
 	               $tempRecording->setFileName($row[9]);
+               	   if ($row[10] !== null) {
+			       		$tempRecording->setGrabbed(true);
+			       }
 	               $temp->setRecording($tempRecording);
                }
                

@@ -120,7 +120,7 @@ class Datasource {
                         //$message = addslashes("SQL-command: ".$sql." error-message: ".$message);
                         //$systemLog->writeSystemSqlError ("SQL Error occurred", $errno, $message);
 
-                        print "Unrecowerable error has occurred. All data will be logged.";
+                        print "Unrecoverable error has occurred. All data will be logged.";
                         print "Please contact System Administrator for help! \n";
                         print "<!-- ".$message." -->\n";
                         exit;

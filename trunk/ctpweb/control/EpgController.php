@@ -21,7 +21,7 @@ class EpgController {
 			}
 			
 			foreach ($channels as &$channel) {
-				$programs = EpgLogic::getProgramsWithRecordings(&$conn, &$channel, $date);
+				$programs = EpgLogic::getProgramsWithRecordings(&$conn, &$channel, $date, AccountLogic::getCurrentUser());
 				$channel->setPrograms($programs);
 			}
 			

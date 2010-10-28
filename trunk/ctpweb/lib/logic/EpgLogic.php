@@ -55,9 +55,9 @@ class EpgLogic {
 		return $programDAO->loadDay(&$conn, &$channel, $date);
 	}
 	
-	public function getProgramsWithRecordings(&$conn, &$channel, $date) {
+	public function getProgramsWithRecordings(&$conn, &$channel, $date, $user = null) {
 		$programRecordingDAO = new ProgramDAO();
-		return $programRecordingDAO->loadDayWithRecordings(&$conn, &$channel, $date);
+		return $programRecordingDAO->loadDayWithRecordings(&$conn, &$channel, $date, $user);
 	}
 	
 	public function getProgramById(&$conn, $id) {
