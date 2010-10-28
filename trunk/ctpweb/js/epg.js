@@ -120,7 +120,7 @@ function addProgram(schedule, program, channel){
 		});
 	}
 	else if (program.recording != null) {
-		if (program.recording.mode == "WAITING") {
+		/* if (program.recording.mode == "WAITING") {
 			removeButton = createButton(newActions, "pill letgo", "Let go");
 			
 			removeButton.addEvent('click', function(event){
@@ -129,8 +129,43 @@ function addProgram(schedule, program, channel){
 				event.stop();
 			});
 		}
-		else if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
-			var deleteButton = createButton(newActions, "pill letgo space", "Let go");
+		else */
+		
+		var letGoButton;
+		var grabButton;
+		
+		if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING") | (program.recording.mode == "WAITING")) {
+			letGoButton = createButton(newActions, "pill letgo space", "Let go");
+			letGoButton.addEvent('click', function(event){
+				alert('Let go!');
+				
+				// TODO Currently only emulates letting go!
+				grabButton.removeClass("invisible");
+				letGoButton.addClass("invisible");
+				program.recording.grabbed = false;
+				event.stop();
+			});
+			
+			grabButton = createButton(newActions, "pill grab space", "Grab");
+			grabButton.addEvent('click', function(event){
+				alert('Grabbing!');
+				
+				// TODO Currently only emulates letting go!
+				letGoButton.removeClass("invisible");
+				grabButton.addClass("invisible");
+				program.recording.grabbed = true;
+				event.stop();
+			});
+			
+			if (program.recording.grabbed == true) {
+				grabButton.addClass("invisible");
+			} else {
+				letGoButton.addClass("invisible");
+			}
+		}
+		
+		if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING")) {
+			//var deleteButton = createButton(newActions, "pill letgo space", "Let go");
 			
 			if (program.recording.mode == "PROCESSING")
 				playButtonType = "pill-l";
@@ -175,13 +210,13 @@ function addProgram(schedule, program, channel){
 				
 				event.stop();
 			});
-			deleteButton.addEvent('click', function(event){
+			/* deleteButton.addEvent('click', function(event){
 				alert('delete!');
 				
 				contextMenuHide();
 				
 				event.stop();
-			});
+			}); */
 		}
 	}
 	
