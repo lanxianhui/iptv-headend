@@ -79,3 +79,7 @@
       font-weight:bold;
       color:#000;
       }
+	/* use if button should be hidden from the user */
+	 .invisible {
+	 	display: none;
+	 }
