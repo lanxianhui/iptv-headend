@@ -17,3 +17,40 @@ p {
 #canvas {
 	margin: 10em 10em;
 }
+.channel {
+	position: relative;
+	display: block;
+	float: left;
+	margin: 1em 1em;
+	font-size: 1.5em;
+	border: none;
+	background: url(../img/cb_n.png);
+	width: 177px;
+	height: 200px;
+	color: #eee;
+	text-decoration: none;
+}
+.channel img {
+	clear: both;
+	z-index: 1;
+}
+.channel .name {
+	display: block;
+	text-align: center;
+	z-index: 2;
+}
+.channel .lcn {
+	position: absolute;
+	font-weight: bold;
+	top: 10px;
+	left: 10px;
+	z-index: 4;
+	font-size: 5em;
+	color: #060606;
+}
+.channel:hover .lcn {
+	color: #051224;
+}
+.channel:hover {
+	background: url(../img/cb_h.png);
+}

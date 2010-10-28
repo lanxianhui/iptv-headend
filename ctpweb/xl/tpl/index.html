@@ -18,8 +18,15 @@ var maximizeViewport = function() {
 maximizeViewport();
 </script>
 <div id="canvas">
-	<h1><img src="img/logo.png" width="284" height="133" alt="CTP"></h1>
-	<p class="message">Return to this page soon for a Big Screen version of CTP.</p>
+	<div id="channelList">
+		{foreach from=$channels item=channel}
+		<a href="{$channel->unicastUrl}" class="channel">
+			<img src="../img/logos/{$channel->icon}" width="80" height="80"><br>
+			<span class="lcn">{$channel->lcn}</span>
+			<span class="name">{$channel->name}</span>
+		</a>
+		{/foreach}
+	</div>
 </div>
 </body>
 </html>
