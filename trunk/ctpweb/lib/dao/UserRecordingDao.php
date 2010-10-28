@@ -73,18 +73,19 @@ class UserRecordingDao {
      */
     function load(&$conn, &$valueObject) {
 
-          if (!$valueObject->getRecordingId()) {
+          if (!$valueObject->getRecordingId() && !$valueObject->getUserId()) {
                //print "Can not select without Primary-Key!";
                return false;
           }
 
-          if (!$valueObject->getUserId()) {
-               //print "Can not select without Primary-Key!";
-               return false;
+          $sql = "SELECT * FROM UserRecording WHERE (1=1";
+          if ($valueObject->getRecordingId()) {
+          	   $sql = $sql." AND recordingId = ".$valueObject->getRecordingId();
           }
-
-          $sql = "SELECT * FROM UserRecording WHERE (recordingId = ".$valueObject->getRecordingId()." AND ";
-          $sql = $sql."userId = ".$valueObject->getUserId().") "; 
+          if ($valueObject->getUserId()) {
+          	   $sql = $sql." AND userId = ".$valueObject->getUserId();
+          } 
+          $sql = $sql.")";
 
           if ($this->singleQuery(&$conn, $sql, &$valueObject))
                return true;

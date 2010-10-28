@@ -49,7 +49,7 @@ class RecordingDao {
      * for the real load-method which accepts the valueObject as a parameter. Returned
      * valueObject will be created using the createValueObject() method.
      */
-    function getObject(&$conn, $id, $programId = null) {
+    function getObject(&$conn, $id, $programId = null, $userId = null) {
 
           $valueObject = $this->createValueObject();
           
@@ -71,21 +71,33 @@ class RecordingDao {
      * @param conn         This method requires working database connection.
      * @param valueObject  This parameter contains the class instance to be loaded.
      *                     Primary-key field must be set for this to work properly.
+     * @param userId	   User context for this query
      */
-    function load(&$conn, &$valueObject) {
+    function load(&$conn, &$valueObject, $userId = null) {
     	
-		  $sql = "";
+		  $sql = "SELECT * FROM Recording ";
     	
+    	  if ($userId) {
+          		$sql = $sql."LEFT JOIN UserRecording ON Recording.id = UserRecording.recordingId ";
+          }
+		  
           if (!$valueObject->getId()) {
                if (!$valueObject->getProgramId())
                {
                		return false;
                } else {
-               		$sql = "SELECT * FROM Recording WHERE (programId = ".$valueObject->getProgramId().") ";
+               		$sql = $sql."WHERE (Recording.programId = ".$valueObject->getProgramId();
                }
           } else {
-				$sql = "SELECT * FROM Recording WHERE (id = ".$valueObject->getId().") ";
+				$sql = $sql."WHERE (Recording.id = ".$valueObject->getId();
           } 
+          
+          if ($userId) {
+          		$sql = $sql." AND (UserRecording.userId = ".$userId." OR UserRecording.userId IS NULL)";
+          }
+          
+          $sql = $sql." ) ";
+          
 
           if ($this->singleQuery(&$conn, $sql, &$valueObject))
                return true;

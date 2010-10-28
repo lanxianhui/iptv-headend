@@ -37,6 +37,11 @@ class Recording {
     var $mode;
     var $fileName;
     
+    /* grabbed is a special, external kind of variable, only a helper
+     * It only makes sense in a user context
+     */
+    var $grabbed = null;
+    
 	const WAITING = "WAITING";
 	const AVAILABLE = "AVAILABLE";
 	const PROCESSING = "PROCESSING";
@@ -93,6 +98,13 @@ class Recording {
     function setFileName($fileNameIn) {
           $this->fileName = $fileNameIn;
     }
+    
+	function setGrabbed($grabbedIn) {
+    	$this->grabbed = $grabbedIn;
+    }
+    function getGrabbed() {
+    	return $this->grabbed;
+    }
 
 
 
@@ -107,11 +119,13 @@ class Recording {
     function setAll($idIn,
           $programIdIn,
           $modeIn,
-          $fileNameIn) {
+          $fileNameIn,
+          $grabbedIn) {
           $this->id = (int)$idIn;
           $this->programId = (int)$programIdIn;
           $this->mode = $modeIn;
           $this->fileName = $fileNameIn;
+          $this->grabbed = $grabbedIn;
     }
 
 
