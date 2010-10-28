@@ -65,7 +65,7 @@ class ApiController {
 	
 	// ---------- GUIDE OPERATIONS -------------
 	
-	private function getGuide(&$conn, $id = null, $date = null, $withRecordings = false) {
+	private function getGuide(&$conn, $id = null, $date = null, $withRecordings = false, $user = null) {
 		if ($date == null) {
 			$date = time();
 		} else {
@@ -79,7 +79,7 @@ class ApiController {
 		
 		if ($withRecordings) {
 			foreach ($channels as &$channel) {
-				$programs = EpgLogic::getProgramsWithRecordings(&$conn, &$channel, $date);
+				$programs = EpgLogic::getProgramsWithRecordings(&$conn, &$channel, $date, $user);
 				$channel->setPrograms($programs);
 			}
 		} else {
@@ -92,7 +92,7 @@ class ApiController {
 		return $channels;
 	}
 	
-	private function guideOperations(&$conn, $method, $args) {
+	private function guideOperations(&$conn, $method, $args, $user = null) {
 		switch ($method) {
 			case 'GET':
 				$withRecordings = false;
@@ -107,7 +107,7 @@ class ApiController {
 							break;
 					}
 				}
-				return $this->getGuide(&$conn, null, $date, $withRecordings);
+				return $this->getGuide(&$conn, null, $date, $withRecordings, $user);
 				break;
 			default:
 				return sendStatusCode(405, "Guide supports only GET method.", array('Allow: GET'));
@@ -217,7 +217,7 @@ class ApiController {
 			
 			switch ($object) {
 				case "guide":
-					$result = $this->guideOperations(&$conn, $method, $args);
+					$result = $this->guideOperations(&$conn, $method, $args, AccountLogic::getCurrentUser());
 					break;
 				case "channels":
 					$result = $this->channelOperations(&$conn, $method, $args);

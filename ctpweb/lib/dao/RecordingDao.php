@@ -49,7 +49,7 @@ class RecordingDao {
      * for the real load-method which accepts the valueObject as a parameter. Returned
      * valueObject will be created using the createValueObject() method.
      */
-    function getObject(&$conn, $id, $programId = null, $userId = null) {
+    function getObject(&$conn, $id, $programId = null) {
 
           $valueObject = $this->createValueObject();
           
@@ -73,7 +73,7 @@ class RecordingDao {
      *                     Primary-key field must be set for this to work properly.
      * @param userId	   User context for this query
      */
-    function load(&$conn, &$valueObject, $userId = null) {
+    function load(&$conn, &$valueObject, $user = null) {
     	
 		  $sql = "SELECT * FROM Recording ";
     	
@@ -92,8 +92,8 @@ class RecordingDao {
 				$sql = $sql."WHERE (Recording.id = ".$valueObject->getId();
           } 
           
-          if ($userId) {
-          		$sql = $sql." AND (UserRecording.userId = ".$userId." OR UserRecording.userId IS NULL)";
+          if ($user !== null) {
+          		$sql = $sql." AND (UserRecording.userId = ".$user->getId()." OR UserRecording.userId IS NULL)";
           }
           
           $sql = $sql." ) ";
@@ -368,6 +368,11 @@ class RecordingDao {
                    $valueObject->setProgramId($row[1]); 
                    $valueObject->setMode($row[2]); 
                    $valueObject->setFileName($row[3]); 
+                   
+                   if($row[4] !== null) {
+                   		$valueObject->setGrabbed(true);
+                   }
+                   
           } else {
                //print " Object Not Found!";
                return false;
@@ -396,6 +401,11 @@ class RecordingDao {
                $temp->setProgramId($row[1]); 
                $temp->setMode($row[2]); 
                $temp->setFileName($row[3]); 
+               
+          	   if($row[4] !== null) {
+                   $temp->setGrabbed(true);
+               }
+               
                array_push($searchResults, $temp);
           }
 

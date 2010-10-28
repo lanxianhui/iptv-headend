@@ -394,6 +394,7 @@ class UserRecordingDao {
                $tempRecording->setProgramId($row[3]);
                $tempRecording->setMode($row[4]);
                $tempRecording->setFileName($row[5]);
+               $tempRecording->setGrabbed(true);
                
                $programDao = new ProgramDao();
                $tempProgram = $programDao->createValueObject();
