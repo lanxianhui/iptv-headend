@@ -16,12 +16,12 @@ var notification;
 var fits = 4;
 var startsForFit = 0;
 
-function downloadData(url, callback){
-    var jsonRequest = new Request.JSON({
-        method: "get",
+function restCall(url, method, callback, callbackFailure) {
+	var jsonRequest = new Request.JSON({
+        method: method,
         url: url,
-        onSuccess: loadGuide,
-        onFailure: cancelGuide,
+        onSuccess: callback,
+        onFailure: callbackFailure,
         headers: {
             Accept: "application/json",
             'X-CTP-Api': "0.01"
@@ -114,7 +114,7 @@ function addProgram(schedule, program, channel){
 		monitorButton = createButton(newActions, "pill primary grip", "Grip");
 		
 		monitorButton.addEvent('click', function(event){
-			alert('record!');
+			alert('record! ' + program.title);
 			
 			event.stop();
 		});
@@ -137,23 +137,55 @@ function addProgram(schedule, program, channel){
 		if ((program.recording.mode == "AVAILABLE") | (program.recording.mode == "PROCESSING") | (program.recording.mode == "WAITING")) {
 			letGoButton = createButton(newActions, "pill letgo space", "Let go");
 			letGoButton.addEvent('click', function(event){
-				alert('Let go!');
+				//alert('Let go! ' + program.title);
 				
-				// TODO Currently only emulates letting go!
-				grabButton.removeClass("invisible");
-				letGoButton.addClass("invisible");
-				program.recording.grabbed = false;
+				extUrl = "/myList/" + program.recording.id;
+				
+				var callback = function(result) {
+					if (result.code == 202) {
+						letGoButton.addClass("invisible");
+						grabButton.removeClass("invisible");
+						program.recording.grabbed = false;
+						//alert(program.title + ' grabbed!');
+					} else {
+						notificationShow("Unable to let go '" + program.title + "'.");
+						delayedNotificationHide(10);
+					}
+				};
+				var callbackFailure = function() {
+					//alert(program.title + ' grabbing unsuccesful!');
+					notificationShow("Unable to let go '" + program.title + "'.");
+					delayedNotificationHide(10);
+				};
+				
+				restCall("api.php" + extUrl, 'delete', callback, callbackFailure);
 				event.stop();
 			});
 			
 			grabButton = createButton(newActions, "pill grab space", "Grab");
 			grabButton.addEvent('click', function(event){
-				alert('Grabbing!');
+				//alert('Grabbing! ' + program.title);
+				extUrl = "/myList/" + program.recording.id;
 				
-				// TODO Currently only emulates letting go!
-				letGoButton.removeClass("invisible");
-				grabButton.addClass("invisible");
-				program.recording.grabbed = true;
+				var callback = function(result) {
+					if (result.code == 201) {
+						letGoButton.removeClass("invisible");
+						grabButton.addClass("invisible");
+						program.recording.grabbed = true;
+						//alert(program.title + ' grabbed!');
+					} else {
+						notificationShow("Unable to grab '" + program.title + "'.");
+						delayedNotificationHide(10);
+					}
+				};
+				var callbackFailure = function() {
+					//alert(program.title + ' grabbing unsuccesful!');
+					notificationShow("Unable to grab '" + program.title + "'.");
+					delayedNotificationHide(10);
+				};
+				
+				restCall("api.php" + extUrl, 'post', callback, callbackFailure);
+				
 				event.stop();
 			});
 			
@@ -410,7 +442,7 @@ function updateGuide(){
 	var date = yearForS + "-" + monthForS + "-" + dayForS; 
 	extUrl = "/guide/day/" + date + "/withRecordings";
 	
-    downloadData("api.php" + extUrl, loadGuide);
+    restCall("api.php" + extUrl, 'get', loadGuide, cancelGuide);
 }
 
 function hasUrlChanged() {
