@@ -52,10 +52,11 @@ class ApiController {
 			  503 => "Service Unavailable",
 			  504 => "Gateway Timeout"
 		);
-		header('HTTP/1.1 ' + $code + ' ' + $codeDesc[$code]);
+		header('HTTP/1.0 ' + $code + ' ' + $codeDesc[$code]);
+		header('Status: ' + $code + ' ' + $codeDesc[$code]);
 		if (count($headers) > 0) {
 			foreach ($headers as &$header) {
-				header($header);
+				header($header, true, $code);
 			}
 		}
 		$errorObj = array('code' => $code,
