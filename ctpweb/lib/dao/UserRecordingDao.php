@@ -145,8 +145,13 @@ class UserRecordingDao {
      */
     function create(&$conn, &$valueObject) {
 
-          $sql = "INSERT INTO UserRecording ( recordingId, userId) VALUES (".$valueObject->getRecordingId().", ";
-          $sql = $sql."".$valueObject->getUserId().") ";
+          $sql = "INSERT INTO UserRecording ( recordingId, userId, createdOn ) VALUES (".$valueObject->getRecordingId().", ";
+          $sql = $sql."".$valueObject->getUserId().", ";
+          if ($valueObject->getCreatedOn() != null) {
+          	$sql = $sql."\"".$valueObject->createdOn()."\")";
+          } else {
+          	$sql = $sql."NOW())";
+          }
           $result = $this->databaseUpdate(&$conn, $sql);
 
           return true;
@@ -167,8 +172,9 @@ class UserRecordingDao {
     function save(&$conn, &$valueObject) {
 
           $sql = "UPDATE UserRecording SET ";
+          $sql = $sql."createdOn = \"".$valueObject->getCreatedOn()."\" ";
           $sql = $sql." WHERE (recordingId = ".$valueObject->getRecordingId()." AND ";
-          $sql = $sql."userId = ".$valueObject->getUserId().") ";
+          $sql = $sql."userId = ".$valueObject->getUserId().")";
           $result = $this->databaseUpdate(&$conn, $sql);
 
           if ($result != 1) {
@@ -286,6 +292,11 @@ class UserRecordingDao {
               if ($first) { $first = false; }
               $sql = $sql."AND userId = ".$valueObject->getUserId()." ";
           }
+          
+    	  if ($valueObject->getUserId() != null) {
+              if ($first) { $first = false; }
+              $sql = $sql."AND createdOn = \"".$valueObject->getCreatedOn()."\" ";
+          }
 
 
           $sql = $sql."ORDER BY userId ASC ";
@@ -345,6 +356,7 @@ class UserRecordingDao {
 
                    $valueObject->setRecordingId($row[0]); 
                    $valueObject->setUserId($row[1]); 
+                   $valueObject->setCreatedOn($row[2]);
           } else {
                //print " Object Not Found!";
                return false;
@@ -371,6 +383,7 @@ class UserRecordingDao {
 
                $temp->setRecordingId($row[0]); 
                $temp->setUserId($row[1]); 
+               $temp->setCreatedOn($row[2]);
                array_push($searchResults, $temp);
           }
 
@@ -386,7 +399,8 @@ class UserRecordingDao {
                $temp = $this->createValueObject();
 
                $temp->setRecordingId($row[0]); 
-               $temp->setUserId($row[1]); 
+               $temp->setUserId($row[1]);
+               $temp->setCreatedOn($row[2]); 
                
                $recordingDao = new RecordingDao();
                $tempRecording = $recordingDao->createValueObject();

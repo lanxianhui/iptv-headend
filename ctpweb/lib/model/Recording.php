@@ -40,7 +40,7 @@ class Recording {
     /* grabbed is a special, external kind of variable, only a helper
      * It only makes sense in a user context
      */
-    var $grabbed = null;
+    var $grabbed = false;
     
 	const WAITING = "WAITING";
 	const AVAILABLE = "AVAILABLE";

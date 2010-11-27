@@ -4,6 +4,7 @@ require_once('lib/base.inc.php');
 require_once('lib/logic/EpgLogic.php');
 require_once('lib/logic/PvrLogic.php');
 require_once('lib/logic/AccountLogic.php');
+require_once('lib/logic/MyListLogic.php');
 
 class ApiController {
 	
@@ -110,7 +111,7 @@ class ApiController {
 				return $this->getGuide(&$conn, null, $date, $withRecordings, $user);
 				break;
 			default:
-				return sendStatusCode(405, "Guide supports only GET method.", array('Allow: GET'));
+				return $this->sendStatusCode(405, "Guide supports only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
@@ -150,7 +151,7 @@ class ApiController {
 				}
 				break;
 			default:
-				return sendStatusCode(405, "Channels support only GET method.", array('Allow: GET'));
+				return $this->sendStatusCode(405, "Channels support only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
@@ -177,19 +178,52 @@ class ApiController {
 				}
 				break;
 			default:
-				return sendStatusCode(405, "Programs supports only GET method.", array('Allow: GET'));
+				return $this->sendStatusCode(405, "Programs supports only GET method.", array('Allow: GET'));
 				break;
 		}
 	}
 	
-	// ---------- FAVPROG OPERATIONS -------------
+	// ---------- MYLIST OPERATIONS -------------
 	
-	private function favProgsOperations(&$conn, $method, $args) {
+	private function getMyList(&$conn, &$user) {
+		return MyListLogic::getMyList(&$conn, &$user);
+	}
+	
+	private function addToMyList(&$conn, &$user, $recordingId) {
+		return MyListLogic::addToMyList(&$conn, &$user, $recordingId);
+	}
+	
+	private function removeFromMyList(&$conn, &$user, $recordingId) {
+		return MyListLogic::removeFromMyList(&$conn, &$user, $recordingId);
+	}
+	
+	private function myListOperations(&$conn, $method, $args) {
 		switch ($method) {
-			/* case 'GET':
-				break; */
+			case 'GET':
+				return $this->getMyList(&$conn, AccountLogic::getCurrentUser());
+				break;
+			case 'DELETE':
+				if ((count($args) == 1) && is_numeric($args[0])) {
+					if ($this->removeFromMyList(&$conn, AccountLogic::getCurrentUser(), (int)$args[0]))
+						return $this->sendStatusCode(202, "Recording let go.");
+					else 
+						return $this->sendStatusCode(500, "An error occured while letting go.");
+				} else {
+					return $this->sendStatusCode(400, "Only recordings can be let go.");
+				}
+				break;
+			case 'POST':
+				if ((count($args) == 1) && is_numeric($args[0])) {
+					if ($this->addToMyList(&$conn, AccountLogic::getCurrentUser(), (int)$args[0]))
+						return $this->sendStatusCode(201, "Recording grabbed.");
+					else 
+						return $this->sendStatusCode(500, "An error occured while grabbing.");
+				} else {
+					return $this->sendStatusCode(400, "Only recordings can be grabbed.");
+				}
+				break;
 			default:
-				return sendStatusCode(405, "FavProgs supports only GET method.", array('Allow: GET'));
+				return $this->sendStatusCode(405, "MyList supports only GET, POST and DELETE methods.", array('Allow: GET POST DELETE'));
 				break;
 		}
 	}
@@ -207,11 +241,11 @@ class ApiController {
 				$args = split('/', substr($_SERVER["PATH_INFO"], 1));
 				// Args now contain args, and object contains the first argument
 				$object = array_shift($args);
-				// Method gets taken from server array, unless it's a GET parameter
+				// Method gets taken from server array, unless it's a POST parameter
 				if (!isset($_POST["_method"])) {
 					$method = $_SERVER["REQUEST_METHOD"];
 				} else {
-					$method = $_POST["_method"];
+					$method = strtoupper($_POST["_method"]);
 				}
 			}
 			
@@ -225,8 +259,8 @@ class ApiController {
 				case "program":
 					$result = $this->programOperations(&$conn, $method, $args);
 					break;
-				case "favProgs":
-					$result = $this->favProgsOperations(&$conn, $method, $args);
+				case "myList":
+					$result = $this->myListOperations(&$conn, $method, $args);
 					break;
 			}
 			
@@ -235,13 +269,14 @@ class ApiController {
 				print(json_encode($result));
 				exit;
 			} else {
-				header('Content-type: application/json');
-				print(sendStatusCode(406, "JSON is currently the only supported format for API interaction."));
+				header('HTTP/1.1 406 Not Acceptable');
+				header('Content-type: text/plain');
+				print("JSON is currently the only supported format for API interaction.");
 				exit;
 			}
 		} else {
 			header('Content-type: application/json');
-			print(sendStatusCode(401, "You need to authorise yourself."));
+			print(json_encode($this->sendStatusCode(401, "You need to authorise yourself.")));
 			exit;
 		}
 	}

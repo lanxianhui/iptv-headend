@@ -34,8 +34,9 @@ class UserRecording {
      * Persistent Instance variables. This data is directly 
      * mapped to the columns of database table.
      */
-    var $recordingId;
-    var $userId;
+    var $recordingId = 0;
+    var $userId = 0;
+    var $createdOn = null;
 
     var $recording;
     var $program;
@@ -81,6 +82,13 @@ class UserRecording {
           $this->userId = (int)$userIdIn;
     }
     
+	function getCreatedOn() {
+          return $this->createdOn;
+    }
+    function setCreatedOn($createdOnIn) {
+          $this->createdOn = $createdOnIn;
+    }
+    
     function getUser() {
     	  return $this->user;
     }
@@ -112,9 +120,10 @@ class UserRecording {
      */
 
     function setAll($recordingIdIn,
-          $userIdIn) {
+          $userIdIn, $createdOnIn) {
           $this->recordingId = (int)$recordingIdIn;
           $this->userId = (int)$userIdIn;
+          $this->createdOn = $createdOnIn;
     }
 
 
@@ -131,6 +140,9 @@ class UserRecording {
                     return(false);
           }
           if ($valueObject->getUserId() != $this->userId) {
+                    return(false);
+          }
+    	  if ($valueObject->getCreatedOn() != $this->createdOn) {
                     return(false);
           }
 
@@ -150,6 +162,7 @@ class UserRecording {
         $out = $out."Persistent attributes: \n"; 
         $out = $out."recordingId = ".$this->recordingId."\n"; 
         $out = $out."userId = ".$this->userId."\n"; 
+        $out = $out."createdOn = ".$this->createdOn."\n";
         return $out;
     }
 
@@ -165,6 +178,7 @@ class UserRecording {
 
         $cloned->setRecordingId($this->recordingId); 
         $cloned->setUserId($this->userId); 
+        $cloned->setCreatedOn($this->createdOn);
 
         return $cloned;
     }

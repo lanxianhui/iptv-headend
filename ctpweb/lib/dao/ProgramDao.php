@@ -57,7 +57,7 @@ class ProgramDao {
           return $valueObject;
     }
     
-	function getObjectWithRecording(&$conn, $id, $user) {
+	function getObjectWithRecording(&$conn, $id, $user = null) {
 
           $valueObject = $this->createValueObject();
           $valueObject->setId($id);
