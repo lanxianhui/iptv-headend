@@ -2,6 +2,7 @@ var lastUrl = "";
 var currentDate = null;
 var openProgram = null;
 var timeFormat = "%I:%M%p";
+var fullDateFormat = "%m/%d/%Y %I:%M%p";
 var timefallUpdater = null;
 var timefallPrecision = 60;
 var epgUpdater = null;
@@ -141,24 +142,26 @@ function addProgram(schedule, program, channel){
 				
 				extUrl = "/myList/" + program.recording.id;
 				
-				var callback = function(result) {
-					if (result.code == 202) {
-						letGoButton.addClass("invisible");
-						grabButton.removeClass("invisible");
-						program.recording.grabbed = false;
-						//alert(program.title + ' grabbed!');
-					} else {
+				if (confirm("Do you want to let go of '" + program.title + "' at " + begin.format(fullDateFormat) + "?")) {
+					var callback = function(result) {
+						if (result.code == 202) {
+							letGoButton.addClass("invisible");
+							grabButton.removeClass("invisible");
+							program.recording.grabbed = false;
+							//alert(program.title + ' grabbed!');
+						} else {
+							notificationShow("Unable to let go '" + program.title + "'.");
+							delayedNotificationHide(10);
+						}
+					};
+					var callbackFailure = function() {
+						//alert(program.title + ' grabbing unsuccesful!');
 						notificationShow("Unable to let go '" + program.title + "'.");
 						delayedNotificationHide(10);
-					}
-				};
-				var callbackFailure = function() {
-					//alert(program.title + ' grabbing unsuccesful!');
-					notificationShow("Unable to let go '" + program.title + "'.");
-					delayedNotificationHide(10);
-				};
-				
-				restCall("api.php" + extUrl, 'delete', callback, callbackFailure);
+					};
+					
+					restCall("api.php" + extUrl, 'delete', callback, callbackFailure);
+				}
 				event.stop();
 			});
 			
