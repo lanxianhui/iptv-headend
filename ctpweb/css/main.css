@@ -121,9 +121,10 @@ a {
 	margin-right: 10px;
 }
 
-.topMenu ul#menu li.current {
+.topMenu ul#menu li.current a {
 	color: #000;
 	font-weight: bold;
+	text-decoration: none;
 }
 
 .topMenu div#loginInfo {
@@ -276,13 +277,13 @@ a {
 }
 
 .channelGuide .channel {
-	background: #e0ecff;
+	border: 1px solid #e0ecff;
 	float: left;
 	height: 125px;
 	margin: 5px;
 	position: relative;
 	padding: 10px 10px;
-	width: 80px;
+	width: 78px;
 	cursor: pointer;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -306,7 +307,7 @@ a {
 }
 
 .channelGuide .channel .lcn {
-	color: #f7faff;
+	color: #E0ECFF;
 	font-size: 4em;
 	font-weight: bold;
 	left: 0px;
