@@ -99,7 +99,10 @@ class UserRecordingDao {
     		return false;
     	}
     	
-    	$sql = "SELECT * FROM UserRecording LEFT JOIN Recording ON UserRecording.recordingId = Recording.id ";
+    	$sql = "SELECT UserRecording.recordingId, UserRecording.userId, UserRecording.createdOn,";
+    	$sql = $sql." Recording.id, Recording.programId, Recording.mode, Recording.fileName, ";
+    	$sql = $sql." Program.tvChannelId, Program.title, Program.description, Program.begin, Program.end ";
+    	$sql = $sql." FROM UserRecording LEFT JOIN Recording ON UserRecording.recordingId = Recording.id ";
     	$sql = $sql."LEFT JOIN Program ON Recording.programId = Program.id ";
     	$sql = $sql."WHERE (UserRecording.userId = ".$user->getId().")";
     	
@@ -400,23 +403,24 @@ class UserRecordingDao {
 
                $temp->setRecordingId($row[0]); 
                $temp->setUserId($row[1]);
-               $temp->setCreatedOn($row[2]); 
+               $temp->setCreatedOn(strtotime($row[2])); 
                
                $recordingDao = new RecordingDao();
                $tempRecording = $recordingDao->createValueObject();
-               $tempRecording->setId($row[2]);
-               $tempRecording->setProgramId($row[3]);
-               $tempRecording->setMode($row[4]);
-               $tempRecording->setFileName($row[5]);
+               $tempRecording->setId($row[3]);
+               $tempRecording->setProgramId($row[4]);
+               $tempRecording->setMode($row[5]);
+               $tempRecording->setFileName($row[6]);
                $tempRecording->setGrabbed(true);
                
                $programDao = new ProgramDao();
                $tempProgram = $programDao->createValueObject();
-               $tempProgram->setTvChannelId($row[6]);
-               $tempProgram->setTitle($row[7]);
-               $tempProgram->setDescription($row[8]);
-               $tempProgram->setBegin($row[9]);
-               $tempProgram->setEnd($row[9]);
+               $tempProgram->setId($row[4]);
+               $tempProgram->setTvChannelId($row[7]);
+               $tempProgram->setTitle($row[8]);
+               $tempProgram->setDescription($row[9]);
+               $tempProgram->setBegin(strtotime($row[10]));
+               $tempProgram->setEnd(strtotime($row[11]));
                
                $temp->setProgram($tempProgram);
                $temp->setRecording($tempRecording);
