@@ -74,7 +74,7 @@ public final class ProgramRecordingDAO {
             preparedStatement = prepareStatement(connection, sql, false, values);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                dvrSchedules.add(mapProgramDvrSchedule(resultSet));
+                dvrSchedules.add(mapProgramRecording(resultSet));
             }
         } catch (SQLException e) {
             throw new DAOException(e);
@@ -85,7 +85,7 @@ public final class ProgramRecordingDAO {
         return dvrSchedules;
     }
 	
-	private static ProgramRecording mapProgramDvrSchedule(ResultSet resultSet) throws SQLException {
+	private static ProgramRecording mapProgramRecording(ResultSet resultSet) throws SQLException {
         return new ProgramRecording(
     		new Program(
     			resultSet.getLong("Program.id"),

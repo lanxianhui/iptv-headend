@@ -57,4 +57,11 @@ public abstract class DAOFactory {
 		return new ProgramRecordingDAO(this);
 	}
 	
+	public UserDAO getUserDAO() {
+		return new UserDAO(this);
+	}
+	
+	public UserRecordingDAO getUserRecordingDAO() {
+		return new UserRecordingDAO(this);
+	}
 }

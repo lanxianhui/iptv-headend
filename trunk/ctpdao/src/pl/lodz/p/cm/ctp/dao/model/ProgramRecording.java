@@ -1,14 +1,30 @@
 package pl.lodz.p.cm.ctp.dao.model;
 
 public class ProgramRecording {
-	public Program program;
-	public Recording recording;
+	private Program program;
+	private Recording recording;
 	
 	public ProgramRecording(Program program, Recording dvrSchedule) {
 		this.program = program;
 		this.recording = dvrSchedule;
 	}
 	
+	public Program getProgram() {
+		return program;
+	}
+
+	public void setProgram(Program program) {
+		this.program = program;
+	}
+
+	public Recording getRecording() {
+		return recording;
+	}
+
+	public void setRecording(Recording recording) {
+		this.recording = recording;
+	}
+
 	public boolean equals(Object o) {
 		return (o instanceof ProgramRecording) ? (((ProgramRecording)o).program.equals(this.program) && ((ProgramRecording)o).recording.equals(this.recording)) : false; 
 	}
