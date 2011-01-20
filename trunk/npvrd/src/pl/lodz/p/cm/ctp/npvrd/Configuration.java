@@ -12,6 +12,7 @@ public class Configuration implements Serializable {
 	public Integer prepTime;
 	public String cleanerSchedule;
 	public Integer cleanerTolerance;
+	public Integer cleanerMaxHold;
 	public VlmConfig vlm;
 
 }
