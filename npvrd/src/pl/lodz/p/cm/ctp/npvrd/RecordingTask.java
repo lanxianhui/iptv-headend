@@ -29,11 +29,11 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	
 	public RecordingTask(ProgramRecording programRecording) {
 		this.programRecording = programRecording;
-		this.programName = programRecording.program.getTitle();
-		this.recordingBegin = programRecording.program.getBegin();
-		this.recordingEnd = programRecording.program.getEnd();
-		this.resultFileName = this.programRecording.recording.getFileName();
-		this.state = this.programRecording.recording.getMode();
+		this.programName = programRecording.getProgram().getTitle();
+		this.recordingBegin = programRecording.getProgram().getBegin();
+		this.recordingEnd = programRecording.getProgram().getEnd();
+		this.resultFileName = this.programRecording.getRecording().getFileName();
+		this.state = this.programRecording.getRecording().getMode();
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	public void setState(Mode state) {
 		this.state = state;
 		if (programRecording != null) {
-			this.programRecording.recording.setMode(this.state);
+			this.programRecording.getRecording().setMode(this.state);
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class RecordingTask implements Comparable<RecordingTask> {
 	public void setResultFileName(String fileName) {
 		this.resultFileName = fileName;
 		if (programRecording != null) {
-			this.programRecording.recording.setFileName(fileName);
+			this.programRecording.getRecording().setFileName(fileName);
 		}
 	}
 	
@@ -101,9 +101,9 @@ public class RecordingTask implements Comparable<RecordingTask> {
 			DAOFactory dbase = DAOFactory.getInstance(Npvrd.config.database);
 			RecordingDAO dvrScheduleDAO = dbase.getRecordingDAO();
 			try {
-				dvrScheduleDAO.save(this.programRecording.recording);
+				dvrScheduleDAO.save(this.programRecording.getRecording());
 			} catch (DAOException e) {
-				System.err.println("Unable to save underlying DvrSchedule (" + this.programRecording.recording.getId() + ") to database: " + e.getMessage());
+				System.err.println("Unable to save underlying DvrSchedule (" + this.programRecording.getRecording().getId() + ") to database: " + e.getMessage());
 			}
 		}
 	}

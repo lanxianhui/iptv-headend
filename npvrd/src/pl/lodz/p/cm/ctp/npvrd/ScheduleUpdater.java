@@ -25,8 +25,8 @@ public class ScheduleUpdater implements Runnable {
 		}
 		
 		ProgramRecordingSink(ProgramRecording programRecording, Sink sink) {
-			this.program = programRecording.program;
-			this.recording = programRecording.recording;
+			this.program = programRecording.getProgram();
+			this.recording = programRecording.getRecording();
 			this.sink = sink;
 		}
 	}
@@ -41,7 +41,7 @@ public class ScheduleUpdater implements Runnable {
 	 * @return A unique file name.
 	 */
 	private static String generateFileName(ProgramRecording pr) {
-		String plaintext = pr.program.toString() + pr.recording.toString();
+		String plaintext = pr.getProgram().toString() + pr.getRecording().toString();
 		return DAOUtil.hashMD5(plaintext) + ".ts";
 	}
 	
@@ -104,22 +104,22 @@ public class ScheduleUpdater implements Runnable {
 					for (ProgramRecording cpr : topProgramSchedule) {
 						// We check if given PR is about to begin, if it is, we set smthUseful flag to true
 						// Npvrd.log("Program: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
-						long beginMillis = cpr.program.getBegin().getTime() - channelPreRollMillis;
-						long endMillis = cpr.program.getEnd().getTime() + channelPostRollMillis;
+						long beginMillis = cpr.getProgram().getBegin().getTime() - channelPreRollMillis;
+						long endMillis = cpr.getProgram().getEnd().getTime() + channelPostRollMillis;
 						if (beginMillis - waitTimeMillis - 100 < System.currentTimeMillis()) {
 							String fileName = generateFileName(cpr);
-							lastAdded = cpr.program.getEnd();
+							lastAdded = cpr.getProgram().getEnd();
 							
 							try {
 								// We create and add a new sink to the temporary sink list
 								Sink tempSink = new FileSink(new BufferedOutputStream(new FileOutputStream(path + fileName)), beginMillis, endMillis);
 								tempSinks.add(tempSink);
-								Npvrd.log(logPrefix + "New sink: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString() + " (" + (new Timestamp(beginMillis)).toGMTString() + ")");
+								Npvrd.log(logPrefix + "New sink: " + cpr.getProgram().getTitle() + " at " + cpr.getProgram().getBegin().toGMTString() + " (" + (new Timestamp(beginMillis)).toGMTString() + ")");
 								// We set the status of a given recording to Processing and we set the fileName
-								cpr.recording.setMode(Mode.PROCESSING);
-								cpr.recording.setFileName(fileName);
+								cpr.getRecording().setMode(Mode.PROCESSING);
+								cpr.getRecording().setFileName(fileName);
 								// We save the data to the database
-								recordingDAO.save(cpr.recording);
+								recordingDAO.save(cpr.getRecording());
 								// We store the sink in the store to know which recording to update
 								prsStore.add(new ProgramRecordingSink(cpr, tempSink));
 							} catch (FileNotFoundException e) {
