@@ -214,7 +214,7 @@ public class ScheduleUpdater implements Runnable {
 				// We've been interrupted - perhaps as a result of a changing RunMode
 				// Anyway, it's worth rechecking everything.
 			} catch (IllegalArgumentException iae) {
-				Npvrd.log(logPrefix + "Strange timeout value: " + (nextRefreshAt - System.currentTimeMillis()));
+				Npvrd.log(logPrefix + "Strange timeout value: " + (nextRefreshAt - System.currentTimeMillis()) + " Message: " + iae.getMessage());
 				//System.exit(1);
 			}
 		}

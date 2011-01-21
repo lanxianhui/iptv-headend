@@ -28,7 +28,7 @@ public class Cleaner implements Runnable {
 		try {
 			tvChannels = tvChannelDAO.list();
 		} catch (DAOException e) {
-			Npvrd.error(logPrefix + "Unable to get channel list");
+			Npvrd.error(logPrefix + "Unable to get channel list. Message: " + e.getMessage());
 		}
 	}
 
@@ -82,7 +82,7 @@ public class Cleaner implements Runnable {
 					}
 				}
 			} catch (DAOException e) {
-				Npvrd.error(logPrefix + "Problem working with the database in Cleaner");
+				Npvrd.error(logPrefix + "Problem working with the database in Cleaner. Message: " + e.getMessage());
 			}	
 		}
 		Npvrd.log(logPrefix + "Deleted " + counter + " recordings.");
