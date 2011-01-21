@@ -67,7 +67,7 @@ public class Npvrd {
 			
 			config = (Configuration)xs.fromXML(fis);
 		} catch (FileNotFoundException e) {
-			error("Configuration file not found! This is a critical problem, shuting down.");
+			error("Configuration file not found! This is a critical problem, shuting down. Message: " + e.getMessage());
 			System.exit(1);
 		}
 		
