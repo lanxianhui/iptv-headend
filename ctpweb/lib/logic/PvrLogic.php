@@ -7,7 +7,7 @@ class PvrLogic {
 	}
 	
 	/**
-	 * Add a new recording to the user's recordings list
+	 * Add a new recording to the systems recordings list
 	 * @param $conn The Datasource object containing the database connection
 	 * @param $program The program to be recorded and placed in the user's recordings list
 	 * @param User $user The User, whose recordings list is to be modified
@@ -32,6 +32,14 @@ class PvrLogic {
 				return false;
 		}
 		return true;
+	}
+	
+	public function recordRecording(&$conn, &$user, $recordingId) {
+		$userRecordingDAO = new UserRecordingDao();
+		$newEntry = new UserRecording();
+		$newEntry->setRecordingId($recordingId);
+		$newEntry->setUserId($user->getId());
+		return $userRecordingDAO->create(&$conn, $newEntry);
 	}
 	
 	/**

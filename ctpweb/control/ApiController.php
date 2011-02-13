@@ -4,7 +4,7 @@ require_once('lib/base.inc.php');
 require_once('lib/logic/EpgLogic.php');
 require_once('lib/logic/PvrLogic.php');
 require_once('lib/logic/AccountLogic.php');
-require_once('lib/logic/MyListLogic.php');
+//require_once('lib/logic/MyListLogic.php');
 
 class ApiController {
 	
@@ -187,15 +187,20 @@ class ApiController {
 	// ---------- MYLIST OPERATIONS -------------
 	
 	private function getMyList(&$conn, &$user) {
-		return MyListLogic::getMyList(&$conn, &$user);
+		//return MyListLogic::getMyList(&$conn, &$user);
+		return PvrLogic::listRecordings(&$conn, &$user);
 	}
 	
 	private function addToMyList(&$conn, &$user, $recordingId) {
-		return MyListLogic::addToMyList(&$conn, &$user, $recordingId);
+		//return MyListLogic::addToMyList(&$conn, &$user, $recordingId);
+		return PvrLogic::recordRecording(&$conn, &$user, $recordingId);
 	}
 	
 	private function removeFromMyList(&$conn, &$user, $recordingId) {
-		return MyListLogic::removeFromMyList(&$conn, &$user, $recordingId);
+		//return MyListLogic::removeFromMyList(&$conn, &$user, $recordingId);
+		$recording = new Recording();
+		$recording->setId($recordingId);
+		return PvrLogic::deleteRecording(&$conn, &$recording, &$user);
 	}
 	
 	private function myListOperations(&$conn, $method, $args) {

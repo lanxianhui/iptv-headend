@@ -5,7 +5,7 @@ require_once('lib/logic/AccountLogic.php');
 
 class LoginController {
 	
-	function redirectToApp() {
+	private function redirectToApp() {
 		header('Location: epg.php');
 		die();
 	}

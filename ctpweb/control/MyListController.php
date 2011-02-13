@@ -2,7 +2,8 @@
 
 require_once('lib/base.inc.php');
 require_once('lib/logic/EpgLogic.php');
-require_once('lib/logic/MyListLogic.php');
+//require_once('lib/logic/MyListLogic.php');
+require_once('lib/logic/PvrLogic.php');
 require_once('lib/logic/AccountLogic.php');
 
 class MyListController {
@@ -19,7 +20,8 @@ class MyListController {
 				$channels[$tempChannel->getId()] = $tempChannel;
 			}
 			
-			$programs = MyListLogic::getMyList(&$conn, AccountLogic::getCurrentUser());
+			//$programs = MyListLogic::getMyList(&$conn, AccountLogic::getCurrentUser());
+			$programs = PvrLogic::listRecordings(&$conn, AccountLogic::getCurrentUser());
 			
 			foreach ($programs as $tempGrab) {
 				$tempGrab->left = ($tempGrab->getCreatedOn() + ($config["pvr"]["maxhold"] * 60)) - time();

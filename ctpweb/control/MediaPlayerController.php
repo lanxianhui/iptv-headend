@@ -8,7 +8,7 @@ class MediaPlayerController {
 	
 	var $program;
 	var $channel;
-	var $mode;
+	//var $mode;
 	
 	public function MediaPlayerController($config) {
 		$conn = new Datasource($config["database"]["host"], $config["database"]["name"], $config["database"]["username"], $config["database"]["password"]);
