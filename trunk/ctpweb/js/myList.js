@@ -20,7 +20,7 @@ function letGoRecording(id, title, callback) {
 	extUrl = "/myList/" + id;
 	
 	var callback = function(result) {
-		if (result.code == 200) {
+		if (result.code == 202) {
 			callback(id, title);
 		} else {
 			notificationShow("Unable to let go '" + title + "'.");
