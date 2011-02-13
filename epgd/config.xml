@@ -7,18 +7,20 @@
 		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
 	</database>
 	<xmlTvGrabbers>
+		<!-- You can have multiple xmlTvGrabber tags for multiple sources -->
 		<xmlTvGrabber>
+			<!-- The command line to run every schedule. -->
 			<commandLine>/home/jstar/epguide-1.3/src/epguide_run -p teleman -d %tF -c 1,2 -f xmltv -o thisWeek.xml</commandLine>
-			<resultFile>thisWeek.xml</resultFile>
+			<resultFile>thisWeek.xml</resultFile> <!-- What will the result file be called -->
 			<mapFile>mapping.xml</mapFile>
 			<schedule>0 3 * * Mon</schedule> <!-- this is crontab-like syntax, for more lookup cron4j -->
-			<aheadDays>5</aheadDays>
+			<aheadDays>5</aheadDays> <!-- This doesn't work yet. Let it be. -->
 		</xmlTvGrabber>
 	</xmlTvGrabbers>
 	<runInfoDir>/var/run/epgd/</runInfoDir>
 	<recordAllPrograms>true</recordAllPrograms>
 	<cleaner>
-		<schedule>5 3 * * Mon</schedule>
-		<olderThanDays>14</olderThanDays>
+		<schedule>5 3 * * Mon</schedule> <!-- When to run the cleaner -->
+		<olderThanDays>14</olderThanDays> <!-- When should all outdated EPG data be removed -->
 	</cleaner>
 </config>
