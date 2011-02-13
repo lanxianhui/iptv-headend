@@ -4,14 +4,14 @@
 		<userName>iptv-test</userName>
 		<password>iptv-test</password>
 		<databaseLocator>jdbc:mysql://localhost:3306/cm_iptv?useUnicode=true&amp;characterEncoding=utf-8</databaseLocator>
-		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver>
+		<databaseDriver>com.mysql.jdbc.Driver</databaseDriver> <!-- You have to have the MySQL JDBC connector in classpath -->
 	</database>
 	<recordings>/var/ctp/pvr/</recordings> <!-- Where to write all recorded programs (should be writable by the npvrd -->
 	<prepTime>2</prepTime> <!-- How much time before a task begins should it be added to the queue (in seconds) -->
 	<cleanerSchedule>30 * * * *</cleanerSchedule> <!-- When to run the cleaner -->
 	<cleanerTolerance>90</cleanerTolerance> <!-- How long to wait before removing a recording from the system -->
 	<cleanerMaxHold>43200</cleanerMaxHold> <!-- How long to wait for a hold to release, before removing from the system -->
-	<vlm>
+	<vlm> <!-- if you do not whish to use vlm, let this be -->
 		<host>localhost</host>
 		<port>4212</port>
 		<password>ianiro</password>
