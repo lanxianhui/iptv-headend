@@ -22,4 +22,16 @@
 	$config["pvr"]["userQuota"] = 600; 
 	// 30 days of holding possible, has to be equal to what nPVRd has in it's config file.
 	$config["pvr"]["maxHold"] = 60 * 24 * 30; 
+	
+	
+	// Multicast default policy: ALLOW (true) or DENY (false)
+	$config["multicast"]["default"] = false;
+	// These are stored in the following configuration: network address, network mask
+	// Multicast whitelist (ALLOW)
+	$config["multicast"]["allow"] = array(
+		array("192.168.0.0", "255.255.0.0")
+	);
+	// Multicast blacklist (DENY)
+	$config["multicast"]["deny"] = array(
+	);
 ?>
