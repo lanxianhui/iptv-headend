@@ -75,8 +75,8 @@ public class ScheduleUpdater implements Runnable {
 		
 		String logPrefix = parentChannel.getTvChannel().getIpAdress() + "/SU: ";
 		
-		Npvrd.log(logPrefix + "Creating a VLM manager.");
-        VlmManager vlm = new VlmManager(Npvrd.config.vlm);
+		//Npvrd.log(logPrefix + "Creating a VLM manager.");
+        //VlmManager vlm = new VlmManager(Npvrd.config.vlm);
         String path = Npvrd.config.recordings;
         // Pre- and Post-roll in the database is given in seconds, convert to millis
         int channelPreRollMillis = parentChannel.getTvChannel().getPreRoll() * 1000;
@@ -103,7 +103,7 @@ public class ScheduleUpdater implements Runnable {
 				if (topProgramSchedule.size() > 0) {
 					for (ProgramRecording cpr : topProgramSchedule) {
 						// We check if given PR is about to begin, if it is, we set smthUseful flag to true
-						// Npvrd.log("Program: " + cpr.program.getTitle() + " at " + cpr.program.getBegin().toGMTString());
+						//Npvrd.log("Program: " + cpr.getProgram().getTitle() + " at " + cpr.getProgram().getBegin().toGMTString());
 						long beginMillis = cpr.getProgram().getBegin().getTime() - channelPreRollMillis;
 						long endMillis = cpr.getProgram().getEnd().getTime() + channelPostRollMillis;
 						if (beginMillis - waitTimeMillis - 100 < System.currentTimeMillis()) {
@@ -128,17 +128,17 @@ public class ScheduleUpdater implements Runnable {
 							}
 							
 							// Generally programs happen one after another, so it stands to reason to expect we should refresh around that time
-							//Npvrd.log(logPrefix + "Compare End: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
+							// Npvrd.log(logPrefix + "Compare End: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
 							if (nextRefreshAt > endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis) {
 								nextRefreshAt = endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis - 100;
-								//Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
+								// Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
 							}
 						} else {
 							// We should also check if a program following this one may start sooner than current nextRefreshAt
-							//Npvrd.log(logPrefix + "Compare Begin: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
+							// Npvrd.log(logPrefix + "Compare Begin: " + (new Timestamp(nextRefreshAt)) + " (nra) to " + (new Timestamp(endMillis - channelPostRollMillis - waitTimeMillis - channelPreRollMillis)));
 							if (nextRefreshAt > beginMillis) {
 								nextRefreshAt = beginMillis - 100;
-								//Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
+								// Npvrd.log(logPrefix + "New refresh at: " + (new Timestamp(nextRefreshAt)));
 							}
 						}
 					}
@@ -152,8 +152,10 @@ public class ScheduleUpdater implements Runnable {
 						
 						parentChannel.getSinksLock().unlock();
 						
-						Npvrd.log(logPrefix + "Addeed new sinks");
+						//Npvrd.log(logPrefix + "Addeed new sinks");
 					}
+				} else {
+					//Npvrd.log(logPrefix + "Got 0 new programs.");
 				}
 			} catch (DAOException e) {
 				Npvrd.error(logPrefix + "Database error: " + e.getMessage());
@@ -190,7 +192,7 @@ public class ScheduleUpdater implements Runnable {
 							cprs.recording.setMode(Mode.UNAVAILABLE);	
 						} else {
 							cprs.recording.setMode(Mode.AVAILABLE);
-							vlm.createNewVod(cprs.recording.getFileName(), Npvrd.config.recordings + cprs.recording.getFileName());
+							//vlm.createNewVod(cprs.recording.getFileName(), Npvrd.config.recordings + cprs.recording.getFileName());
 						}
 						
 						try {
