@@ -52,7 +52,7 @@ class ApiController {
 			  503 => "Service Unavailable",
 			  504 => "Gateway Timeout"
 		);
-		header('HTTP/1.0 ' + $code + ' ' + $codeDesc[$code]);
+		header('HTTP/1.1 ' + $code + ' ' + $codeDesc[$code]);
 		header('Status: ' + $code + ' ' + $codeDesc[$code]);
 		if (count($headers) > 0) {
 			foreach ($headers as &$header) {
@@ -63,6 +63,30 @@ class ApiController {
 						  'description' => $codeDesc[$code],
 						  'message' => $message);
 		return $errorObj;
+	}
+	
+	private function checkMulticast($multicastConfig, $ipAddress) {
+		$multicastEnabled = $multicastConfig["default"];
+		
+		$ip = ip2long($ipAddress);
+		
+		foreach ($multicastConfig["allow"] as $network) {
+			$net = ip2long($network[0]);
+			$mask = ip2long($network[1]);
+			
+			if ($net == ($ip & $mask)) {
+				$multicastEnabled = true;
+			}
+		}
+		
+		foreach ($multicastConfig["deny"] as $network) {
+			$net = ip2long($network[0]);
+			$mask = ip2long($network[1]);
+			
+			if ($net == ($ip & $mask)) {
+				$multicastEnabled = false;
+			}
+		}
 	}
 	
 	// ---------- GUIDE OPERATIONS -------------
@@ -272,6 +296,13 @@ class ApiController {
 			
 			if (($_SERVER["HTTP_ACCEPT"] == "application/json") | ($_GET["format"] == "json")) {
 				header('Content-type: application/json');
+				
+				if (checkMulticast($config["multicast"], $_SERVER["REMOTE_ADDR"])) {
+					header("X-CTP-Allow-Method: Multicast, Unicast");
+				} else {
+					header("X-CTP-Allow-Method: Unicast");
+				}
+				
 				print(json_encode($result));
 				exit;
 			} else {
