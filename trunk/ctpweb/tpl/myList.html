@@ -10,7 +10,8 @@
 		<div class="programRecording" id="{$program->getProgram()->getId()}-{$program->getRecordingId()}">
 			<h3 class="title">{$program->getProgram()->getTitle()}</h3>
 			<p class="desc">{$program->getProgram()->getDescription()}</p>
-			<div class="tvChannel">{$program->tvChannelName}</p>
+			<span class="streamUrl">{$program->getRecording()->getFileName()}</span>
+			<div class="tvChannel">{$program->tvChannelName}</div>
 			<div class="begin">{$program->getProgram()->getBegin()|date_format}</div>
 			<div class="grabbedOn">{$program->getCreatedOn()|date_format}</div>
 			<div class="left">{if floor($program->left/(60*60*24)) == 0}{floor($program->left/(60*60))} hours left to watch{else}{floor($program->left/(60*60*24))} days left to watch{/if}</div>
@@ -20,6 +21,9 @@
 				</button>
 				<button class="btn pill letgo">
 					<span><span>Let go</span></span>
+				</button>
+				<button class="btn pill download">
+					<span><span>Download</span></span>
 				</button>
 			</div>
 		</div>

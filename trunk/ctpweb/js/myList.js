@@ -16,12 +16,14 @@ function restCall(url, method, callback, callbackFailure) {
     jsonRequest.send();
 }
 
-function letGoRecording(id, title, callback) {
+function letGoRecording(id, title, mainCallback) {
 	extUrl = "/myList/" + id;
 	
 	var callback = function(result) {
+		//alert(result.code);
+		//alert(result);
 		if (result.code == 202) {
-			callback(id, title);
+			mainCallback(id, title);
 		} else {
 			notificationShow("Unable to let go '" + title + "'.");
 			delayedNotificationHide(10);
@@ -61,11 +63,19 @@ function attachActions() {
 			//alert('Let go ' + recordingId);
 			var title = itm.getElement('h3.title').innerHTML;
 			var callback = function(id, title) {
-				alert(title + ' let go (id: ' + id + ')');
+				var target = itm;
+				alert(title + ' let go.');
+				target.destroy();
 			};
 			if (confirm("Do you want to let go of '" + title + "'?")) {
 				letGoRecording(recordingId, title, callback);
 			}
+		});
+		
+		var download = itm.getElement('button.download');
+		download.addEvent('click', function(event) {
+			var url = itm.getElement('span.streamUrl').innerHTML;
+			window.open(url, 'downloadWindow');
 		});
 	});
 }

@@ -2,8 +2,7 @@
 
 require_once('lib/base.inc.php');
 require_once('lib/logic/EpgLogic.php');
-//require_once('lib/logic/MyListLogic.php');
-require_once('lib/logic/PvrLogic.php');
+require_once('lib/logic/MyListLogic.php');
 require_once('lib/logic/AccountLogic.php');
 
 class MyListController {
@@ -20,12 +19,15 @@ class MyListController {
 				$channels[$tempChannel->getId()] = $tempChannel;
 			}
 			
-			//$programs = MyListLogic::getMyList(&$conn, AccountLogic::getCurrentUser());
-			$programs = PvrLogic::listRecordings(&$conn, AccountLogic::getCurrentUser());
+			$programs = MyListLogic::getMyList(&$conn, AccountLogic::getCurrentUser());
 			
 			foreach ($programs as $tempGrab) {
-				$tempGrab->left = ($tempGrab->getCreatedOn() + ($config["pvr"]["maxhold"] * 60)) - time();
+				$tempGrab->left = ($tempGrab->getCreatedOn() + ($config["pvr"]["maxHold"] * 60)) - time();
 				$tempGrab->tvChannelName = $channels[$tempGrab->getProgram()->getTvChannelId()]->name;
+				//$tempGrab->setRecording(EpgLogic::getProgramRecordingByProgramId(&$conn, $tempGrab->getProgram()->getId())->getRecording());
+				if ($tempGrab->getRecording() != null) {
+					$tempGrab->getRecording()->setFileName($config["pvr"]["downloadUrl"] . $tempGrab->getRecording()->getFileName());
+				}
 			}
 			
 			$smarty = new Smarty();
