@@ -31,6 +31,7 @@ p {
 	text-decoration: none;
 }
 .channel img {
+	margin: 20px 45px;
 	clear: both;
 	z-index: 1;
 }
@@ -40,16 +41,17 @@ p {
 	z-index: 2;
 }
 .channel .lcn {
+	display: none;
 	position: absolute;
 	font-weight: bold;
 	top: 10px;
 	left: 10px;
-	z-index: 4;
+	z-index: 0;
 	font-size: 5em;
-	color: #060606;
+	color: #565656;
 }
 .channel:hover .lcn {
-	color: #051224;
+	color: #556274;
 }
 .channel:hover {
 	background: url(../img/cb_h.png);

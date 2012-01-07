@@ -316,6 +316,15 @@ a {
 	z-index: 1;
 }
 
+.streamUrl {
+    display: none;
+}
+
+.programRecording {
+	margin: 0 0 10px 0;
+	max-width: 800px;
+}
+
 div.hidden {
     display: none;
 }
